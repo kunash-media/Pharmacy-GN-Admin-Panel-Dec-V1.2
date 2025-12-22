@@ -1,308 +1,1305 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PharmaCare - Banner Management</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
-  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-<link rel="stylesheet" href="banner.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Sidebar Styles */
+        #sidebar {
+            transition: transform 0.3s ease;
+            width: 16rem;
+        }
+
+        #sidebar {
+            transform: translateX(-100%);
+        }
+
+        @media (min-width: 768px) {
+            #sidebar {
+                transform: translateX(0);
+            }
+        }
+
+        #sidebar.translate-x-0 {
+            transform: translateX(0);
+        }
+
+        #sidebar.collapsed {
+            width: 4rem;
+        }
+
+        #sidebar.collapsed .nav-text,
+        #sidebar.collapsed .logo-text,
+        #sidebar.collapsed .sidebar-logo-expanded {
+            display: none !important;
+        }
+
+        #sidebar.collapsed .nav-icon {
+            margin-right: 0 !important;
+            justify-content: center !important;
+        }
+
+        #sidebar.collapsed nav a {
+            justify-content: center !important;
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-container {
+            background-color: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        /* Form Styles */
+        .edit-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .edit-form input,
+        .edit-form select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+            background-color: white;
+        }
+
+        .edit-form input:focus,
+        .edit-form select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Image Upload Styles */
+        .image-upload-container {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #f9fafb;
+        }
+
+        .image-upload-container:hover {
+            border-color: #3b82f6;
+            background-color: #f0f9ff;
+        }
+
+        .image-upload-container.drag-over {
+            border-color: #3b82f6;
+            background-color: #e0f2fe;
+        }
+
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .image-count {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+        }
+
+        /* Table Styles */
+        #bannerTable_wrapper {
+            font-size: 14px;
+        }
+
+        #bannerTable {
+            width: 100% !important;
+        }
+
+        #bannerTable thead th {
+            font-weight: 600;
+            background-color: #f9fafb;
+            padding: 12px !important;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        #bannerTable tbody td {
+            padding: 12px !important;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: middle;
+        }
+
+        #bannerTable tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        /* Banner Images in Table */
+        .banner-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .banner-thumbnail {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .more-images {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-buttons button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        .action-buttons button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .action-buttons .edit-btn {
+            color: #3b82f6;
+        }
+
+        .action-buttons .delete-btn {
+            color: #ef4444;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .modal-container {
+                width: 95%;
+                padding: 16px;
+            }
+            
+            .image-preview-item {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .action-buttons button {
+                width: 28px;
+                height: 28px;
+            }
+        }
+
+        /* Success Popup */
+        .popup-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .popup-container i {
+            font-size: 48px;
+            color: #10b981;
+            margin-bottom: 20px;
+        }
+
+        .popup-container p {
+            margin-bottom: 24px;
+            color: #374151;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .popup-container button {
+            background-color: #3b82f6;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            border: none;
+            transition: background-color 0.2s;
+        }
+
+        .popup-container button:hover {
+            background-color: #2563eb;
+        }
+
+         /* Smooth transition classes */
+#sidebar {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#sidebar.collapsed {
+    width: 64px !important;
+}
+
+#sidebar:not(.collapsed) {
+    width: 256px !important;
+}
+
+.nav-text {
+    transition: all 0.3s ease-in-out;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.nav-icon {
+    transition: all 0.3s ease-in-out;
+    min-width: 20px;
+}
+
+/* For smoother hover effects */
+li {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Staggered animation for nav items */
+li:nth-child(1) { transition-delay: 0ms; }
+li:nth-child(2) { transition-delay: 20ms; }
+li:nth-child(3) { transition-delay: 40ms; }
+li:nth-child(4) { transition-delay: 60ms; }
+li:nth-child(5) { transition-delay: 80ms; }
+li:nth-child(6) { transition-delay: 100ms; }
+li:nth-child(7) { transition-delay: 120ms; }
+li:nth-child(8) { transition-delay: 140ms; }
+li:nth-child(9) { transition-delay: 160ms; }
+li:nth-child(10) { transition-delay: 180ms; }
+li:nth-child(11) { transition-delay: 200ms; }
+
+
+    </style>
 </head>
-<body class="bg-white h-screen flex overflow-hidden transition-colors duration-300">
-  <!-- Sidebar -->
-  <aside id="sidebar" class="sidebar w-64 bg-blue-600 text-white flex-shrink-0 flex flex-col fixed h-full z-20 md:static md:translate-x-0 -translate-x-full">
-    <div class="sidebar-logo p-4 border-b border-blue-500 sticky top-0 bg-blue-600 z-10 flex justify-between items-center">
-      <button id="toggle-sidebar-logo" class="flex items-center">
-        <img src="../Images/logo.png" alt="PharmaCare Logo" class="w-8 h-8 mr-2" id="sidebar-logo">
-        <i id="sidebar-arrow" class="fas fa-chevron-right ml-2 transition-transform duration-300 sidebar-arrow"></i>
-      </button>
-      <button id="close-sidebar" class="md:hidden text-white"><i class="fas fa-times"></i></button>
+<body class="bg-gray-50 h-screen flex overflow-hidden">
+    
+    
+    <!-- Sidebar -->
+  <aside id="sidebar" class="border w-64 bg-white text-white flex-shrink-0 flex flex-col fixed h-full z-20 md:static transition-all duration-300 ease-in-out">
+    <div class="border-b h-[72px] p-4 bg-gray-50 sticky top-0 z-10 flex justify-between items-center">
+        <div class="ml-6 transition-all duration-300 ease-in-out overflow-hidden">
+            <img src="../Images/kunash-logo.png" alt="PharmaCare Logo"
+                class="w-full h-[44px] sidebar-logo-expanded transition-all duration-300 ease-in-out">
+        </div>
+        <div class="flex items-center space-x-2">
+            <button id="toggle-sidebar-logo" class="flex items-center transition-all duration-300 ease-in-out">
+                <i id="sidebar-arrow"
+                    class="fas fa-chevron-left ml-2 text-black transition-transform duration-300 ease-in-out"></i>
+            </button>
+            <button id="close-sidebar" class="md:hidden text-black transition-all duration-300 ease-in-out">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
     </div>
-    <nav class="flex-1 overflow-y-auto py-4">
-      <div class="px-4 py-2 text-sm text-blue-200 uppercase nav-text">Main</div>
-      <a href="../Dashboard/dashboard.html" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors"><i class="fas fa-home mr-3 nav-icon text-blue-200"></i><span class="nav-text">Dashboard</span></a>
-      <a href="../Inventory/inventory.html" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors"><i class="fas fa-pills mr-3 nav-icon text-blue-200"></i><span class="nav-text">Inventory Management</span></a>
-      <a href="../Prescriptions/prescription.html" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors"><i class="fas fa-file-prescription mr-3 nav-icon text-blue-200"></i><span class="nav-text">Prescriptions</span></a>
-      <a href="../Customer/customer management.html" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors"><i class="fas fa-users mr-3 nav-icon text-blue-200"></i><span class="nav-text">Customers Management</span></a>
-      <a href="../Order/ordermanagment.html" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors"><i class="fas fa-shopping-cart mr-3 nav-icon text-blue-200"></i><span class="nav-text">Order Management</span></a>
-      <a href="../Product Management/product.html" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors"><i class="fas fa-box mr-3 nav-icon text-blue-200"></i><span class="nav-text">Product / Category Management</span></a>
-      <a href="#" class="flex items-center py-3 px-4 bg-blue-700"><i class="fas fa-image mr-3 nav-icon text-blue-200"></i><span class="nav-text">Banner Management</span></a>
-      <div class="px-4 py-2 mt-4 text-sm text-blue-200 uppercase nav-text">Reports</div>
-      <a href="../Reports/report.html" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors"><i class="fas fa-file-invoice mr-3 nav-icon text-blue-200"></i><span class="nav-text">Reports</span></a>
-      <div class="px-4 py-2 mt-4 text-sm text-blue-200 uppercase nav-text">Admin</div>
-      <button id="logout-btn" class="flex items-center py-3 px-4 hover:bg-blue-700 transition-colors w-full text-left"><i class="fas fa-sign-out-alt mr-3 nav-icon text-blue-200"></i><span class="nav-text">Logout</span></button>
+    <nav class="flex-1 overflow-y-auto py-4 transition-all duration-300 ease-in-out">
+        <ul class="space-y-1">
+            <!-- Each list item -->
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Dashboard/dashboard.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-home mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Dashboard</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Inventory/inventory.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-pills mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Inventory Management</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Prescriptions/prescription.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-file-prescription mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Prescriptions</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Customer/customer management.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-users mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Customers Management</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Order/ordermanagment.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-shopping-cart mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Order Management</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Product Management/product.html"
+                    class="flex items-center py-3 px-4 text-gray-700  hover:text-white transition-colors duration-200">
+                    <i class="fas fa-box mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200 ">Medicine Product Management</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Mother and Baby Care/motherbabycare.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-box mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Mother & Baby Care Product Management</span>
+                </a>
+            </li>
+
+            <li class="bg-blue-700 text-white rounded-md transition-all duration-200 ease-in-out">
+                <a href="../Banner/banner.html"
+                    class="flex items-center py-3 px-4 text-gray-700 text-white transition-colors duration-200">
+                    <i class="fas fa-image mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Banner Management</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <a href="../Reports/report.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-file-invoice mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Reports</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md mb-4">
+                <a href="../Admin/admin.html"
+                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    <i class="fas fa-user-shield mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Admin Management</span>
+                </a>
+            </li>
+
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+                <button id="logoutBtn"
+                    class="flex items-center w-full py-3 px-4 text-gray-700 hover:text-white font-semibold text-left transition-colors duration-200">
+                    <i class="fas fa-sign-out-alt mr-3 nav-icon transition-all duration-200"></i>
+                    <span class="nav-text transition-all duration-200">Logout</span>
+                </button>
+            </li>
+        </ul>
     </nav>
-  </aside>
+</aside>
 
-  <!-- Main Content -->
-  <div class="flex-1 flex flex-col overflow-hidden">
-    <header class="bg-white shadow sticky top-0 z-10">
-      <div class="flex justify-between items-center p-4">
-        <div class="flex items-center">
-          <button id="toggle-sidebar-mobile" class="text-gray-500 mr-4 md:hidden"><i class="fas fa-bars"></i></button>
-          <h1 class="text-xl font-semibold text-gray-800">Banner Management</h1>
-        </div>
-        <div class="flex items-center">
-          <div class="flex items-center">
-            <div id="user-initials" class="w-10 h-10 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center text-lg font-semibold">AD</div>
-            <div class="ml-2">
-              <span id="user-name" class="text-gray-800">Admin User</span>
-              <span id="user-role" class="text-gray-500 text-sm block">Administrator</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
 
-    <main class="flex-1 overflow-y-auto p-4 bg-white">
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border shadow-xl p-4 hover:scale-105 transition-transform duration-300 stats-card">
-          <div class="flex justify-between items-center">
-            <div>
-              <p class="text-gray-500">Total Banners</p>
-              <h2 class="text-2xl font-bold text-gray-800">12</h2>
-              <p class="text-green-600 text-sm"><i class="fas fa-arrow-up"></i> 2 from last month</p>
-            </div>
-            <div class="bg-blue-50 p-3 rounded-full">
-              <i class="fas fa-image text-cyan-500 text-xl"></i>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border shadow-xl p-4 hover:scale-105 transition-transform duration-300 stats-card">
-          <div class="flex justify-between items-center">
-            <div>
-              <p class="text-gray-500">Active Banners</p>
-              <h2 class="text-2xl font-bold text-gray-800">8</h2>
-              <p class="text-green-600 text-sm"><i class="fas fa-check-circle"></i> 67% active rate</p>
-            </div>
-            <div class="bg-blue-50 p-3 rounded-full">
-              <i class="fas fa-check-circle text-green-400 text-xl"></i>
-            </div>
-          </div>
-        </div>
-        <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border shadow-xl p-4 hover:scale-105 transition-transform duration-300 stats-card">
-          <div class="flex justify-between items-center">
-            <div>
-              <p class="text-gray-500">Inactive Banners</p>
-              <h2 class="text-2xl font-bold text-gray-800">4</h2>
-              <p class="text-red-600 text-sm"><i class="fas fa-pause-circle"></i> 33% inactive rate</p>
-            </div>
-            <div class="bg-blue-50 p-3 rounded-full">
-              <i class="fas fa-pause-circle text-orange-400 text-xl"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Header with Controls -->
-      <div class="flex justify-between items-center mb-6">
-        <div class="flex items-center">
-          <input type="text" id="banner-search" placeholder="Search banners..." class="border rounded py-2 px-4 mr-4 bg-white border-blue-200 w-64">
-          <select id="status-filter" class="border rounded py-2 px-4 bg-white border-blue-200">
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-        <div class="flex items-center">
-          <div class="view-toggle mr-4">
-            <button class="view-toggle-btn active" id="tableViewBtn"><i class="fas fa-list"></i></button>
-            <button class="view-toggle-btn" id="gridViewBtn"><i class="fas fa-th"></i></button>
-          </div>
-          <button class="btn-primary" id="addBannerBtn"><i class="fas fa-plus mr-2"></i> Add New Banner</button>
-        </div>
-      </div>
-
-      <!-- Banners Table View -->
-      <div class="card" id="tableView">
-        <div class="overflow-x-auto">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Thumbnail</th>
-                <th>Title</th>
-                <th>Page</th>
-                <th>Status</th>
-                <th>Created Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="bannersTableBody">
-              <!-- Banners will be loaded here -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Banners Grid View -->
-      <div class="grid-view" id="gridView" style="display: none;">
-        <!-- Banners will be loaded here -->
-      </div>
-
-      <!-- Add/Edit Banner Modal -->
-      <div class="modal" id="bannerModal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 class="text-lg font-bold" id="modalTitle">Add New Banner</h3>
-            <button class="action-btn close-modal"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="modal-body">
-            <form id="bannerForm">
-              <input type="hidden" id="bannerId">
-              <div class="form-group">
-                <label class="form-label" for="bannerTitle">Banner Title</label>
-                <input type="text" class="form-control" id="bannerTitle" placeholder="Enter banner title" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="bannerDescription">Subtitle / Short Description</label>
-                <textarea class="form-control" id="bannerDescription" rows="3" placeholder="Enter banner description"></textarea>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="pageName">Page Name</label>
-                <select class="form-control" id="pageName" required>
-                  <option value="" disabled selected>Select a page</option>
-                  <option value="Homepage">Homepage (Hero Section)</option>
-                  <option value="Mothercare">Mothercare Page (Top Banner)</option>
-                  <option value="Product">Product Page (Featured Section)</option>
-                  <option value="Checkout">Checkout Page (Promotional Banner)</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Upload Banner Images (1 required, up to 3 optional)</label>
-                <div class="form-group">
-                  <label class="form-label" for="bannerImage1">Main Banner Image (Required)</label>
-                  <input type="file" class="form-control" id="bannerImage1" accept=".jpg,.jpeg,.png,.webp" required>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <header class="bg-white shadow sticky top-0 z-10">
+            <div class="flex justify-between items-center p-4">
+                <div class="flex items-center">
+                    <button id="toggle-sidebar-mobile" class="text-gray-500 mr-4 md:hidden"><i class="fas fa-bars"></i></button>
+                    <!-- <button id="toggle-sidebar-desktop" class="text-gray-500 mr-4 hidden md:block"><i class="fas fa-bars"></i></button> -->
+                    <h1 class="text-xl font-semibold text-gray-800">Banner Management</h1>
                 </div>
-                <div class="form-group">
-                  <label class="form-label" for="bannerImage2">Optional Banner Image 2</label>
-                  <input type="file" class="form-control" id="bannerImage2" accept=".jpg,.jpeg,.png,.webp">
+                <div class="flex items-center space-x-4">
+                    <button id="addBannerBtn" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Add New Banner
+                    </button>
                 </div>
-                <div class="form-group">
-                  <label class="form-label" for="bannerImage3">Optional Banner Image 3</label>
-                  <input type="file" class="form-control" id="bannerImage3" accept=".jpg,.jpeg,.png,.webp">
-                </div>
-                <div class="form-group">
-                  <label class="form-label" for="bannerImage4">Optional Banner Image 4</label>
-                  <input type="file" class="form-control" id="bannerImage4" accept=".jpg,.jpeg,.png,.webp">
-                </div>
-                <img id="imagePreview" class="image-preview" src="" alt="Main Image Preview">
-                <div id="thumbnailContainer" class="thumbnail-container"></div>
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="redirectLink">Redirect Link (Optional)</label>
-                <input type="url" class="form-control" id="redirectLink" placeholder="https://example.com">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Status</label>
-                <div class="flex items-center mt-2">
-                  <label class="switch mr-3">
-                    <input type="checkbox" id="bannerStatus">
-                    <span class="slider"></span>
-                  </label>
-                  <span id="statusLabel">Active</span>
-                </div>
-              </div>
-              <div class="form-group">
-                <h4 class="font-medium mb-2">Preview</h4>
-                <div class="banner-card">
-                  <img id="previewImage" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150' viewBox='0 0 400 150'%3E%3Crect width='400' height='150' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3EBanner Preview%3C/text%3E%3C/svg%3E" alt="Banner Preview">
-                  <div class="banner-card-body">
-                    <div class="banner-card-title" id="previewTitle">Banner Title</div>
-                    <div class="banner-card-desc" id="previewDescription">Banner description will appear here</div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button class="btn-secondary close-modal">Cancel</button>
-            <button class="btn-primary" id="saveBannerBtn">Save Banner</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- View Banner Modal -->
-      <div class="modal view-banner-modal" id="viewBannerModal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h3 class="text-lg font-bold">Banner Details</h3>
-            <button class="action-btn close-view-modal"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="modal-body">
-            <img id="viewBannerImage" class="view-banner-image" src="" alt="Banner Image">
-            <div id="viewThumbnailContainer" class="thumbnail-container"></div>
-            <div class="view-banner-details">
-              <div class="view-banner-detail">
-                <span class="view-banner-label">Title:</span>
-                <span class="view-banner-value" id="viewBannerTitle"></span>
-              </div>
-              <div class="view-banner-detail">
-                <span class="view-banner-label">Description:</span>
-                <span class="view-banner-value" id="viewBannerDescription"></span>
-              </div>
-              <div class="view-banner-detail">
-                <span class="view-banner-label">Page:</span>
-                <span class="view-banner-value" id="viewBannerPage"></span>
-              </div>
-              <div class="view-banner-detail">
-                <span class="view-banner-label">Redirect Link:</span>
-                <span class="view-banner-value" id="viewBannerLink"></span>
-              </div>
-              <div class="view-banner-detail">
-                <span class="view-banner-label">Status:</span>
-                <span class="view-banner-value" id="viewBannerStatus"></span>
-              </div>
-              <div class="view-banner-detail">
-                <span class="view-banner-label">Created Date:</span>
-                <span class="view-banner-value" id="viewBannerDate"></span>
-              </div>
             </div>
-          </div>
-          <div class="modal-footer">
-            <button class="btn-secondary close-view-modal">Close</button>
-          </div>
-        </div>
-      </div>
+        </header>
 
-      <!-- Delete Confirmation Modal -->
-      <div class="modal" id="deleteModal">
-        <div class="modal-content" style="max-width: 400px;">
-          <div class="modal-header">
-            <h3 class="text-lg font-bold">Confirm Deletion</h3>
-            <button class="action-btn close-delete-modal"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you want to delete this banner? This action cannot be undone.</p>
-          </div>
-          <div class="modal-footer">
-            <button class="btn-secondary close-delete-modal">Cancel</button>
-            <button class="btn-danger" id="confirmDeleteBtn">Delete Banner</button>
-          </div>
-        </div>
-      </div>
+        <!-- Banner Content -->
+        <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
+            <!-- Banner List -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">All Banners</h2>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table id="bannerTable" class="w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left py-3 px-4">PAGE NAME</th>
+                                <th class="text-left py-3 px-4">SLIDES</th>
+                                <th class="text-left py-3 px-4">BANNER TWO</th>
+                                <th class="text-left py-3 px-4">BANNER THREE</th>
+                                <th class="text-left py-3 px-4">BANNER FOUR</th>
+                                <th class="text-left py-3 px-4">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bannerTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-      <!-- Logout Confirmation Modal -->
-      <div class="modal" id="logoutModal">
-        <div class="modal-content" style="max-width: 400px;">
-          <div class="modal-header">
-            <h3 class="text-lg font-bold">Confirm Logout</h3>
-            <button class="action-btn close-logout-modal"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="modal-body">
-            <p>Are you sure you want to logout?</p>
-          </div>
-          <div class="modal-footer">
-            <button class="btn-secondary close-logout-modal">Cancel</button>
-            <button class="btn-danger" id="confirmLogoutBtn">Logout</button>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
+            <!-- Add/Edit Banner Modal -->
+            <div id="editBannerModal" class="modal">
+                <div class="modal-container">
+                    <span class="close-btn" id="closeEditModal">&times;</span>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6" id="editModalTitle">Add New Banner</h2>
+                    
+                    <form id="editBannerForm" class="edit-form space-y-6">
+                        <!-- Page Name -->
+                        <div>
+                            <label for="edit-page-name">Page Name *</label>
+                            <select id="edit-page-name" required>
+                                <option value="">Select Page</option>
+                                <option value="home">HOME</option>
+                                <option value="category">CATEGORY</option>
+                                <option value="product">PRODUCT</option>
+                                <option value="cart">CART</option>
+                                <option value="checkout">CHECKOUT</option>
+                            </select>
+                        </div>
 
-  <script src="banner.js"></script>
+                        <!-- Banner Slides (Multiple Images) -->
+                        <div>
+                            <label class="block mb-2">Banner Slides (Multiple Images)</label>
+                            <p class="text-sm text-gray-500 mb-3">Upload up to 2 images (optional)</p>
+                            <div class="image-upload-container" id="slides-dropzone">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-600">Click to upload or drag and drop</p>
+                                <p class="text-sm text-gray-400 mt-1">PNG, JPG, GIF up to 5MB each</p>
+                                <input type="file" id="edit-slides" class="hidden" accept="image/*" multiple>
+                            </div>
+                            <div class="image-preview-container" id="slides-preview"></div>
+                        </div>
+
+                        <!-- Banner Two -->
+                        <div>
+                            <label class="block mb-2">Banner Two</label>
+                            <p class="text-sm text-gray-500 mb-3">Upload up to 1 image (optional)</p>
+                            <div class="image-upload-container" id="banner2-dropzone">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-600">Click to upload or drag and drop</p>
+                                <p class="text-sm text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                                <input type="file" id="edit-banner2" class="hidden" accept="image/*">
+                            </div>
+                            <div class="image-preview-container" id="banner2-preview"></div>
+                        </div>
+
+                        <!-- Banner Three -->
+                        <div>
+                            <label class="block mb-2">Banner Three</label>
+                            <p class="text-sm text-gray-500 mb-3">Upload up to 1 image (optional)</p>
+                            <div class="image-upload-container" id="banner3-dropzone">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-600">Click to upload or drag and drop</p>
+                                <p class="text-sm text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                                <input type="file" id="edit-banner3" class="hidden" accept="image/*">
+                            </div>
+                            <div class="image-preview-container" id="banner3-preview"></div>
+                        </div>
+
+                        <!-- Banner Four -->
+                        <div>
+                            <label class="block mb-2">Banner Four</label>
+                            <p class="text-sm text-gray-500 mb-3">Upload up to 1 image (optional)</p>
+                            <div class="image-upload-container" id="banner4-dropzone">
+                                <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-600">Click to upload or drag and drop</p>
+                                <p class="text-sm text-gray-400 mt-1">PNG, JPG, GIF up to 5MB</p>
+                                <input type="file" id="edit-banner4" class="hidden" accept="image/*">
+                            </div>
+                            <div class="image-preview-container" id="banner4-preview"></div>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-4 border-t">
+                            <button type="button" id="cancelEdit" class="bg-gray-500 text-white py-2 px-6 rounded-lg hover:bg-gray-600 transition">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition">
+                                Save Banner
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Success Popup -->
+            <div id="successPopup" class="modal">
+                <div class="popup-container">
+                    <i id="popupIcon" class="fas fa-check-circle"></i>
+                    <p id="successMessage"></p>
+                    <button id="closeSuccessPopup">OK</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- JavaScript Code -->
+    <script>
+    // API Base URL - Update this to match your backend
+    const API_BASE_URL = 'http://localhost:8083/api/banners';
+
+    // Global Variables
+    let currentBannerId = null;
+    let bannersData = [];
+    let slidesImages = [];
+    let banner2Images = [];
+    let banner3Images = [];
+    let banner4Images = [];
+
+    // Initialize DataTables
+    function initializeDataTable() {
+        $('#bannerTable').DataTable({
+            paging: false,
+            searching: false,
+            info: false,
+            ordering: false,
+            language: {
+                emptyTable: "No banners available"
+            }
+        });
+    }
+
+    // Load banners from API
+    async function loadBanners() {
+        try {
+            showSuccessPopup('Loading banners...', 'info');
+            
+            const response = await fetch(`${API_BASE_URL}/get-All-Banners`);
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load banners: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            bannersData = Array.isArray(data) ? data : [];
+            
+            renderBanners();
+            showSuccessPopup('Banners loaded successfully!');
+            
+        } catch (error) {
+            console.error('Error loading banners:', error);
+            showSuccessPopup('Error loading banners: ' + error.message, 'error');
+            bannersData = [];
+            renderBanners();
+        }
+    }
+
+    // Render banners to table
+    function renderBanners() {
+        const tbody = document.getElementById('bannerTableBody');
+        tbody.innerHTML = '';
+
+        if (bannersData.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="6" class="py-8 text-center text-gray-500">
+                    <i class="fas fa-image text-4xl mb-3 text-gray-300"></i>
+                    <p class="text-lg">No banners found</p>
+                    <p class="text-sm">Click "Add New Banner" to create your first banner</p>
+                </td>
+            `;
+            tbody.appendChild(row);
+            return;
+        }
+
+        bannersData.forEach(banner => {
+            const row = document.createElement('tr');
+            
+            // Page Name
+            const pageCell = document.createElement('td');
+            pageCell.className = 'py-3 px-4 font-medium';
+            pageCell.textContent = banner.pageName ? banner.pageName.toUpperCase() : 'N/A';
+            row.appendChild(pageCell);
+
+            // Slides
+            const slidesCell = document.createElement('td');
+            slidesCell.className = 'py-3 px-4';
+            slidesCell.appendChild(createImagesCell(banner.bannerFileSlides || []));
+            row.appendChild(slidesCell);
+
+            // Banner Two
+            const banner2Cell = document.createElement('td');
+            banner2Cell.className = 'py-3 px-4';
+            banner2Cell.appendChild(createSingleImageCell(banner.bannerFileTwo));
+            row.appendChild(banner2Cell);
+
+            // Banner Three
+            const banner3Cell = document.createElement('td');
+            banner3Cell.className = 'py-3 px-4';
+            banner3Cell.appendChild(createSingleImageCell(banner.bannerFileThree));
+            row.appendChild(banner3Cell);
+
+            // Banner Four
+            const banner4Cell = document.createElement('td');
+            banner4Cell.className = 'py-3 px-4';
+            banner4Cell.appendChild(createSingleImageCell(banner.bannerFileFour));
+            row.appendChild(banner4Cell);
+
+            // Actions
+            const actionsCell = document.createElement('td');
+            actionsCell.className = 'py-3 px-4';
+            actionsCell.innerHTML = `
+                <div class="action-buttons">
+                    <button class="edit-btn" data-id="${banner.id}" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="delete-btn" data-id="${banner.id}" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            row.appendChild(actionsCell);
+
+            tbody.appendChild(row);
+        });
+
+        // Add event listeners to action buttons
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const bannerId = e.currentTarget.getAttribute('data-id');
+                const banner = bannersData.find(b => b.id == bannerId);
+                openEditModal(banner);
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const bannerId = e.currentTarget.getAttribute('data-id');
+                await deleteBanner(bannerId);
+            });
+        });
+    }
+
+    // Create images cell with thumbnails for slides
+    function createImagesCell(slideLinks) {
+        const container = document.createElement('div');
+        container.className = 'banner-images';
+        
+        if (!slideLinks || slideLinks.length === 0) {
+            const naSpan = document.createElement('span');
+            naSpan.textContent = 'NA';
+            naSpan.className = 'text-gray-400';
+            container.appendChild(naSpan);
+            return container;
+        }
+
+        // Show up to 2 thumbnails
+        const showCount = Math.min(slideLinks.length, 2);
+        for (let i = 0; i < showCount; i++) {
+            const img = document.createElement('img');
+            img.src = API_BASE_URL + slideLinks[i];
+            img.alt = `Slide ${i + 1}`;
+            img.className = 'banner-thumbnail';
+            img.onerror = function() {
+                this.src = 'https://via.placeholder.com/40?text=Img';
+            };
+            container.appendChild(img);
+        }
+
+        // Show "+X" if there are more images
+        if (slideLinks.length > 2) {
+            const moreSpan = document.createElement('span');
+            moreSpan.className = 'more-images';
+            moreSpan.textContent = `+${slideLinks.length - 2}`;
+            container.appendChild(moreSpan);
+        }
+
+        return container;
+    }
+
+    // Create single image cell
+    function createSingleImageCell(imageLink) {
+        const container = document.createElement('div');
+        container.className = 'banner-images';
+        
+        if (!imageLink) {
+            const naSpan = document.createElement('span');
+            naSpan.textContent = 'NA';
+            naSpan.className = 'text-gray-400';
+            container.appendChild(naSpan);
+            return container;
+        }
+
+        const img = document.createElement('img');
+        img.src = API_BASE_URL + imageLink;
+        img.alt = 'Banner';
+        img.className = 'banner-thumbnail';
+        img.onerror = function() {
+            this.src = 'https://via.placeholder.com/40?text=Img';
+        };
+        container.appendChild(img);
+
+        return container;
+    }
+
+    // Setup image upload for slides (multiple images)
+    function setupSlidesUpload() {
+        const dropzone = document.getElementById('slides-dropzone');
+        const input = document.getElementById('edit-slides');
+        const preview = document.getElementById('slides-preview');
+        
+        slidesImages = [];
+
+        // Click to upload
+        dropzone.addEventListener('click', () => {
+            input.click();
+        });
+
+        // File input change
+        input.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files).slice(0, 2); // Max 2 files
+            handleSlidesFiles(files);
+        });
+
+        // Drag and drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('drag-over');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drag-over');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+            
+            const files = Array.from(e.dataTransfer.files)
+                .filter(file => file.type.startsWith('image/'))
+                .slice(0, 2); // Max 2 files
+            
+            handleSlidesFiles(files);
+        });
+
+        function handleSlidesFiles(files) {
+            slidesImages = []; // Reset slides images
+            files.forEach(file => {
+                if (slidesImages.length >= 2) return; // Max 2 images
+                
+                slidesImages.push(file);
+            });
+            renderSlidesPreview();
+        }
+
+        function renderSlidesPreview() {
+            preview.innerHTML = '';
+            slidesImages.forEach((file, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'image-preview-item';
+                
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.alt = `Slide ${index + 1}`;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-image-btn';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.onclick = () => {
+                    slidesImages.splice(index, 1);
+                    renderSlidesPreview();
+                };
+                
+                previewItem.appendChild(img);
+                previewItem.appendChild(removeBtn);
+                preview.appendChild(previewItem);
+            });
+        }
+
+        // Return function to get images
+        return () => slidesImages;
+    }
+
+    // Setup single image upload
+    function setupSingleImageUpload(dropzoneId, inputId, previewId, imagesArray) {
+        const dropzone = document.getElementById(dropzoneId);
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        
+        let currentImage = null;
+
+        // Click to upload
+        dropzone.addEventListener('click', () => {
+            input.click();
+        });
+
+        // File input change
+        input.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Drag and drop
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('drag-over');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('drag-over');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+            
+            const files = Array.from(e.dataTransfer.files)
+                .filter(file => file.type.startsWith('image/'));
+            
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            currentImage = file;
+            renderPreview();
+        }
+
+        function renderPreview() {
+            preview.innerHTML = '';
+            
+            if (currentImage) {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'image-preview-item';
+                
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(currentImage);
+                img.alt = 'Banner';
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-image-btn';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.onclick = () => {
+                    currentImage = null;
+                    renderPreview();
+                };
+                
+                previewItem.appendChild(img);
+                previewItem.appendChild(removeBtn);
+                preview.appendChild(previewItem);
+            }
+        }
+
+        // Return function to get image
+        return () => currentImage;
+    }
+
+    // Open edit modal
+    function openEditModal(banner = null) {
+        const modal = document.getElementById('editBannerModal');
+        const title = document.getElementById('editModalTitle');
+        
+        // Reset all image arrays
+        slidesImages = [];
+        banner2Images = [];
+        banner3Images = [];
+        banner4Images = [];
+        
+        if (banner) {
+            title.textContent = 'Edit Banner';
+            currentBannerId = banner.id;
+            
+            // Set form values
+            document.getElementById('edit-page-name').value = banner.pageName || '';
+            
+            // Note: In a real implementation, you might want to load existing images
+            // For now, we'll show a message that existing images are preserved
+            showSuccessPopup('Existing images will be preserved. Upload new images to replace them.', 'info');
+        } else {
+            title.textContent = 'Add New Banner';
+            currentBannerId = null;
+            document.getElementById('editBannerForm').reset();
+        }
+        
+        // Clear previews
+        clearImagePreviews();
+        modal.style.display = 'flex';
+    }
+
+    // Clear all image previews
+    function clearImagePreviews() {
+        const previewIds = ['slides-preview', 'banner2-preview', 'banner3-preview', 'banner4-preview'];
+        previewIds.forEach(id => {
+            document.getElementById(id).innerHTML = '';
+        });
+    }
+
+    // Handle form submission
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        
+        try {
+            // Get form data
+            const pageName = document.getElementById('edit-page-name').value;
+            
+            // Validate
+            if (!pageName) {
+                showSuccessPopup('Please select a page name.', 'error');
+                return;
+            }
+
+            // Check if this page already exists (for new banners)
+            if (!currentBannerId) {
+                const existingBanner = bannersData.find(b => b.pageName === pageName);
+                if (existingBanner) {
+                    showSuccessPopup(`A banner for "${pageName}" page already exists. Please edit the existing banner instead.`, 'error');
+                    return;
+                }
+            }
+
+            // Create FormData for multipart request
+            const formData = new FormData();
+            formData.append('pageName', pageName);
+
+            // Add slides images (multiple)
+            slidesImages.forEach((file, index) => {
+                formData.append('bannerFileSlides', file);
+            });
+
+            // Add single images if they exist
+            const banner2Image = getBanner2Image();
+            if (banner2Image) {
+                formData.append('bannerFileTwo', banner2Image);
+            }
+
+            const banner3Image = getBanner3Image();
+            if (banner3Image) {
+                formData.append('bannerFileThree', banner3Image);
+            }
+
+            const banner4Image = getBanner4Image();
+            if (banner4Image) {
+                formData.append('bannerFileFour', banner4Image);
+            }
+
+            showSuccessPopup('Saving banner...', 'info');
+
+            let response;
+            if (currentBannerId) {
+                // Update existing banner
+                formData.append('pageName', pageName); // For PATCH, pageName is optional
+                response = await fetch(`${API_BASE_URL}/update-Banner/${currentBannerId}`, {
+                    method: 'PATCH',
+                    body: formData
+                });
+            } else {
+                // Create new banner
+                response = await fetch(`${API_BASE_URL}`, {
+                    method: 'POST',
+                    body: formData
+                });
+            }
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to save banner: ${response.status} - ${errorText}`);
+            }
+
+            // Close modal and reload data
+            document.getElementById('editBannerModal').style.display = 'none';
+            showSuccessPopup(currentBannerId ? 'Banner updated successfully!' : 'Banner created successfully!');
+            await loadBanners();
+            
+        } catch (error) {
+            console.error('Error saving banner:', error);
+            showSuccessPopup('Error saving banner: ' + error.message, 'error');
+        }
+    }
+
+    // Delete banner
+    async function deleteBanner(bannerId) {
+        if (!confirm('Are you sure you want to delete this banner?')) {
+            return;
+        }
+
+        try {
+            showSuccessPopup('Deleting banner...', 'info');
+            
+            const response = await fetch(`${API_BASE_URL}/delete-Banner/${bannerId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete banner: ${response.status}`);
+            }
+
+            showSuccessPopup('Banner deleted successfully!');
+            await loadBanners();
+            
+        } catch (error) {
+            console.error('Error deleting banner:', error);
+            showSuccessPopup('Error deleting banner: ' + error.message, 'error');
+        }
+    }
+
+    // Show success/error popup
+    function showSuccessPopup(message, type = 'success') {
+        const popup = document.getElementById('successPopup');
+        const messageEl = document.getElementById('successMessage');
+        const icon = document.getElementById('popupIcon');
+        
+        messageEl.textContent = message;
+        icon.style.color = type === 'success' ? '#10b981' : 
+                          type === 'error' ? '#dc2626' : 
+                          type === 'info' ? '#3b82f6' : '#10b981';
+        icon.className = type === 'success' ? 'fas fa-check-circle' : 
+                        type === 'error' ? 'fas fa-exclamation-circle' : 
+                        type === 'info' ? 'fas fa-info-circle' : 'fas fa-check-circle';
+        
+        popup.style.display = 'flex';
+        
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, type === 'error' ? 5000 : 3000);
+    }
+
+    // Sidebar functions
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        
+        if (window.innerWidth < 768) {
+            sidebar.classList.toggle('translate-x-0');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            const sidebarArrow = document.getElementById('sidebar-arrow');
+            if (sidebar.classList.contains('collapsed')) {
+                sidebarArrow.classList.remove('fa-chevron-left');
+                sidebarArrow.classList.add('fa-chevron-right');
+            } else {
+                sidebarArrow.classList.remove('fa-chevron-right');
+                sidebarArrow.classList.add('fa-chevron-left');
+            }
+        }
+    }
+
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarArrow = document.getElementById('sidebar-arrow');
+        
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('collapsed');
+            sidebarArrow.classList.remove('fa-chevron-right');
+            sidebarArrow.classList.add('fa-chevron-left');
+        } else {
+            sidebar.classList.remove('translate-x-0');
+        }
+    }
+
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize sidebar
+        initializeSidebar();
+        
+        // Setup sidebar toggle buttons
+        document.getElementById('toggle-sidebar-logo').addEventListener('click', toggleSidebar);
+        document.getElementById('close-sidebar').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('translate-x-0');
+        });
+        document.getElementById('toggle-sidebar-mobile').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('translate-x-0');
+        });
+        // document.getElementById('toggle-sidebar-desktop').addEventListener('click', toggleSidebar);
+
+        // Setup image uploaders
+        const getSlidesImages = setupSlidesUpload();
+        const getBanner2Image = setupSingleImageUpload('banner2-dropzone', 'edit-banner2', 'banner2-preview', banner2Images);
+        const getBanner3Image = setupSingleImageUpload('banner3-dropzone', 'edit-banner3', 'banner3-preview', banner3Images);
+        const getBanner4Image = setupSingleImageUpload('banner4-dropzone', 'edit-banner4', 'banner4-preview', banner4Images);
+        
+        // Expose getter functions globally for form submission
+        window.getSlidesImages = getSlidesImages;
+        window.getBanner2Image = getBanner2Image;
+        window.getBanner3Image = getBanner3Image;
+        window.getBanner4Image = getBanner4Image;
+
+        // Modal close buttons
+        document.getElementById('closeEditModal').addEventListener('click', () => {
+            document.getElementById('editBannerModal').style.display = 'none';
+        });
+        document.getElementById('cancelEdit').addEventListener('click', () => {
+            document.getElementById('editBannerModal').style.display = 'none';
+        });
+        document.getElementById('closeSuccessPopup').addEventListener('click', () => {
+            document.getElementById('successPopup').style.display = 'none';
+        });
+
+        // Add banner button
+        document.getElementById('addBannerBtn').addEventListener('click', () => {
+            openEditModal();
+        });
+
+        // Form submission
+        document.getElementById('editBannerForm').addEventListener('submit', handleFormSubmit);
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            const modals = ['editBannerModal', 'successPopup'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    if (modalId === 'editBannerModal') {
+                        document.getElementById('editBannerForm').reset();
+                        clearImagePreviews();
+                    }
+                }
+            });
+        });
+
+        // Initialize DataTable and load banners
+        initializeDataTable();
+        loadBanners();
+    });
+</script>
+
+<script src="/auth.js"></script>
+ <script>
+    // This will redirect to login if session is missing or expired
+    Auth.requireAuth();
+
+    // Optional: start background timer to warn on expiration
+    Auth.startSessionTimer();
+
+    // Example: display admin name
+    document.addEventListener("DOMContentLoaded", () => {
+        const admin = Auth.getCurrentAdmin();
+        if (admin) {
+            console.log("Logged in as:", admin.firstName + " " + admin.lastName);
+            // e.g., document.getElementById('adminName').textContent = admin.firstName;
+        }
+    });
+</script>
 </body>
 </html>

@@ -22,6 +22,6 @@
       th, td { border: 1px solid #ddd; padding: 8px; text-align: left; word-wrap: break-word; max-width: 0; overflow-wrap: break-word; }
       th { background-color: #f2f2f2; }
     }
-    #sidebar {
+    /* #sidebar {
       transition: transform 0.3s ease, width 0.3s ease;
-    }
+    } */

@@ -3,30 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management Module</title>
+    <title>Product Management - Mother & Baby Care</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.3.0/css/fixedColumns.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/fixedcolumns/4.3.0/js/dataTables.fixedColumns.min.js"></script>
     <!-- Add SheetJS for Excel export -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
-
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        /* Sidebar Styles - SIMPLE VERSION like mother & baby care */
+        /* Sidebar Styles - Fixed */
         #sidebar {
             transition: transform 0.3s ease;
-            width: 16rem; /* 64px equivalent */
-        }
-
-        /* Mobile: Hidden by default with -translate-x-full */
-        #sidebar {
+            width: 16rem;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 40;
             transform: translateX(-100%);
         }
 
@@ -34,34 +28,116 @@
         @media (min-width: 768px) {
             #sidebar {
                 transform: translateX(0);
+                position: static;
             }
         }
 
-        /* When sidebar is visible/open */
-        #sidebar.translate-x-0 {
+        /* When sidebar is open */
+        #sidebar.open {
             transform: translateX(0);
         }
 
-        /* Collapsed state styles (if you need them for desktop toggle) */
-        #sidebar.collapsed {
-            width: 4rem; /* 16px equivalent for collapsed state */
+        /* Sticky Action Button */
+        .sticky-action-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+            z-index: 100;
+            transition: all 0.3s ease;
+            border: none;
         }
 
-        #sidebar.collapsed .nav-text,
-        #sidebar.collapsed .logo-text,
-        #sidebar.collapsed .sidebar-logo-expanded {
-            display: none !important;
+        .sticky-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
         }
 
-        #sidebar.collapsed .nav-icon {
-            margin-right: 0 !important;
-            justify-content: center !important;
+        .sticky-action-btn:active {
+            transform: scale(0.95);
         }
 
-        #sidebar.collapsed nav a {
-            justify-content: center !important;
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
+        .sticky-action-menu {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            padding: 15px;
+            z-index: 99;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+            animation: slideUp 0.3s ease;
+        }
+
+        .sticky-action-menu.show {
+            display: flex;
+        }
+
+        .sticky-action-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #374151;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sticky-action-item:hover {
+            background-color: #f3f4f6;
+            transform: translateX(-3px);
+        }
+
+        .sticky-action-item i {
+            width: 20px;
+            text-align: center;
+            color: #3b82f6;
+        }
+
+        .sticky-action-item.export i {
+            color: #10b981;
+        }
+
+        .sticky-action-item.import i {
+            color: #f59e0b;
+        }
+
+        .sticky-action-item.refresh i {
+            color: #6366f1;
+        }
+
+        .sticky-action-item.category i {
+            color: #8b5cf6;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Modal Styles */
@@ -266,45 +342,6 @@
             color: #d97706;
         }
 
-        .status-available {
-            background-color: #dcfce7;
-            color: #16a34a;
-        }
-
-        .status-unavailable {
-            background-color: #fee2e2;
-            color: #dc2626;
-        }
-
-        .status-discontinued {
-            background-color: #d1d5db;
-            color: #6b7280;
-        }
-
-        /* Table Status Indicators */
-        .low-stock {
-            color: #dc2626;
-            font-weight: 600;
-        }
-
-        .expiring-soon {
-            /* color:  */
-            font-weight: 600;
-            background-color:#da271add;
-            border-radius: 20px;
-            font-size: small;
-            color: white;
-            padding: 4px;
-           
-        }
-
-        .nonExpiringDate{
-            border-radius: 20px;
-            border:1px solid black;
-            padding: 4px;
-
-        }
-
         /* Action Buttons */
         .action-buttons {
             display: flex;
@@ -342,32 +379,7 @@
             color: #ef4444;
         }
 
-        /* Product Table Container with FixedColumns */
-        .product-table-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            /* border: 1px solid #e5e7eb; */
-            border-radius: 8px;
-            background: white;
-        }
-
-        /* FixedColumns Styling */
-        .DTFC_RightWrapper {
-            background: white !important;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.1) !important;
-        }
-
-        .DTFC_RightBodyLiner {
-            background: white !important;
-        }
-
-        .DTFC_RightHeadWrapper th {
-            background: #f9fafb !important;
-            border-bottom: 2px solid #e5e7eb !important;
-        }
-
-        /* Custom DataTables Styling - SMALLER FONT */
+        /* DataTables Custom Styling */
         #productTable_wrapper {
             font-size: 13px !important;
         }
@@ -399,112 +411,18 @@
             background-color: #f9fafb;
         }
 
-        /* Fix for FixedColumns hover */
-        .DTFC_RightBodyWrapper tr:hover td {
-            background-color: #f9fafb !important;
-        }
-
-        /* Row Highlighting */
-        .status-low-stock-row {
-            background-color: #fef3c7 !important;
-        }
-
-        .status-expiring-row {
-            background-color: #fee2e2 !important;
-        }
-
-        .status-in-stock-row {
-            background-color: #dcfce7 !important;
-        }
-
-        /* Text Truncation */
-        .text-truncate {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: block;
+        /* Product Images */
+        .product-thumbnail {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
         }
 
         /* Rating Stars */
         .rating-stars {
             color: #fbbf24;
-            font-size: 11px !important;
-        }
-
-        .rating-stars i {
-            margin-right: 1px;
-        }
-
-        /* Old Price */
-        .old-price {
-            text-decoration: line-through;
-            color: #9ca3af;
-            font-size: 11px !important;
-            margin-top: 2px;
-        }
-
-        /* Product Images */
-        .product-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            transition: transform 0.2s;
-        }
-
-        .product-image:hover {
-            transform: scale(1.05);
-        }
-
-        .product-thumbnail {
-            width: 40px !important;
-            height: 40px !important;
-            object-fit: cover;
-            border-radius: 4px !important;
-            border: 1px solid #e5e7eb;
-            margin: 0 auto;
-            display: block;
-        }
-
-        /* Custom scrollbar */
-        .dataTables_scrollBody::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-
-        .dataTables_scrollBody::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-
-        .dataTables_scrollBody::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-
-        .dataTables_scrollBody::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-        }
-
-        /* Logout Modal */
-        #logoutModal.hidden {
-            display: none;
-        }
-
-        #logoutModal .bg-white {
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
         }
 
         /* Stats cards */
@@ -517,91 +435,24 @@
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
-        /* Filter inputs styling */
-        select.border {
-            transition: all 0.2s;
+        /* Backdrop for mobile sidebar */
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 30;
         }
 
-        select.border:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            outline: none;
+        .sidebar-backdrop.active {
+            display: block;
         }
 
-        /* Pagination styling */
-        .dataTables_paginate .paginate_button {
-            border: 1px solid #d1d5db !important;
-            border-radius: 4px !important;
-            padding: 4px 8px !important;
-            margin: 0 2px !important;
-            color: #374151 !important;
-            background: white !important;
-            font-size: 12px !important;
-        }
 
-        .dataTables_paginate .paginate_button.current {
-            background: #3b82f6 !important;
-            color: white !important;
-            border-color: #3b82f6 !important;
-        }
-
-        .dataTables_paginate .paginate_button:hover {
-            background: #f3f4f6 !important;
-            border-color: #9ca3af !important;
-        }
-
-        /* Dropdown styling */
-        .dropdown-arrow {
-            pointer-events: none;
-        }
-
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            .modal-container {
-                width: 95%;
-                padding: 16px;
-            }
-            
-            .product-table-container {
-                max-height: 400px;
-            }
-            
-            #productTable thead th,
-            #productTable tbody td {
-                font-size: 11px !important;
-                padding: 6px 8px !important;
-            }
-            
-            .info-item {
-                grid-template-columns: 1fr;
-                gap: 4px;
-            }
-            
-            .info-label {
-                text-align: left;
-                font-weight: 600;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                gap: 4px;
-            }
-            
-            .action-buttons button {
-                width: 26px;
-                height: 26px;
-            }
-            
-            .profile-actions {
-                flex-direction: column;
-            }
-            
-            .profile-actions button {
-                width: 100%;
-            }
-        }
-
-        /* Smooth transition classes */
+         /* Smooth transition classes */
 #sidebar {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -642,15 +493,16 @@ li:nth-child(8) { transition-delay: 140ms; }
 li:nth-child(9) { transition-delay: 160ms; }
 li:nth-child(10) { transition-delay: 180ms; }
 li:nth-child(11) { transition-delay: 200ms; }
-
-        
     </style>
 </head>
 <body class="bg-gray-50 h-screen flex overflow-hidden">
-    <!-- Sidebar - UPDATED with working structure -->
+    <!-- Sidebar Backdrop (Mobile only) -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Sidebar -->
     <aside id="sidebar"
     class="border w-64 bg-white text-white flex-shrink-0 flex flex-col fixed h-full z-20 md:static transition-all duration-300 ease-in-out">
-    <div class="border-b  h-[75px] p-4 bg-gray-50 sticky top-0 z-10 flex justify-between items-center">
+    <div class="border-b p-4 bg-gray-50 sticky top-0 z-10 flex justify-between items-center">
         <div class="ml-6 transition-all duration-300 ease-in-out overflow-hidden">
             <img src="../Images/kunash-logo.png" alt="PharmaCare Logo"
                 class="w-full h-[44px] sidebar-logo-expanded transition-all duration-300 ease-in-out">
@@ -708,17 +560,17 @@ li:nth-child(11) { transition-delay: 200ms; }
                 </a>
             </li>
 
-            <li class="bg-blue-700 text-white rounded-md transition-all duration-200 ease-in-out">
+            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
                 <a href="../Product Management/product.html"
-                    class="flex items-center py-3 px-4 text-white transition-colors duration-200">
+                    class="flex items-center py-3 px-4 text-gray-700  hover:text-white transition-colors duration-200">
                     <i class="fas fa-box mr-3 nav-icon transition-all duration-200"></i>
-                    <span class="nav-text transition-all duration-200">Medicine Product Management</span>
+                    <span class="nav-text transition-all duration-200 ">Medicine Product Management</span>
                 </a>
             </li>
 
-            <li class="hover:bg-blue-700 hover:text-white transition-all duration-200 ease-in-out rounded-md">
+            <li class="bg-blue-700  rounded-md transition-all duration-200 ease-in-out">
                 <a href="../Mother and Baby Care/motherbabycare.html"
-                    class="flex items-center py-3 px-4 text-gray-700 hover:text-white transition-colors duration-200">
+                    class="flex items-center py-3 px-4 text-gray-700 text-white transition-colors duration-200">
                     <i class="fas fa-box mr-3 nav-icon transition-all duration-200"></i>
                     <span class="nav-text transition-all duration-200">Mother & Baby Care Product Management</span>
                 </a>
@@ -767,7 +619,7 @@ li:nth-child(11) { transition-delay: 200ms; }
                 <div class="flex items-center">
                     <button id="toggle-sidebar-mobile" class="text-gray-500 mr-4 md:hidden"><i class="fas fa-bars"></i></button>
                     <!-- <button id="toggle-sidebar-desktop" class="text-gray-500 mr-4 hidden md:block"><i class="fas fa-bars"></i></button> -->
-                    <h1 class="text-xl font-semibold text-gray-800">Product Management</h1>
+                    <h1 class="text-xl font-semibold text-gray-800">Mother & Baby Care Products</h1>
                 </div>
                 <div class="flex items-center">
                     <div class="relative mr-4">
@@ -779,10 +631,10 @@ li:nth-child(11) { transition-delay: 200ms; }
                         <span class="absolute -top-1 -right-1 bg-red-500 text-red-100 rounded-full text-xs w-5 h-5 flex items-center justify-center">3</span>
                     </div> -->
                     <div class="flex items-center">
-                        <div id="user-initials" class="w-10 h-10 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center text-lg font-semibold">A</div>
+                        <div id="user-initials" class="w-10 h-10 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center text-lg font-semibold">SK</div>
                         <div class="ml-2">
-                            <span id="user-name" class="text-gray-800">Admin User</span>
-                            <span id="user-role" class="text-gray-500 text-sm block">System Administrator</span>
+                            <span id="user-name" class="text-gray-800">Shreya Kamble</span>
+                            <span id="user-role" class="text-gray-500 text-sm block">Admin</span>
                         </div>
                     </div>
                 </div>
@@ -800,7 +652,7 @@ li:nth-child(11) { transition-delay: 200ms; }
                             <h2 id="totalProducts" class="text-2xl font-bold text-gray-800 mt-1">0</h2>
                         </div>
                         <div class="bg-blue-100 p-3 rounded-full">
-                            <i class="fas fa-pills text-blue-500 text-xl"></i>
+                            <i class="fas fa-box text-blue-500 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -849,9 +701,6 @@ li:nth-child(11) { transition-delay: 200ms; }
                             <select id="categoryFilter" class="border rounded-lg py-2 px-4 pr-10 bg-white border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition w-full md:w-48">
                                 <option value="">All Categories</option>
                             </select>
-                            <div class="absolute right-3 top-3 text-gray-400 dropdown-arrow">
-                                <!-- <i class="fas fa-chevron-down"></i> -->
-                            </div>
                         </div>
                         
                         <!-- Subcategory Filter -->
@@ -859,21 +708,6 @@ li:nth-child(11) { transition-delay: 200ms; }
                             <select id="subcategoryFilter" class="border rounded-lg py-2 px-4 pr-10 bg-white border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition w-full md:w-48" disabled>
                                 <option value="">All Subcategories</option>
                             </select>
-                            <div class="absolute right-3 top-3 text-gray-400 dropdown-arrow">
-                                <!-- <i class="fas fa-chevron-down"></i> -->
-                            </div>
-                        </div>
-                        
-                        <!-- Prescription Filter -->
-                        <div class="relative">
-                            <select id="prescriptionFilter" class="border rounded-lg py-2 px-4 pr-10 bg-white border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition w-full md:w-48">
-                                <option value="">Prescription Required</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                            <div class="absolute right-3 top-3 text-gray-400 dropdown-arrow">
-                                <!-- <i class="fas fa-chevron-down"></i> -->
-                            </div>
                         </div>
                         
                         <!-- Stock Filter -->
@@ -884,9 +718,6 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <option value="low-stock">Low Stock</option>
                                 <option value="out-of-stock">Out of Stock</option>
                             </select>
-                            <div class="absolute right-3 top-3 text-gray-400 dropdown-arrow">
-                                <!-- <i class="fas fa-chevron-down"></i> -->
-                            </div>
                         </div>
                         
                         <!-- Add Product Button -->
@@ -894,42 +725,14 @@ li:nth-child(11) { transition-delay: 200ms; }
                             <i class="fas fa-plus mr-2"></i>Add Product
                         </button>
                         
-                        <!-- Export Button with Dropdown -->
-                        <div class="relative group">
-                            <button id="exportBtn" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition shadow-sm hover:shadow-md whitespace-nowrap">
-                                <i class="fas fa-file-excel mr-2"></i>Export
-                                <i class="fas fa-chevron-down ml-2 text-xs"></i>
-                            </button>
-                            <div class="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-xl border border-gray-200 hidden group-hover:block z-50">
-                                <div class="py-1">
-                                    <button onclick="exportToExcel('csv')" class="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                        <i class="fas fa-file-csv mr-3 text-green-500"></i>
-                                        <div>
-                                            <div class="font-medium">Export as CSV</div>
-                                            <div class="text-xs text-gray-500">Quick export in CSV format</div>
-                                        </div>
-                                    </button>
-                                    <button onclick="exportToExcel('excel')" class="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 border-b border-gray-100">
-                                        <i class="fas fa-file-excel mr-3 text-green-600"></i>
-                                        <div>
-                                            <div class="font-medium">Export as Excel</div>
-                                            <div class="text-xs text-gray-500">Complete Excel file with formatting</div>
-                                        </div>
-                                    </button>
-                                    <button onclick="exportToExcel('detailed')" class="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-50">
-                                        <i class="fas fa-file-alt mr-3 text-blue-600"></i>
-                                        <div>
-                                            <div class="font-medium">Export Detailed Report</div>
-                                            <div class="text-xs text-gray-500">Full product details with summary</div>
-                                        </div>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Export Button -->
+                        <button id="exportBtn" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition shadow-sm hover:shadow-md whitespace-nowrap">
+                            <i class="fas fa-file-excel mr-2"></i>Export
+                        </button>
                     </div>
                 </div>
                 
-                <div class="product-table-container">
+                <div class="overflow-x-auto">
                     <table id="productTable" class="w-full display">
                         <thead>
                             <tr>
@@ -943,8 +746,6 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <th>Stock</th>
                                 <th>Price (₹)</th>
                                 <th>Rating</th>
-                                <th>Expiry Date</th>
-                                <th>Status</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
@@ -955,7 +756,7 @@ li:nth-child(11) { transition-delay: 200ms; }
                 </div>
             </div>
 
-            <!-- Modals -->
+            <!-- Product Detail Modal -->
             <div id="productDetailModal" class="modal">
                 <div class="modal-container" style="max-width: 800px;">
                     <span class="close-btn" id="closeDetailModal">&times;</span>
@@ -989,14 +790,6 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <span class="info-label">Brand:</span>
                                 <span class="info-value" id="detail-brand"></span>
                             </div>
-                            <div class="info-item">
-                                <span class="info-label">Prescription:</span>
-                                <span class="info-value" id="detail-prescription"></span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Status:</span>
-                                <span class="info-value" id="detail-status"></span>
-                            </div>
                         </div>
                         <div class="info-section">
                             <h3>Stock & Pricing</h3>
@@ -1005,36 +798,28 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <span class="info-value" id="detail-quantity"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Unit:</span>
-                                <span class="info-value" id="detail-unit"></span>
-                            </div>
-                            <div class="info-item">
                                 <span class="info-label">Current Price:</span>
                                 <span class="info-value" id="detail-price"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Old Price:</span>
-                                <span class="info-value" id="detail-old-price"></span>
+                                <span class="info-label">Original Price:</span>
+                                <span class="info-value" id="detail-original-price"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">MRP:</span>
-                                <span class="info-value" id="detail-mrp"></span>
+                                <span class="info-label">Discount:</span>
+                                <span class="info-value" id="detail-discount"></span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Rating:</span>
                                 <span class="info-value" id="detail-rating"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Batch:</span>
-                                <span class="info-value" id="detail-batch"></span>
+                                <span class="info-label">Reviews:</span>
+                                <span class="info-value" id="detail-review-count"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">MFG Date:</span>
-                                <span class="info-value" id="detail-mfg-date"></span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Expiry:</span>
-                                <span class="info-value" id="detail-expiry"></span>
+                                <span class="info-label">Stock Status:</span>
+                                <span class="info-value" id="detail-stock-status"></span>
                             </div>
                         </div>
                         <div class="info-section md:col-span-2">
@@ -1044,44 +829,24 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <span class="info-value" id="detail-description"></span>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Benefits:</span>
-                                <ul id="detail-benefits" class="benefits-list info-value"></ul>
+                                <span class="info-label">Features:</span>
+                                <ul id="detail-features" class="info-value"></ul>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Directions:</span>
-                                <ul id="detail-directions" class="directions-list info-value"></ul>
+                                <span class="info-label">Sizes:</span>
+                                <div id="detail-sizes" class="info-value"></div>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Ingredients:</span>
-                                <ul id="detail-ingredients" class="ingredients-list info-value"></ul>
+                                <span class="info-label">Specifications:</span>
+                                <pre id="detail-specifications" class="info-value text-xs bg-gray-100 p-2 rounded"></pre>
                             </div>
                             <div class="info-item">
-                                <span class="info-label">Available Sizes:</span>
-                                <div id="detail-sizes" class="sizes-container info-value"></div>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Dynamic Fields:</span>
-                                <div id="detail-dynamic-fields" class="info-value"></div>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Stock Status:</span>
-                                <span class="info-value" id="detail-stock-status"></span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Added:</span>
-                                <span class="info-value" id="detail-added"></span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Updated:</span>
-                                <span class="info-value" id="detail-updated"></span>
+                                <span class="info-label">Created:</span>
+                                <span class="info-value" id="detail-created"></span>
                             </div>
                             <div class="info-item">
                                 <span class="info-label">Main Image:</span>
                                 <div id="detail-main-image" class="info-value"></div>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">All Images:</span>
-                                <div id="detail-images" class="info-value grid grid-cols-2 md:grid-cols-4 gap-2"></div>
                             </div>
                         </div>
                     </div>
@@ -1106,171 +871,85 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <input type="text" id="edit-sku" required>
                             </div>
                             <div class="mb-4">
-                                <label for="edit-name">Product Name *</label>
-                                <input type="text" id="edit-name" required>
+                                <label for="edit-title">Product Title *</label>
+                                <input type="text" id="edit-title" required>
                             </div>
                             <div class="mb-4">
                                 <label for="edit-category">Category *</label>
-                                <div class="relative">
-                                    <select id="edit-category" class="w-full" required>
-                                        <option value="">Select Category</option>
-                                    </select>
-                                    <div class="absolute right-3 top-3 text-gray-400 dropdown-arrow">
-                                        <!-- <i class="fas fa-chevron-down"></i> -->
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-4 hidden" id="category-other-container">
-                                <label for="edit-category-other">Specify Other Category *</label>
-                                <input type="text" id="edit-category-other" placeholder="Enter custom category">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-type">Subcategory *</label>
-                                <div class="relative">
-                                    <select id="edit-type" class="w-full" required disabled>
-                                        <option value="">Select Subcategory</option>
-                                    </select>
-                                    <div class="absolute right-3 top-3 text-gray-400 dropdown-arrow">
-                                        <!-- <i class="fas fa-chevron-down"></i> -->
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-4 hidden" id="type-other-container">
-                                <label for="edit-type-other">Specify Other Subcategory *</label>
-                                <input type="text" id="edit-type-other" placeholder="Enter custom subcategory">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-brand">Brand/Manufacturer *</label>
-                                <input type="text" id="edit-brand" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-prescription">Prescription Required *</label>
-                                <select id="edit-prescription" required>
-                                    <option value="No">No</option>
-                                    <option value="Yes">Yes</option>
+                                <select id="edit-category" required>
+                                    <option value="">Select Category</option>
                                 </select>
                             </div>
                             <div class="mb-4">
-                                <label for="edit-status">Product Status *</label>
-                                <select id="edit-status" required>
-                                    <option value="Available">Available</option>
-                                    <option value="Unavailable">Unavailable</option>
-                                    <option value="Discontinued">Discontinued</option>
+                                <label for="edit-subcategory">Subcategory</label>
+                                <input type="text" id="edit-subcategory">
+                            </div>
+                            <div class="mb-4">
+                                <label for="edit-brand">Brand *</label>
+                                <input type="text" id="edit-brand" required>
+                            </div>
+                            <div class="mb-4">
+                                <label for="edit-instock">In Stock *</label>
+                                <select id="edit-instock" required>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
                                 </select>
                             </div>
                         </div>
                         <div class="info-section">
-                            <h3>Stock & Pricing</h3>
+                            <h3>Pricing & Stock</h3>
                             <div class="mb-4">
-                                <label for="edit-quantity">Quantity in Stock *</label>
-                                <input type="number" id="edit-quantity" min="0" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-unit">Unit *</label>
-                                <select id="edit-unit" required>
-                                    <option value="">Select Unit</option>
-                                    <option value="Tablet Strip">Tablet Strip</option>
-                                    <option value="Bottle">Bottle</option>
-                                    <option value="Pack">Pack</option>
-                                    <option value="Tube">Tube</option>
-                                    <option value="Box">Box</option>
-                                    <option value="Piece">Piece</option>
-                                    <option value="Strip">Strip</option>
-                                    <option value="Capsule">Capsule</option>
-                                    <option value="Syrup">Syrup</option>
-                                    <option value="Cream">Cream</option>
-                                    <option value="Ointment">Ointment</option>
-                                    <option value="Injection">Injection</option>
-                                    <option value="Drop">Drop</option>
-                                    <option value="Powder">Powder</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-mrp">MRP (₹) *</label>
-                                <input type="number" id="edit-mrp" min="0" step="0.01" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-price">Selling Price (₹) *</label>
+                                <label for="edit-price">Price (₹) *</label>
                                 <input type="number" id="edit-price" min="0" step="0.01" required>
                             </div>
                             <div class="mb-4">
-                                <label for="edit-old-price">Old Price (₹)</label>
-                                <input type="number" id="edit-old-price" min="0" step="0.01">
+                                <label for="edit-original-price">Original Price (₹)</label>
+                                <input type="number" id="edit-original-price" min="0" step="0.01">
                             </div>
                             <div class="mb-4">
-                                <label for="edit-rating">Rating (0-5) *</label>
-                                <input type="number" id="edit-rating" min="0" max="5" step="0.1" required>
+                                <label for="edit-discount">Discount (%)</label>
+                                <input type="number" id="edit-discount" min="0" max="100">
                             </div>
                             <div class="mb-4">
-                                <label for="edit-batch">Batch Number *</label>
-                                <input type="text" id="edit-batch" required>
+                                <label for="edit-rating">Rating (0-5)</label>
+                                <input type="number" id="edit-rating" min="0" max="5" step="0.1">
                             </div>
                             <div class="mb-4">
-                                <label for="edit-mfg-date">Manufacturing Date *</label>
-                                <input type="date" id="edit-mfg-date" required>
+                                <label for="edit-review-count">Review Count</label>
+                                <input type="number" id="edit-review-count" min="0">
                             </div>
                             <div class="mb-4">
-                                <label for="edit-expiry">Expiry Date *</label>
-                                <input type="date" id="edit-expiry" required>
+                                <label for="edit-stock-quantity">Stock Quantity *</label>
+                                <input type="number" id="edit-stock-quantity" min="0" required>
                             </div>
                         </div>
                         <div class="info-section md:col-span-2">
                             <h3>Additional Information</h3>
                             <div class="mb-4">
-                                <label for="edit-description">Description *</label>
-                                <textarea id="edit-description" rows="3" required></textarea>
+                                <label for="edit-description">Description (One per line)</label>
+                                <textarea id="edit-description" rows="3" placeholder="Enter each description point on a new line"></textarea>
                             </div>
                             <div class="mb-4">
-                                <label for="edit-benefits">Benefits (One per line) *</label>
-                                <textarea id="edit-benefits" rows="3" placeholder="Enter each benefit on a new line" required></textarea>
+                                <label for="edit-features">Features (One per line)</label>
+                                <textarea id="edit-features" rows="3" placeholder="Enter each feature on a new line"></textarea>
                             </div>
                             <div class="mb-4">
-                                <label for="edit-directions">Directions for Use (One per line) *</label>
-                                <textarea id="edit-directions" rows="3" placeholder="Enter each direction on a new line" required></textarea>
+                                <label for="edit-sizes">Sizes (Comma separated)</label>
+                                <input type="text" id="edit-sizes" placeholder="e.g., S, M, L, XL">
                             </div>
                             <div class="mb-4">
-                                <label for="edit-ingredients">Ingredients (Comma separated) *</label>
-                                <textarea id="edit-ingredients" rows="2" placeholder="Enter ingredients separated by commas" required></textarea>
+                                <label for="edit-specifications">Specifications (JSON format)</label>
+                                <textarea id="edit-specifications" rows="3" placeholder='{"key": "value"}'>{"": ""}</textarea>
                             </div>
                             <div class="mb-4">
-                                <label for="edit-sizes">Available Sizes (Comma separated)</label>
-                                <input type="text" id="edit-sizes" placeholder="e.g., 50 tablets bottle, 100 tablets bottle">
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                <div>
-                                    <label for="edit-strength">Strength</label>
-                                    <input type="text" id="edit-strength" placeholder="e.g., 500mg">
-                                </div>
-                                <div>
-                                    <label for="edit-form">Form</label>
-                                    <input type="text" id="edit-form" placeholder="e.g., Tablet, Syrup, Cream">
-                                </div>
-                                <div>
-                                    <label for="edit-dosage">Dosage</label>
-                                    <input type="text" id="edit-dosage" placeholder="e.g., Oral, Topical">
-                                </div>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-main-image">Main Product Image</label>
+                                <label for="edit-main-image">Main Product Image *</label>
                                 <input type="file" id="edit-main-image" accept="image/*">
-                                <p class="text-sm text-gray-500 mt-1">Required for new products. Leave empty to keep existing image.</p>
+                                <p class="text-sm text-gray-500 mt-1">Required for new products</p>
                             </div>
                             <div class="mb-4">
-                                <label for="edit-image1">Product Image 1</label>
-                                <input type="file" id="edit-image1" accept="image/*">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-image2">Product Image 2</label>
-                                <input type="file" id="edit-image2" accept="image/*">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-image3">Product Image 3</label>
-                                <input type="file" id="edit-image3" accept="image/*">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-image4">Product Image 4</label>
-                                <input type="file" id="edit-image4" accept="image/*">
+                                <label for="edit-sub-images">Additional Images (Optional)</label>
+                                <input type="file" id="edit-sub-images" accept="image/*" multiple>
+                                <p class="text-sm text-gray-500 mt-1">Select multiple images</p>
                             </div>
                         </div>
                         <div class="md:col-span-2 flex justify-end gap-3 mt-6">
@@ -1283,10 +962,12 @@ li:nth-child(11) { transition-delay: 200ms; }
 
             <!-- Success Popup -->
             <div id="successPopup" class="modal">
-                <div class="popup-container">
-                    <i id="popupIcon" class="fas fa-check-circle"></i>
-                    <p id="successMessage"></p>
-                    <button id="closeSuccessPopup">OK</button>
+                <div class="modal-container" style="max-width: 400px;">
+                    <div class="text-center">
+                        <i id="popupIcon" class="fas fa-check-circle text-4xl text-green-500 mb-4"></i>
+                        <p id="successMessage" class="text-gray-700 mb-6"></p>
+                        <button id="closeSuccessPopup" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition">OK</button>
+                    </div>
                 </div>
             </div>
 
@@ -1312,25 +993,55 @@ li:nth-child(11) { transition-delay: 200ms; }
             </div>
         </main>
     </div>
+
+    <!-- Sticky Action Button -->
+    <button class="sticky-action-btn" id="stickyActionBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Sticky Action Menu -->
+    <div class="sticky-action-menu" id="stickyActionMenu">
+        <a href="#" class="sticky-action-item add" id="quickAddProduct">
+            <i class="fas fa-plus-circle"></i>
+            <span>Add Product</span>
+        </a>
+        <a href="#" class="sticky-action-item export" id="quickExport">
+            <i class="fas fa-file-export"></i>
+            <span>Export Data</span>
+        </a>
+        <a href="#" class="sticky-action-item import" id="quickImport">
+            <i class="fas fa-file-import"></i>
+            <span>Import Data</span>
+        </a>
+        <a href="#" class="sticky-action-item refresh" id="quickRefresh">
+            <i class="fas fa-sync-alt"></i>
+            <span>Refresh Data</span>
+        </a>
+        <a href="#" class="sticky-action-item category" id="quickAddCategory">
+            <i class="fas fa-layer-group"></i>
+            <span>Add Category</span>
+        </a>
+    </div>
     
     <!-- JavaScript Code -->
-<script src="../Product Management/product.js"></script>
-<script src="/auth.js"></script>
- <script>
-    // This will redirect to login if session is missing or expired
-    Auth.requireAuth();
+    <script src="/Mother and Baby Care/motherbaby.js"></script>
 
-    // Optional: start background timer to warn on expiration
-    Auth.startSessionTimer();
+    <script src="/auth.js"></script>
+    <script>
+        // This will redirect to login if session is missing or expired
+        Auth.requireAuth();
 
-    // Example: display admin name
-    document.addEventListener("DOMContentLoaded", () => {
-        const admin = Auth.getCurrentAdmin();
-        if (admin) {
-            console.log("Logged in as:", admin.firstName + " " + admin.lastName);
-            // e.g., document.getElementById('adminName').textContent = admin.firstName;
-        }
-    });
-</script>
+        // Optional: start background timer to warn on expiration
+        Auth.startSessionTimer();
+
+        // Example: display admin name
+        document.addEventListener("DOMContentLoaded", () => {
+            const admin = Auth.getCurrentAdmin();
+            if (admin) {
+                console.log("Logged in as:", admin.firstName + " " + admin.lastName);
+                // e.g., document.getElementById('adminName').textContent = admin.firstName;
+            }
+        });
+    </script>
 </body>
 </html>

@@ -1,26 +1,165 @@
 // User profile data
-const user = {
-  name: "Shreya Kamble",
-  role: "Admin"
-};
+// const user = {
+//   name: "Shreya Kamble",
+//   role: "Admin"
+// };
 
-// Display user profile in the UI
 function displayUserProfile() {
+  const admin = Auth.getCurrentAdmin(); // This returns the admin object like { id: 4, firstName: "Sumer", lastName: "Khan", ... }
+
   const userInitials = document.getElementById('user-initials');
   const userName = document.getElementById('user-name');
   const userRole = document.getElementById('user-role');
 
-  const nameParts = user.name.trim().split(' ');
+  if (!admin || !admin.firstName) {
+    // Fallback if no admin is logged in (shouldn't happen due to Auth.requireAuth())
+    userName.textContent = "Guest";
+    userRole.textContent = "Unknown";
+    userInitials.textContent = "??";
+    return;
+  }
+
+  // Full name
+  const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
+
+  // Generate initials (e.g., "SK" for Sumer Khan)
+  const nameParts = fullName.trim().split(' ');
   const initials = nameParts.length > 1
     ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-    : nameParts[0][0];
-  userInitials.textContent = initials.toUpperCase();
+    : (nameParts[0]?.[0] || '?');
 
-  userName.textContent = user.name;
-  userRole.textContent = user.role;
+  // Update DOM
+  userInitials.textContent = initials.toUpperCase();
+  userName.textContent = fullName;
+  userRole.textContent = "Admin"; // You can make this dynamic later if needed
 }
 
-displayUserProfile();
+// Call it when page loads
+document.addEventListener("DOMContentLoaded", displayUserProfile);
+
+
+
+ function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarArrow = document.getElementById('sidebar-arrow');
+    const logoDiv = document.querySelector('div > div'); // Logo container
+    const navTexts = document.querySelectorAll('.nav-text');
+    const navIcons = document.querySelectorAll('.nav-icon');
+    
+    if (window.innerWidth < 768) {
+        // Mobile: Just toggle visibility with smooth transition
+        sidebar.classList.toggle('-translate-x-full');
+        sidebar.classList.toggle('translate-x-0');
+    } else {
+        // Desktop: Toggle between collapsed and expanded
+        sidebar.classList.toggle('collapsed');
+        
+        if (sidebar.classList.contains('collapsed')) {
+            // Collapsed state
+            sidebar.style.width = '64px'; // Smaller width when collapsed
+            sidebarArrow.classList.remove('fa-chevron-left');
+            sidebarArrow.classList.add('fa-chevron-right');
+            
+            // Hide logo smoothly
+            logoDiv.style.opacity = '0';
+            logoDiv.style.width = '0';
+            
+            // Hide nav texts with delay
+            navTexts.forEach((text, index) => {
+                text.style.opacity = '0';
+                text.style.width = '0';
+                text.style.overflow = 'hidden';
+                text.style.transitionDelay = `${index * 20}ms`;
+            });
+            
+            // Center icons
+            navIcons.forEach(icon => {
+                icon.style.marginLeft = '0';
+                icon.style.marginRight = '0';
+            });
+            
+        } else {
+            // Expanded state
+            sidebar.style.width = '256px'; // Original width
+            sidebarArrow.classList.remove('fa-chevron-right');
+            sidebarArrow.classList.add('fa-chevron-left');
+            
+            // Show logo smoothly
+            logoDiv.style.opacity = '1';
+            logoDiv.style.width = 'auto';
+            
+            // Show nav texts with staggered animation
+            navTexts.forEach((text, index) => {
+                text.style.opacity = '1';
+                text.style.width = 'auto';
+                text.style.overflow = 'visible';
+                text.style.transitionDelay = `${index * 20}ms`;
+            });
+            
+            // Restore icon margins
+            navIcons.forEach(icon => {
+                icon.style.marginLeft = '0';
+                icon.style.marginRight = '0.75rem'; // mr-3
+            });
+        }
+    }
+}
+
+
+// Add event listeners
+document.getElementById('toggle-sidebar-logo').addEventListener('click', toggleSidebar);
+document.getElementById('close-sidebar').addEventListener('click', () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.add('-translate-x-full');
+    sidebar.classList.remove('translate-x-0');
+});
+
+// Optional: Close sidebar when clicking outside on mobile
+document.addEventListener('click', (event) => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggle-sidebar-logo');
+    
+    if (window.innerWidth < 768 && 
+        !sidebar.contains(event.target) && 
+        !toggleBtn.contains(event.target) &&
+        sidebar.classList.contains('translate-x-0')) {
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+    }
+});
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarArrow = document.getElementById('sidebar-arrow');
+        
+        // Set initial state based on screen width
+        if (window.innerWidth >= 768) {
+            // Desktop: Start expanded
+            sidebar.classList.remove('collapsed');
+            sidebarArrow.classList.remove('fa-chevron-right');
+            sidebarArrow.classList.add('fa-chevron-left');
+        } else {
+            // Mobile: Start hidden
+            sidebar.classList.remove('translate-x-0');
+        }
+    }
+
+// Display user profile in the UI
+// function displayUserProfile() {
+//   const userInitials = document.getElementById('user-initials');
+//   const userName = document.getElementById('user-name');
+//   const userRole = document.getElementById('user-role');
+
+//   const nameParts = user.name.trim().split(' ');
+//   const initials = nameParts.length > 1
+//     ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+//     : nameParts[0][0];
+//   userInitials.textContent = initials.toUpperCase();
+
+//   userName.textContent = user.name;
+//   userRole.textContent = user.role;
+// }
+
+// displayUserProfile();
 
 // Global variables
 let inventory = [];
@@ -57,7 +196,7 @@ function updateSidebarArrow(isHidden, isCollapsed, isMobileView) {
 function handleTableResponsiveness() {
   if (dataTable) {
     // Trigger DataTable to recalculate dimensions
-    dataTable.columns.adjust().responsive.recalc();
+    // dataTable.columns.adjust().responsive.recalc();
     
     // Add horizontal scroll if needed
     const tableContainer = $('.table-container');
@@ -72,9 +211,9 @@ function handleTableResponsiveness() {
 }
 
 // Handle window resize
-$(window).on('resize', debounce(function() {
-  handleTableResponsiveness();
-}, 250));
+// $(window).on('resize', debounce(function() {
+//   handleTableResponsiveness();
+// }, 250));
 
 $(document).ready(function() {
   // Initialize DataTable with proper configuration
@@ -272,8 +411,8 @@ $(document).ready(function() {
     }
 
     const url = isEditMode 
-      ? `http://localhost:8080/api/products/patch-product/${currentEditId}`
-      : 'http://localhost:8080/api/products/create-product';
+      ? `http://localhost:8083/api/products/patch-product/${currentEditId}`
+      : 'http://localhost:8083/api/products/create-product';
     const method = isEditMode ? 'PATCH' : 'POST';
 
     fetch(url, {
@@ -359,7 +498,7 @@ $(document).ready(function() {
       $('#bulkUploadLoader').removeClass('hidden');
       $('#bulkUploadAcknowledgment').addClass('hidden');
 
-      fetch('http://localhost:8080/api/products/bulk-products-upload', {
+      fetch('http://localhost:8083/api/products/bulk-upload', {
         method: 'POST',
         body: formData
       })
@@ -426,7 +565,7 @@ $(document).ready(function() {
   };
 
   $('#export-csv').click(function() {
-    fetch(`http://localhost:8080/api/products/get-all-products?page=0&size=1000`)
+    fetch(`http://localhost:8083/api/products/get-all-product?page=0&size=1000`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`Failed to fetch products for export: ${response.status}`);
@@ -607,7 +746,7 @@ function updateDataTable(data) {
 }
 
 function fetchAllProducts() {
-  fetch('http://localhost:8080/api/products/get-all-products?page=0&size=1000')
+  fetch('http://localhost:8083/api/products/get-all-product?page=0&size=1000')
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -658,7 +797,7 @@ function updateOverviewCards(data) {
 let currentImageIndex = 0;
 
 function showViewModal(id) {
-  fetch(`http://localhost:8080/api/products/get-product/${id}`)
+  fetch(`http://localhost:8083/api/products/${id}`)
     .then(response => {
       if (!response.ok) {
         throw new Error(`Failed to fetch product details: ${response.status}`);
@@ -708,7 +847,7 @@ function showViewModal(id) {
 
       const images = [item.productMainImage, ...(item.productSubImages || [])].filter(img => img && typeof img === 'string' && img.trim() !== '');
       if (images.length > 0) {
-        const validImages = images.map(img => img.startsWith('http') ? img : `http://localhost:8080${img}`);
+        const validImages = images.map(img => img.startsWith('http') ? img : `http://localhost:8083${img}`);
         mainImage.attr('src', validImages[0]).removeClass('hidden');
         validImages.forEach((imgSrc, index) => {
           gallery.append(`<img src="${imgSrc}" alt="Product Image ${index + 1}" class="image-gallery-img ${index === 0 ? 'active' : ''}" onclick="updateMainImage('${imgSrc}', ${index})"/>`);
@@ -758,7 +897,7 @@ function showEditModal(id) {
   isEditMode = true;
   currentEditId = id;
   
-  fetch(`http://localhost:8080/api/products/get-product/${id}`)
+  fetch(`http://localhost:8083/api/products/${id}`)
     .then(response => {
       if (!response.ok) {
         throw new Error(`Failed to fetch product for edit: ${response.status}`);
@@ -800,12 +939,12 @@ function showEditModal(id) {
       $('#mainImage').prop('required', false);
 
       $('#mainImagePreview').attr('src', item.productMainImage ? 
-        (item.productMainImage.startsWith('http') ? item.productMainImage : `http://localhost:8080${item.productMainImage}`) : '')
+        (item.productMainImage.startsWith('http') ? item.productMainImage : `http://localhost:8083${item.productMainImage}`) : '')
         .toggleClass('hidden', !item.productMainImage);
       $('#subImagesPreview').empty();
       (item.productSubImages || []).forEach((imgSrc, index) => {
         if (imgSrc) {
-          const validImgSrc = imgSrc.startsWith('http') ? imgSrc : `http://localhost:8080${imgSrc}`;
+          const validImgSrc = imgSrc.startsWith('http') ? imgSrc : `http://localhost:8083${imgSrc}`;
           $('#subImagesPreview').append(
             `<img src="${validImgSrc}" alt="Sub Image Preview ${index + 1}" class="image-preview w-24 h-24 object-cover rounded" />`
           );
@@ -847,7 +986,7 @@ function showDeleteConfirm(id) {
 
 function deleteItem() {
   const id = $('#confirmDelete').data('deleteId');
-  fetch(`http://localhost:8080/api/products/delete-product/${id}`, {
+  fetch(`http://localhost:8083/api/products/delete-product/${id}`, {
     method: 'DELETE'
   })
     .then(response => {
@@ -907,3 +1046,53 @@ window.onclick = function(event) {
     }
   }
 }
+
+//logout functionality 
+// ----- LOGOUT BUTTON -------------------------------------------------
+$('#logoutBtn').on('click', function () {
+  const modalHTML = `
+    <div id="logoutModal" class="modal">
+      <div class="modal-content max-w-md mx-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800">Confirm Logout</h2>
+          <span class="close cursor-pointer text-gray-500 hover:text-red-500 text-2xl" id="closeLogoutModal">&times;</span>
+        </div>
+        <p class="text-gray-700 mb-6">Are you sure you want to logout?</p>
+        <div class="flex justify-end gap-3">
+          <button id="confirmLogout" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-sm">
+            Yes
+          </button>
+          <button id="cancelLogout" class="bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition shadow-sm">
+            No
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  $('body').append(modalHTML);
+  $('#logoutModal').show();
+});
+
+// ----- CONFIRM LOGOUT ------------------------------------------------
+$(document).on('click', '#confirmLogout', function () {
+  $('#logoutModal').remove();
+
+  Toastify({
+    text: "Successfully logged out.",
+    duration: 3000,
+    style: { background: 'linear-gradient(to right, #00b09b, #96c93d)' }
+  }).showToast();
+
+  setTimeout(() => {
+    window.location.href = '../Login/login.html';
+  }, 1500);
+});
+
+// ----- CANCEL / CLOSE LOGOUT -----------------------------------------
+$(document).on('click', '#cancelLogout, #closeLogoutModal, #logoutModal', function (e) {
+  if (e.target.id === 'cancelLogout' || 
+      e.target.id === 'closeLogoutModal' || 
+      e.target.id === 'logoutModal') {
+    $('#logoutModal').remove();
+  }
+});

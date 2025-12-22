@@ -1,648 +1,459 @@
+const user = { name: "", role: "Admin" };
 
-    const user = {
-      name: "Shreya Kamble",
-      role: "Admin"
-    };
+function displayUserProfile() {
+  const initialsEl = document.getElementById('user-initials');
+  const nameEl = document.getElementById('user-name');
+  const roleEl = document.getElementById('user-role');
+  const parts = user.name.trim().split(' ');
+  const initials = parts.length > 1 ? `${parts[0][0]}${parts[parts.length-1][0]}` : parts[0][0];
+  initialsEl.textContent = initials.toUpperCase();
+  nameEl.textContent = user.name;
+  roleEl.textContent = user.role;
+}
 
-    function displayUserProfile() {
-      const userInitials = document.getElementById('user-initials');
-      const userName = document.getElementById('user-name');
-      const userRole = document.getElementById('user-role');
+function showToast(message, type = 'success') {
+  Toastify({
+    text: message,
+    duration: 3000,
+    gravity: 'top',
+    position: 'right',
+    backgroundColor: type === 'success' ? '#34a853' : '#ea4335',
+    stopOnFocus: true,
+    style: { borderRadius: '8px', fontSize: '14px', padding: '10px 20px' }
+  }).showToast();
+}
 
-      const nameParts = user.name.trim().split(' ');
-      const initials = nameParts.length > 1
-        ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-        : nameParts[0][0];
-      userInitials.textContent = initials.toUpperCase();
+displayUserProfile();
 
-      userName.textContent = user.name;
-      userRole.textContent = user.role;
-    }
+// API Configuration
+const API_BASE_URL = 'http://localhost:8083/api/banners';
 
-    // Toastify notification function
-    function showToast(message, type = 'success') {
-      Toastify({
-        text: message,
-        duration: 3000,
-        gravity: 'top',
-        position: 'right',
-        backgroundColor: type === 'success' ? '#34a853' : '#ea4335',
-        stopOnFocus: true,
-        style: {
-          borderRadius: '8px',
-          fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
-          fontSize: '14px',
-          padding: '10px 20px',
-        }
-      }).showToast();
-    }
+// Store banners in memory
+let banners = [];
 
-    displayUserProfile();
+// DOM Elements
+const tableView = document.getElementById('tableView');
+const gridView = document.getElementById('gridView');
+const tableViewBtn = document.getElementById('tableViewBtn');
+const gridViewBtn = document.getElementById('gridViewBtn');
+const addBannerBtn = document.getElementById('addBannerBtn');
+const bannerModal = document.getElementById('bannerModal');
+const viewBannerModal = document.getElementById('viewBannerModal');
+const deleteModal = document.getElementById('deleteModal');
+const logoutModal = document.getElementById('logoutModal');
+const saveBannerBtn = document.getElementById('saveBannerBtn');
+const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
+const bannersTableBody = document.getElementById('bannersTableBody');
+const bannerImage1 = document.getElementById('bannerImage1');
+const bannerImage2 = document.getElementById('bannerImage2');
+const bannerImage3 = document.getElementById('bannerImage3');
+const bannerImage4 = document.getElementById('bannerImage4');
+const imagePreview = document.getElementById('imagePreview');
+const thumbnailContainer = document.getElementById('thumbnailContainer');
+const bannerStatus = document.getElementById('bannerStatus');
+const statusLabel = document.getElementById('statusLabel');
+const bannerSearch = document.getElementById('banner-search');
+const statusFilter = document.getElementById('status-filter');
+const logoutBtn = document.getElementById('logout-btn');
 
-    // Sample banner data
-    let banners = [
-      {
-        id: 1,
-        title: "Summer Health Sale",
-        description: "Get 20% off on all vitamins and supplements",
-        images: [
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150' viewBox='0 0 400 150'%3E%3Crect width='400' height='150' fill='%231a73e8'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='white'%3ESummer Health Sale%3C/text%3E%3C/svg%3E"
-        ],
-        redirectLink: "#",
-        pageName: "Homepage",
-        status: "active",
-        createdDate: "2023-06-15"
-      },
-      {
-        id: 2,
-        title: "New Arrivals",
-        description: "Check out our latest pharmaceutical products",
-        images: [
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150' viewBox='0 0 400 150'%3E%3Crect width='400' height='150' fill='%2334a853'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='white'%3ENew Arrivals%3C/text%3E%3C/svg%3E"
-        ],
-        redirectLink: "#",
-        pageName: "Product",
-        status: "active",
-        createdDate: "2023-06-10"
-      },
-      {
-        id: 3,
-        title: "Winter Wellness",
-        description: "Stay healthy this winter with our immunity boosters",
-        images: [
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150' viewBox='0 0 400 150'%3E%3Crect width='400' height='150' fill='%23fbbc05'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='white'%3EWinter Wellness%3C/text%3E%3C/svg%3E"
-        ],
-        redirectLink: "#",
-        pageName: "Mothercare",
-        status: "inactive",
-        createdDate: "2023-05-28"
-      },
-      {
-        id: 4,
-        title: "Prescription Refills",
-        description: "Easy online prescription refills available 24/7",
-        images: [
-          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150' viewBox='0 0 400 150'%3E%3Crect width='400' height='150' fill='%23ea4335'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='white'%3EPrescription Refills%3C/text%3E%3C/svg%3E"
-        ],
-        redirectLink: "#",
-        pageName: "Checkout",
-        status: "active",
-        createdDate: "2023-06-05"
-      }
-    ];
+let currentBannerId = null;
+let isEditMode = false;
+let currentMainImageIndex = 0;
 
-    // DOM Elements
-    const tableView = document.getElementById('tableView');
-    const gridView = document.getElementById('gridView');
-    const tableViewBtn = document.getElementById('tableViewBtn');
-    const gridViewBtn = document.getElementById('gridViewBtn');
-    const addBannerBtn = document.getElementById('addBannerBtn');
-    const bannerModal = document.getElementById('bannerModal');
-    const viewBannerModal = document.getElementById('viewBannerModal');
-    const deleteModal = document.getElementById('deleteModal');
-    const logoutModal = document.getElementById('logoutModal');
-    const bannerForm = document.getElementById('bannerForm');
-    const saveBannerBtn = document.getElementById('saveBannerBtn');
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    const confirmLogoutBtn = document.getElementById('confirmLogoutBtn');
-    const bannersTableBody = document.getElementById('bannersTableBody');
-    const bannerImage1 = document.getElementById('bannerImage1');
-    const bannerImage2 = document.getElementById('bannerImage2');
-    const bannerImage3 = document.getElementById('bannerImage3');
-    const bannerImage4 = document.getElementById('bannerImage4');
-    const imagePreview = document.getElementById('imagePreview');
-    const thumbnailContainer = document.getElementById('thumbnailContainer');
-    const bannerStatus = document.getElementById('bannerStatus');
-    const statusLabel = document.getElementById('statusLabel');
-    const bannerSearch = document.getElementById('banner-search');
-    const statusFilter = document.getElementById('status-filter');
-    const logoutBtn = document.getElementById('logout-btn');
-    const pageName = document.getElementById('pageName');
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  loadBanners();
 
-    // Current banner being edited or deleted
-    let currentBannerId = null;
-    let isEditMode = false;
-    let currentMainImageIndex = 0;
+  // View toggle
+  tableViewBtn.addEventListener('click', () => { 
+    tableView.style.display = 'block'; 
+    gridView.style.display = 'none'; 
+    tableViewBtn.classList.add('active'); 
+    gridViewBtn.classList.remove('active'); 
+  });
+  gridViewBtn.addEventListener('click', () => { 
+    tableView.style.display = 'none'; 
+    gridView.style.display = 'grid'; 
+    gridViewBtn.classList.add('active'); 
+    tableViewBtn.classList.remove('active'); 
+  });
 
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      loadBanners();
-      
-      // View toggle functionality
-      tableViewBtn.addEventListener('click', function() {
-        tableView.style.display = 'block';
-        gridView.style.display = 'none';
-        tableViewBtn.classList.add('active');
-        gridViewBtn.classList.remove('active');
-      });
-      
-      gridViewBtn.addEventListener('click', function() {
-        tableView.style.display = 'none';
-        gridView.style.display = 'grid';
-        tableViewBtn.classList.remove('active');
-        gridViewBtn.classList.add('active');
-      });
-      
-      // Add banner button
-      addBannerBtn.addEventListener('click', function() {
-        openBannerModal();
-      });
-      
-      // Close modal buttons
-      document.querySelectorAll('.close-modal').forEach(button => {
-        button.addEventListener('click', function() {
-          bannerModal.style.display = 'none';
-        });
-      });
-      
-      document.querySelectorAll('.close-view-modal').forEach(button => {
-        button.addEventListener('click', function() {
-          viewBannerModal.style.display = 'none';
-        });
-      });
-      
-      document.querySelectorAll('.close-delete-modal').forEach(button => {
-        button.addEventListener('click', function() {
-          deleteModal.style.display = 'none';
-        });
-      });
-      
-      document.querySelectorAll('.close-logout-modal').forEach(button => {
-        button.addEventListener('click', function() {
-          logoutModal.style.display = 'none';
-        });
-      });
-      
-      // Save banner button
-      saveBannerBtn.addEventListener('click', function() {
-        saveBanner();
-      });
-      
-      // Confirm delete button
-      confirmDeleteBtn.addEventListener('click', function() {
-        deleteBanner();
-      });
-      
-      // Confirm logout button
-      confirmLogoutBtn.addEventListener('click', function() {
-        // Redirect to login page
-        window.location.href = '../Login/login.html';
-      });
-      
-      // Logout button
-      logoutBtn.addEventListener('click', function() {
-        logoutModal.style.display = 'flex';
-      });
-      
-      // Image upload preview for multiple images
-      [bannerImage1, bannerImage2, bannerImage3, bannerImage4].forEach((input, index) => {
-        input.addEventListener('change', function(e) {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-              const imgSrc = e.target.result;
-              if (index === 0) {
-                imagePreview.src = imgSrc;
-                imagePreview.style.display = 'block';
-                document.getElementById('previewImage').src = imgSrc;
-                currentMainImageIndex = 0;
-              }
-              updateThumbnails(index, imgSrc);
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-      });
-      
-      // Status toggle in modal
-      bannerStatus.addEventListener('change', function() {
-        statusLabel.textContent = this.checked ? 'Active' : 'Inactive';
-      });
-      
-      // Real-time preview updates
-      document.getElementById('bannerTitle').addEventListener('input', function() {
-        document.getElementById('previewTitle').textContent = this.value || 'Banner Title';
-      });
-      
-      document.getElementById('bannerDescription').addEventListener('input', function() {
-        document.getElementById('previewDescription').textContent = this.value || 'Banner description will appear here';
-      });
-      
-      // Search and filter functionality
-      bannerSearch.addEventListener('input', function() {
-        loadBanners();
-      });
-      
-      statusFilter.addEventListener('change', function() {
-        loadBanners();
-      });
-    });
+  // Modals
+  addBannerBtn.addEventListener('click', () => openBannerModal());
+  document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', () => bannerModal.style.display = 'none'));
+  document.querySelectorAll('.close-view-modal').forEach(btn => btn.addEventListener('click', () => viewBannerModal.style.display = 'none'));
+  document.querySelectorAll('.close-delete-modal').forEach(btn => btn.addEventListener('click', () => deleteModal.style.display = 'none'));
+  document.querySelectorAll('.close-logout-modal').forEach(btn => btn.addEventListener('click', () => logoutModal.style.display = 'none'));
 
-    // Update thumbnails and handle main image selection
-    function updateThumbnails(activeIndex, newSrc) {
-      const images = [
-        bannerImage1.files[0] ? imagePreview.src : null,
-        bannerImage2.files[0] ? getInputSrc(bannerImage2) : null,
-        bannerImage3.files[0] ? getInputSrc(bannerImage3) : null,
-        bannerImage4.files[0] ? getInputSrc(bannerImage4) : null
-      ].filter(src => src);
+  saveBannerBtn.addEventListener('click', saveBanner);
+  confirmDeleteBtn.addEventListener('click', deleteBanner);
+  confirmLogoutBtn.addEventListener('click', () => { window.location.href = '../Login/login.html'; });
+  logoutBtn.addEventListener('click', () => logoutModal.style.display = 'flex');
 
-      if (newSrc) {
-        images[activeIndex] = newSrc;
-      }
-
-      thumbnailContainer.innerHTML = '';
-      images.forEach((src, index) => {
-        if (src) {
-          const img = document.createElement('img');
-          img.src = src;
-          img.className = `thumbnail ${index === currentMainImageIndex ? 'active' : ''}`;
-          img.alt = `Thumbnail ${index + 1}`;
-          img.addEventListener('click', () => {
-            currentMainImageIndex = index;
-            imagePreview.src = src;
-            document.getElementById('previewImage').src = src;
-            updateThumbnails();
-          });
-          thumbnailContainer.appendChild(img);
-        }
-      });
-    }
-
-    // Helper to get input src
-    function getInputSrc(input) {
-      const file = input.files[0];
+  // Image preview
+  [bannerImage1, bannerImage2, bannerImage3, bannerImage4].forEach((input, idx) => {
+    input.addEventListener('change', e => {
+      const file = e.target.files[0];
       if (file) {
-        return URL.createObjectURL(file);
-      }
-      return null;
-    }
-
-    // Load banners into table and grid views
-    function loadBanners() {
-      const searchTerm = bannerSearch.value.toLowerCase();
-      const statusFilterValue = statusFilter.value;
-      
-      // Clear existing content
-      bannersTableBody.innerHTML = '';
-      gridView.innerHTML = '';
-      
-      // Show skeleton loading
-      showSkeletonLoading();
-      
-      // Simulate API call delay
-      setTimeout(() => {
-        // Remove skeleton loading
-        bannersTableBody.innerHTML = '';
-        gridView.innerHTML = '';
-        
-        // Filter banners based on search and status
-        const filteredBanners = banners.filter(banner => {
-          const matchesSearch = banner.title.toLowerCase().includes(searchTerm) || 
-                               banner.description.toLowerCase().includes(searchTerm);
-          const matchesStatus = !statusFilterValue || banner.status === statusFilterValue;
-          return matchesSearch && matchesStatus;
-        });
-        
-        // Populate table view
-        filteredBanners.forEach(banner => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>
-              <img src="${banner.images[0]}" alt="${banner.title}" style="width: 80px; height: 50px; object-fit: cover; border-radius: 4px;">
-            </td>
-            <td>${banner.title}</td>
-            <td>${banner.pageName}</td>
-            <td>
-              <span class="badge ${banner.status === 'active' ? 'badge-active' : 'badge-inactive'}">
-                ${banner.status === 'active' ? '🟢 Active' : '🔴 Inactive'}
-              </span>
-            </td>
-            <td>${formatDate(banner.createdDate)}</td>
-            <td>
-              <button class="action-btn view" onclick="viewBanner(${banner.id})">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="action-btn edit" onclick="editBanner(${banner.id})">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button class="action-btn delete" onclick="confirmDelete(${banner.id})">
-                <i class="fas fa-trash"></i>
-              </button>
-              <label class="switch ml-2">
-                <input type="checkbox" ${banner.status === 'active' ? 'checked' : ''} onchange="toggleStatus(${banner.id})">
-                <span class="slider"></span>
-              </label>
-            </td>
-          `;
-          bannersTableBody.appendChild(row);
-        });
-        
-        // Populate grid view
-        filteredBanners.forEach(banner => {
-          const card = document.createElement('div');
-          card.className = 'banner-card';
-          card.innerHTML = `
-            <img src="${banner.images[0]}" alt="${banner.title}">
-            <div class="banner-card-body">
-              <div class="banner-card-title">${banner.title}</div>
-              <div class="banner-card-desc">${banner.description}</div>
-              <div class="banner-card-desc">Page: ${banner.pageName}</div>
-            </div>
-            <div class="banner-card-footer">
-              <span class="badge ${banner.status === 'active' ? 'badge-active' : 'badge-inactive'}">
-                ${banner.status === 'active' ? '🟢 Active' : '🔴 Inactive'}
-              </span>
-              <div>
-                <button class="action-btn view" onclick="viewBanner(${banner.id})">
-                  <i class="fas fa-eye"></i>
-                </button>
-                <button class="action-btn edit" onclick="editBanner(${banner.id})">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="action-btn delete" onclick="confirmDelete(${banner.id})">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          `;
-          gridView.appendChild(card);
-        });
-      }, 1000);
-    }
-
-    // Show skeleton loading
-    function showSkeletonLoading() {
-      // Table view skeleton
-      for (let i = 0; i < 3; i++) {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td><div class="skeleton skeleton-image" style="width: 80px; height: 50px;"></div></td>
-          <td><div class="skeleton skeleton-text"></div></td>
-          <td><div class="skeleton skeleton-text short"></div></td>
-          <td><div class="skeleton skeleton-text short"></div></td>
-          <td><div class="skeleton skeleton-text short"></div></td>
-          <td><div class="skeleton skeleton-text" style="width: 120px;"></div></td>
-        `;
-        bannersTableBody.appendChild(row);
-      }
-      
-      // Grid view skeleton
-      for (let i = 0; i < 3; i++) {
-        const card = document.createElement('div');
-        card.className = 'banner-card';
-        card.innerHTML = `
-          <div class="skeleton skeleton-image"></div>
-          <div class="banner-card-body">
-            <div class="skeleton skeleton-text"></div>
-            <div class="skeleton skeleton-text short"></div>
-          </div>
-          <div class="banner-card-footer">
-            <div class="skeleton skeleton-text short"></div>
-            <div class="skeleton skeleton-text" style="width: 80px;"></div>
-          </div>
-        `;
-        gridView.appendChild(card);
-      }
-    }
-
-    // Open banner modal for adding or editing
-    function openBannerModal(banner = null) {
-      isEditMode = banner !== null;
-      currentBannerId = banner ? banner.id : null;
-      currentMainImageIndex = 0;
-      
-      document.getElementById('modalTitle').textContent = isEditMode ? 'Edit Banner' : 'Add New Banner';
-      
-      if (isEditMode) {
-        // Populate form with banner data
-        document.getElementById('bannerId').value = banner.id;
-        document.getElementById('bannerTitle').value = banner.title;
-        document.getElementById('bannerDescription').value = banner.description;
-        document.getElementById('redirectLink').value = banner.redirectLink;
-        document.getElementById('pageName').value = banner.pageName;
-        bannerStatus.checked = banner.status === 'active';
-        statusLabel.textContent = banner.status === 'active' ? 'Active' : 'Inactive';
-        
-        // Set image preview and thumbnails
-        imagePreview.src = banner.images[0] || '';
-        imagePreview.style.display = banner.images[0] ? 'block' : 'none';
-        document.getElementById('previewImage').src = banner.images[0] || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150' viewBox='0 0 400 150'%3E%3Crect width='400' height='150' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3EBanner Preview%3C/text%3E%3C/svg%3E";
-        document.getElementById('previewTitle').textContent = banner.title;
-        document.getElementById('previewDescription').textContent = banner.description;
-        
-        thumbnailContainer.innerHTML = '';
-        banner.images.forEach((src, index) => {
-          const img = document.createElement('img');
-          img.src = src;
-          img.className = `thumbnail ${index === 0 ? 'active' : ''}`;
-          img.alt = `Thumbnail ${index + 1}`;
-          img.addEventListener('click', () => {
-            currentMainImageIndex = index;
-            imagePreview.src = src;
-            document.getElementById('previewImage').src = src;
-            updateThumbnails();
-          });
-          thumbnailContainer.appendChild(img);
-        });
-      } else {
-        // Reset form for new banner
-        bannerForm.reset();
-        imagePreview.style.display = 'none';
-        thumbnailContainer.innerHTML = '';
-        document.getElementById('previewImage').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150' viewBox='0 0 400 150'%3E%3Crect width='400' height='150' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3EBanner Preview%3C/text%3E%3C/svg%3E";
-        document.getElementById('previewTitle').textContent = 'Banner Title';
-        document.getElementById('previewDescription').textContent = 'Banner description will appear here';
-        bannerStatus.checked = true;
-        statusLabel.textContent = 'Active';
-        pageName.value = '';
-      }
-      
-      bannerModal.style.display = 'flex';
-    }
-
-    // Save banner (add or update)
-    function saveBanner() {
-      const title = document.getElementById('bannerTitle').value;
-      const description = document.getElementById('bannerDescription').value;
-      const redirectLink = document.getElementById('redirectLink').value;
-      const pageNameValue = pageName.value;
-      const status = bannerStatus.checked ? 'active' : 'inactive';
-      
-      const images = [
-        bannerImage1.files[0] ? imagePreview.src : (isEditMode ? banners.find(b => b.id === currentBannerId)?.images[0] : null),
-        bannerImage2.files[0] ? getInputSrc(bannerImage2) : (isEditMode ? banners.find(b => b.id === currentBannerId)?.images[1] : null),
-        bannerImage3.files[0] ? getInputSrc(bannerImage3) : (isEditMode ? banners.find(b => b.id === currentBannerId)?.images[2] : null),
-        bannerImage4.files[0] ? getInputSrc(bannerImage4) : (isEditMode ? banners.find(b => b.id === currentBannerId)?.images[3] : null)
-      ].filter(src => src);
-
-      if (!title) {
-        showToast('Please enter a banner title', 'error');
-        return;
-      }
-
-      if (!pageNameValue) {
-        showToast('Please select a page name', 'error');
-        return;
-      }
-
-      if (!images[0]) {
-        showToast('Please upload at least one banner image', 'error');
-        return;
-      }
-      
-      if (isEditMode) {
-        // Update existing banner
-        const index = banners.findIndex(b => b.id === currentBannerId);
-        if (index !== -1) {
-          banners[index] = {
-            ...banners[index],
-            title,
-            description,
-            redirectLink,
-            pageName: pageNameValue,
-            status,
-            images
-          };
-        }
-      } else {
-        // Add new banner
-        const newBanner = {
-          id: banners.length > 0 ? Math.max(...banners.map(b => b.id)) + 1 : 1,
-          title,
-          description,
-          images,
-          redirectLink,
-          pageName: pageNameValue,
-          status,
-          createdDate: new Date().toISOString().split('T')[0]
+        const reader = new FileReader();
+        reader.onload = ev => {
+          if (idx === 0) {
+            imagePreview.src = ev.target.result;
+            imagePreview.style.display = 'block';
+            document.getElementById('previewImage').src = ev.target.result;
+          }
+          updateThumbnails(idx, ev.target.result);
         };
-        banners.push(newBanner);
-      }
-      
-      // Reload banners and close modal
-      loadBanners();
-      bannerModal.style.display = 'none';
-      
-      // Show success message
-      showToast(`Banner ${isEditMode ? 'updated' : 'added'} successfully!`, 'success');
-    }
-
-    // Edit banner
-    function editBanner(id) {
-      const banner = banners.find(b => b.id === id);
-      if (banner) {
-        openBannerModal(banner);
-      }
-    }
-
-    // View banner details in modal
-    function viewBanner(id) {
-      const banner = banners.find(b => b.id === id);
-      if (banner) {
-        document.getElementById('viewBannerImage').src = banner.images[0];
-        document.getElementById('viewBannerTitle').textContent = banner.title;
-        document.getElementById('viewBannerDescription').textContent = banner.description;
-        document.getElementById('viewBannerPage').textContent = banner.pageName;
-        document.getElementById('viewBannerLink').textContent = banner.redirectLink || 'Not provided';
-        document.getElementById('viewBannerStatus').innerHTML = `
-          <span class="badge ${banner.status === 'active' ? 'badge-active' : 'badge-inactive'}">
-            ${banner.status === 'active' ? '🟢 Active' : '🔴 Inactive'}
-          </span>
-        `;
-        document.getElementById('viewBannerDate').textContent = formatDate(banner.createdDate);
-        
-        // Populate thumbnails in view modal
-        const viewThumbnailContainer = document.getElementById('viewThumbnailContainer');
-        viewThumbnailContainer.innerHTML = '';
-        banner.images.forEach((src, index) => {
-          const img = document.createElement('img');
-          img.src = src;
-          img.className = `thumbnail ${index === 0 ? 'active' : ''}`;
-          img.alt = `Thumbnail ${index + 1}`;
-          img.addEventListener('click', () => {
-            document.getElementById('viewBannerImage').src = src;
-            viewThumbnailContainer.querySelectorAll('.thumbnail').forEach(thumb => thumb.classList.remove('active'));
-            img.classList.add('active');
-          });
-          viewThumbnailContainer.appendChild(img);
-        });
-        
-        viewBannerModal.style.display = 'flex';
-      }
-    }
-
-    // Confirm delete banner
-    function confirmDelete(id) {
-      currentBannerId = id;
-      deleteModal.style.display = 'flex';
-    }
-
-    // Delete banner
-    function deleteBanner() {
-      banners = banners.filter(b => b.id !== currentBannerId);
-      loadBanners();
-      deleteModal.style.display = 'none';
-      
-      // Show success message
-      showToast('Banner deleted successfully!', 'success');
-    }
-
-    // Toggle banner status
-    function toggleStatus(id) {
-      const banner = banners.find(b => b.id === id);
-      if (banner) {
-        banner.status = banner.status === 'active' ? 'inactive' : 'active';
-        loadBanners();
-        
-        // Show success message
-        showToast(`Banner status changed to ${banner.status}`, 'success');
-      }
-    }
-
-    // Format date for display
-    function formatDate(dateString) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-
-    // Sidebar toggle logic
-    const sidebar = document.getElementById("sidebar");
-    const toggleSidebarLogo = document.getElementById("toggle-sidebar-logo");
-    const sidebarArrow = document.getElementById("sidebar-arrow");
-    const sidebarTitle = document.getElementById("sidebar-title");
-    const sidebarLogo = document.getElementById("sidebar-logo");
-    const navTexts = document.querySelectorAll(".nav-text");
-    const closeSidebar = document.getElementById("close-sidebar");
-
-    // Toggle sidebar open/close
-    toggleSidebarLogo.addEventListener("click", () => {
-      sidebar.classList.toggle("w-64");
-      sidebar.classList.toggle("w-20");
-
-      // Rotate arrow
-      sidebarArrow.classList.toggle("rotate-180");
-
-      // Toggle visibility of text labels
-      navTexts.forEach((text) => {
-        text.classList.toggle("hidden");
-      });
-
-      // Hide/Show title
-      sidebarTitle.classList.toggle("hidden");
-
-      // Adjust logo spacing
-      if (sidebar.classList.contains("w-20")) {
-        sidebarLogo.classList.add("mx-auto");
-      } else {
-        sidebarLogo.classList.remove("mx-auto");
+        reader.readAsDataURL(file);
       }
     });
+  });
 
-    // Mobile close button
-    if (closeSidebar) {
-      closeSidebar.addEventListener("click", () => {
-        sidebar.classList.add("-translate-x-full");
+  bannerStatus.addEventListener('change', () => statusLabel.textContent = bannerStatus.checked ? 'Active' : 'Inactive');
+
+  document.getElementById('bannerTitle').addEventListener('input', () => document.getElementById('previewTitle').textContent = document.getElementById('bannerTitle').value || 'Banner Title');
+  document.getElementById('bannerDescription').addEventListener('input', () => document.getElementById('previewDescription').textContent = document.getElementById('bannerDescription').value || 'Banner description will appear here');
+
+  bannerSearch.addEventListener('input', loadBanners);
+  statusFilter.addEventListener('change', loadBanners);
+});
+
+// API Functions
+async function loadBanners() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/get-all-banners`);
+    if (!response.ok) throw new Error('Failed to fetch banners');
+    
+    const data = await response.json();
+    banners = data;
+    
+    filterAndDisplayBanners();
+  } catch (error) {
+    console.error('Error loading banners:', error);
+    showToast('Failed to load banners', 'error');
+  }
+}
+
+function filterAndDisplayBanners() {
+  const term = bannerSearch.value.toLowerCase();
+  const status = statusFilter.value;
+  
+  const filtered = banners.filter(b => {
+    const titleMatch = b.header?.toLowerCase().includes(term) || false;
+    const textMatch = b.text?.toLowerCase().includes(term) || false;
+    const pageMatch = b.pageName?.toLowerCase().includes(term) || false;
+    const statusMatch = !status || (b.status === status);
+    
+    return (titleMatch || textMatch || pageMatch) && statusMatch;
+  });
+
+  bannersTableBody.innerHTML = '';
+  gridView.innerHTML = '';
+
+  filtered.forEach(b => {
+    const row = document.createElement('tr');
+    const hasImage = b.hasBannerFileOne || b.hasBannerFileTwo || b.hasBannerFileThree || b.hasBannerFileFour;
+    const imageSrc = hasImage ? 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="50"%3E%3Crect width="80" height="50" fill="%23f0f0f0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="8" fill="%23999"%3EImage%3C/text%3E%3C/svg%3E' : 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="50"%3E%3Crect width="80" height="50" fill="%23e0e0e0"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="8" fill="%23999"%3ENo Image%3C/text%3E%3C/svg%3E';
+    
+    row.innerHTML = `
+      <td><img src="${imageSrc}" alt="${b.header || 'No Title'}" style="width:80px;height:50px;object-fit:cover;border-radius:4px;"></td>
+      <td>${b.header || 'No Title'}</td>
+      <td>${b.pageName || 'No Page'}</td>
+      <td><span class="badge ${b.status==='active'?'badge-active':'badge-inactive'}">${b.status==='active'?'Active':'Inactive'}</span></td>
+      <td>${b.createdDate ? formatDate(b.createdDate) : 'N/A'}</td>
+      <td>
+        <button class="action-btn view" onclick="viewBanner(${b.bannerId})"><i class="fas fa-eye"></i></button>
+        <button class="action-btn edit" onclick="editBanner(${b.bannerId})"><i class="fas fa-edit"></i></button>
+        <button class="action-btn delete" onclick="confirmDelete(${b.bannerId})"><i class="fas fa-trash"></i></button>
+        <label class="switch ml-2"><input type="checkbox" ${b.status==='active'?'checked':''} onchange="toggleStatus(${b.bannerId})"><span class="slider"></span></label>
+      </td>`;
+    bannersTableBody.appendChild(row);
+
+    const card = document.createElement('div');
+    card.className = 'banner-card';
+    card.innerHTML = `
+      <img src="${imageSrc}" alt="${b.header || 'No Title'}">
+      <div class="banner-card-body">
+        <div class="banner-card-title">${b.header || 'No Title'}</div>
+        <div class="banner-card-desc">${b.text || 'No description'}</div>
+        <div class="banner-card-desc">Page: ${b.pageName || 'No page'}</div>
+      </div>
+      <div class="banner-card-footer">
+        <span class="badge ${b.status==='active'?'badge-active':'badge-inactive'}">${b.status==='active'?'Active':'Inactive'}</span>
+        <div>
+          <button class="action-btn view" onclick="viewBanner(${b.bannerId})"><i class="fas fa-eye"></i></button>
+          <button class="action-btn edit" onclick="editBanner(${b.bannerId})"><i class="fas fa-edit"></i></button>
+          <button class="action-btn delete" onclick="confirmDelete(${b.bannerId})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`;
+    gridView.appendChild(card);
+  });
+}
+
+async function openBannerModal(banner = null) {
+  isEditMode = !!banner;
+  currentBannerId = banner?.bannerId || null;
+  currentMainImageIndex = 0;
+  document.getElementById('modalTitle').textContent = isEditMode ? 'Edit Banner' : 'Add New Banner';
+
+  if (isEditMode) {
+    // Load banner details for editing
+    await loadBannerDetails(banner.bannerId);
+  } else {
+    // Reset form for new banner
+    document.getElementById('bannerForm').reset();
+    imagePreview.style.display = 'none'; 
+    thumbnailContainer.innerHTML = '';
+    document.getElementById('previewImage').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150'%3E%3Crect width='400' height='150' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3EBanner Preview%3C/text%3E%3C/svg%3E";
+    document.getElementById('previewTitle').textContent = 'Banner Title';
+    document.getElementById('previewDescription').textContent = 'Banner description will appear here';
+    bannerStatus.checked = true; 
+    statusLabel.textContent = 'Active';
+  }
+  bannerModal.style.display = 'flex';
+}
+
+async function loadBannerDetails(bannerId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/get-banner-by-Id/${bannerId}`);
+    if (!response.ok) throw new Error('Failed to fetch banner details');
+    
+    const b = await response.json();
+    
+    document.getElementById('bannerTitle').value = b.header || '';
+    document.getElementById('bannerDescription').value = b.text || '';
+    document.getElementById('pageName').value = b.pageName || '';
+    bannerStatus.checked = b.status === 'active';
+    statusLabel.textContent = b.status === 'active' ? 'Active' : 'Inactive';
+    
+    // Show placeholder for images since we can't display uploaded files
+    imagePreview.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150'%3E%3Crect width='400' height='150' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3EImage Uploaded%3C/text%3E%3C/svg%3E";
+    imagePreview.style.display = 'block';
+    document.getElementById('previewImage').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='150'%3E%3Crect width='400' height='150' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3EImage Uploaded%3C/text%3E%3C/svg%3E";
+    document.getElementById('previewTitle').textContent = b.header || 'Banner Title';
+    document.getElementById('previewDescription').textContent = b.text || 'Banner description will appear here';
+    
+    // Create thumbnails based on available files
+    thumbnailContainer.innerHTML = '';
+    const fileInputs = [
+      { hasFile: b.hasBannerFileOne, input: bannerImage1 },
+      { hasFile: b.hasBannerFileTwo, input: bannerImage2 },
+      { hasFile: b.hasBannerFileThree, input: bannerImage3 },
+      { hasFile: b.hasBannerFileFour, input: bannerImage4 }
+    ];
+    
+    let imageIndex = 0;
+    fileInputs.forEach((fileObj, idx) => {
+      if (fileObj.hasFile) {
+        const img = document.createElement('img');
+        img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='50'%3E%3Crect width='100' height='50' fill='%23e0f2ff'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='10' fill='%23999'%3EImage ${idx + 1}%3C/text%3E%3C/svg%3E";
+        img.className = `thumbnail ${imageIndex === 0 ? 'active' : ''}`;
+        img.onclick = () => {
+          currentMainImageIndex = imageIndex;
+          document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+          img.classList.add('active');
+        };
+        thumbnailContainer.appendChild(img);
+        imageIndex++;
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error loading banner details:', error);
+    showToast('Failed to load banner details', 'error');
+  }
+}
+
+async function saveBanner() {
+  const title = document.getElementById('bannerTitle').value.trim();
+  const desc = document.getElementById('bannerDescription').value.trim();
+  const page = document.getElementById('pageName').value.trim();
+  const status = bannerStatus.checked ? 'active' : 'inactive';
+
+  if (!title || !page) {
+    showToast('Title and page name are required', 'error');
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('pageName', page);
+    formData.append('header', title);
+    formData.append('text', desc);
+    formData.append('bannerFileOne', bannerImage1.files[0] || '');
+    formData.append('bannerFileTwo', bannerImage2.files[0] || '');
+    formData.append('bannerFileThree', bannerImage3.files[0] || '');
+    formData.append('bannerFileFour', bannerImage4.files[0] || '');
+
+    let response;
+    if (isEditMode) {
+      response = await fetch(`${API_BASE_URL}/update-banner-by-bannerId/${currentBannerId}`, {
+        method: 'PATCH',
+        body: formData
+      });
+    } else {
+      response = await fetch(`${API_BASE_URL}/create-banner`, {
+        method: 'POST',
+        body: formData
       });
     }
+
+    if (!response.ok) throw new Error('Failed to save banner');
+
+    const result = await response.json();
+    
+    bannerModal.style.display = 'none';
+    await loadBanners();
+    showToast(`Banner ${isEditMode ? 'updated' : 'added'} successfully!`, 'success');
+    
+  } catch (error) {
+    console.error('Error saving banner:', error);
+    showToast('Failed to save banner', 'error');
+  }
+}
+
+async function editBanner(bannerId) {
+  const banner = banners.find(b => b.bannerId === bannerId);
+  if (banner) {
+    await openBannerModal(banner);
+  }
+}
+
+async function viewBanner(bannerId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/get-banner-by-Id/${bannerId}`);
+    if (!response.ok) throw new Error('Failed to fetch banner details');
+    
+    const b = await response.json();
+    
+    // Since we can't display uploaded images directly, show placeholder
+    document.getElementById('viewBannerImage').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23f0f0f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='16' fill='%23999'%3EBanner Image%3C/text%3E%3C/svg%3E";
+    document.getElementById('viewBannerTitle').textContent = b.header || 'No Title';
+    document.getElementById('viewBannerDescription').textContent = b.text || 'No description';
+    document.getElementById('viewBannerPage').textContent = b.pageName || 'No page';
+    document.getElementById('viewBannerStatus').innerHTML = `<span class="badge ${b.status==='active'?'badge-active':'badge-inactive'}">${b.status==='active'?'Active':'Inactive'}</span>`;
+    document.getElementById('viewBannerDate').textContent = b.createdDate ? formatDate(b.createdDate) : 'N/A';
+    
+    const cont = document.getElementById('viewThumbnailContainer');
+    cont.innerHTML = '';
+    
+    // Show thumbnails for available images
+    const fileInputs = [
+      { hasFile: b.hasBannerFileOne, label: 'Image 1' },
+      { hasFile: b.hasBannerFileTwo, label: 'Image 2' },
+      { hasFile: b.hasBannerFileThree, label: 'Image 3' },
+      { hasFile: b.hasBannerFileFour, label: 'Image 4' }
+    ];
+    
+    fileInputs.forEach((fileObj, idx) => {
+      if (fileObj.hasFile) {
+        const img = document.createElement('img');
+        img.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='50'%3E%3Crect width='100' height='50' fill='%23e0f2ff'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='10' fill='%23999'%3E${fileObj.label}%3C/text%3E%3C/svg%3E";
+        img.className = `thumbnail ${idx === 0 ? 'active' : ''}`;
+        img.onclick = () => {
+          document.getElementById('viewBannerImage').src = img.src;
+          cont.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+          img.classList.add('active');
+        };
+        cont.appendChild(img);
+      }
+    });
+    
+    viewBannerModal.style.display = 'flex';
+    
+  } catch (error) {
+    console.error('Error viewing banner:', error);
+    showToast('Failed to load banner details', 'error');
+  }
+}
+
+function confirmDelete(bannerId) {
+  currentBannerId = bannerId;
+  deleteModal.style.display = 'flex';
+}
+
+async function deleteBanner() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/delete-banner-by-bannerId/${currentBannerId}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) throw new Error('Failed to delete banner');
+    
+    const result = await response.text();
+    
+    deleteModal.style.display = 'none';
+    await loadBanners();
+    showToast('Banner deleted successfully!', 'success');
+    
+  } catch (error) {
+    console.error('Error deleting banner:', error);
+    showToast('Failed to delete banner', 'error');
+  }
+}
+
+async function toggleStatus(bannerId) {
+  try {
+    const banner = banners.find(b => b.bannerId === bannerId);
+    if (!banner) return;
+    
+    const newStatus = banner.status === 'active' ? 'inactive' : 'active';
+    
+    const formData = new FormData();
+    formData.append('pageName', banner.pageName);
+    formData.append('header', banner.header);
+    formData.append('text', banner.text);
+    
+    const response = await fetch(`${API_BASE_URL}/patch-banner-by-bannerId/${bannerId}`, {
+      method: 'PATCH',
+      body: formData
+    });
+    
+    if (!response.ok) throw new Error('Failed to update banner status');
+    
+    await loadBanners();
+    showToast(`Status changed to ${newStatus}`, 'success');
+    
+  } catch (error) {
+    console.error('Error updating status:', error);
+    showToast('Failed to update status', 'error');
+    // Reload to reset the toggle
+    loadBanners();
+  }
+}
+
+function formatDate(d) {
+  if (!d) return 'N/A';
+  return new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function updateThumbnails(activeIdx, newSrc) {
+  const srcs = [bannerImage1.files[0], bannerImage2.files[0], bannerImage3.files[0], bannerImage4.files[0]]
+    .map(f => f ? URL.createObjectURL(f) : null).filter(Boolean);
+  if (newSrc) srcs[activeIdx] = newSrc;
+  thumbnailContainer.innerHTML = '';
+  srcs.forEach((src, i) => {
+    const img = document.createElement('img');
+    img.src = src; 
+    img.className = `thumbnail ${i===currentMainImageIndex?'active':''}`;
+    img.onclick = () => { 
+      currentMainImageIndex = i; 
+      imagePreview.src = src; 
+      document.getElementById('previewImage').src = src; 
+      updateThumbnails(); 
+    };
+    thumbnailContainer.appendChild(img);
+  });
+}
+
+// Sidebar toggle
+document.getElementById('toggle-sidebar-logo').addEventListener('click', () => {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('w-64'); 
+  sidebar.classList.toggle('w-20');
+  document.querySelectorAll('.nav-text').forEach(t => t.classList.toggle('hidden'));
+  document.getElementById('sidebar-arrow').classList.toggle('rotate-180');
+});
+document.getElementById('close-sidebar').addEventListener('click', () => document.getElementById('sidebar').classList.add('-translate-x-full'));
+document.getElementById('toggle-sidebar-mobile').addEventListener('click', () => document.getElementById('sidebar').classList.remove('-translate-x-full'));

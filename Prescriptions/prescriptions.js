@@ -1,452 +1,168 @@
 // User profile functionality
-const user = {
-  name: "Shreya Kamble",
-  role: "Admin",
-};
+// const user = {
+//   name: "Shreya Kamble",
+//   role: "Admin",
+// };
 
 function displayUserProfile() {
-  const userInitials = document.getElementById("user-initials");
-  const userName = document.getElementById("user-name");
-  const userRole = document.getElementById("user-role");
+  const admin = Auth.getCurrentAdmin(); // This returns the admin object like { id: 4, firstName: "Sumer", lastName: "Khan", ... }
 
-  const nameParts = user.name.trim().split(" ");
-  const initials =
-    nameParts.length > 1
-      ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-      : nameParts[0][0];
+  const userInitials = document.getElementById('user-initials');
+  const userName = document.getElementById('user-name');
+  const userRole = document.getElementById('user-role');
+
+  if (!admin || !admin.firstName) {
+    // Fallback if no admin is logged in (shouldn't happen due to Auth.requireAuth())
+    userName.textContent = "Guest";
+    userRole.textContent = "Unknown";
+    userInitials.textContent = "??";
+    return;
+  }
+
+  // Full name
+  const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
+
+  // Generate initials (e.g., "SK" for Sumer Khan)
+  const nameParts = fullName.trim().split(' ');
+  const initials = nameParts.length > 1
+    ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+    : (nameParts[0]?.[0] || '?');
+
+  // Update DOM
   userInitials.textContent = initials.toUpperCase();
-
-  userName.textContent = user.name;
-  userRole.textContent = user.role;
+  userName.textContent = fullName;
+  userRole.textContent = "Admin"; // You can make this dynamic later if needed
 }
 
-displayUserProfile();
+// Call it when page loads
+document.addEventListener("DOMContentLoaded", displayUserProfile);
+
+
+
+ function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarArrow = document.getElementById('sidebar-arrow');
+    const logoDiv = document.querySelector('div > div'); // Logo container
+    const navTexts = document.querySelectorAll('.nav-text');
+    const navIcons = document.querySelectorAll('.nav-icon');
+    
+    if (window.innerWidth < 768) {
+        // Mobile: Just toggle visibility with smooth transition
+        sidebar.classList.toggle('-translate-x-full');
+        sidebar.classList.toggle('translate-x-0');
+    } else {
+        // Desktop: Toggle between collapsed and expanded
+        sidebar.classList.toggle('collapsed');
+        
+        if (sidebar.classList.contains('collapsed')) {
+            // Collapsed state
+            sidebar.style.width = '64px'; // Smaller width when collapsed
+            sidebarArrow.classList.remove('fa-chevron-left');
+            sidebarArrow.classList.add('fa-chevron-right');
+            
+            // Hide logo smoothly
+            logoDiv.style.opacity = '0';
+            logoDiv.style.width = '0';
+            
+            // Hide nav texts with delay
+            navTexts.forEach((text, index) => {
+                text.style.opacity = '0';
+                text.style.width = '0';
+                text.style.overflow = 'hidden';
+                text.style.transitionDelay = `${index * 20}ms`;
+            });
+            
+            // Center icons
+            navIcons.forEach(icon => {
+                icon.style.marginLeft = '0';
+                icon.style.marginRight = '0';
+            });
+            
+        } else {
+            // Expanded state
+            sidebar.style.width = '256px'; // Original width
+            sidebarArrow.classList.remove('fa-chevron-right');
+            sidebarArrow.classList.add('fa-chevron-left');
+            
+            // Show logo smoothly
+            logoDiv.style.opacity = '1';
+            logoDiv.style.width = 'auto';
+            
+            // Show nav texts with staggered animation
+            navTexts.forEach((text, index) => {
+                text.style.opacity = '1';
+                text.style.width = 'auto';
+                text.style.overflow = 'visible';
+                text.style.transitionDelay = `${index * 20}ms`;
+            });
+            
+            // Restore icon margins
+            navIcons.forEach(icon => {
+                icon.style.marginLeft = '0';
+                icon.style.marginRight = '0.75rem'; // mr-3
+            });
+        }
+    }
+}
+
+
+// Add event listeners
+document.getElementById('toggle-sidebar-logo').addEventListener('click', toggleSidebar);
+document.getElementById('close-sidebar').addEventListener('click', () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.add('-translate-x-full');
+    sidebar.classList.remove('translate-x-0');
+});
+
+// Optional: Close sidebar when clicking outside on mobile
+document.addEventListener('click', (event) => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggle-sidebar-logo');
+    
+    if (window.innerWidth < 768 && 
+        !sidebar.contains(event.target) && 
+        !toggleBtn.contains(event.target) &&
+        sidebar.classList.contains('translate-x-0')) {
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+    }
+});
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarArrow = document.getElementById('sidebar-arrow');
+        
+        // Set initial state based on screen width
+        if (window.innerWidth >= 768) {
+            // Desktop: Start expanded
+            sidebar.classList.remove('collapsed');
+            sidebarArrow.classList.remove('fa-chevron-right');
+            sidebarArrow.classList.add('fa-chevron-left');
+        } else {
+            // Mobile: Start hidden
+            sidebar.classList.remove('translate-x-0');
+        }
+    }
+
+// function displayUserProfile() {
+//   const userInitials = document.getElementById("user-initials");
+//   const userName = document.getElementById("user-name");
+//   const userRole = document.getElementById("user-role");
+
+//   const nameParts = user.name.trim().split(" ");
+//   const initials =
+//     nameParts.length > 1
+//       ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+//       : nameParts[0][0];
+//   userInitials.textContent = initials.toUpperCase();
+
+//   userName.textContent = user.name;
+//   userRole.textContent = user.role;
+// }
+
+// displayUserProfile();
 
 // Updated: Expanded prescriptionsData with 35 entries
-const prescriptionsData = [
-  {
-    id: "RX-1025",
-    patient: "Sarah Johnson",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-15",
-    status: "Approved",
-    medicines: [
-      { name: "Lisinopril", dosage: "10mg", quantity: 30, duration: "30 days" },
-      { name: "Metformin", dosage: "500mg", quantity: 60, duration: "30 days" },
-    ],
-    notes: "Take with food. Follow up in 30 days.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+1", "https://via.placeholder.com/300x200?text=Prescription+2"],
-  },
-  {
-    id: "RX-1024",
-    patient: "Michael Chen",
-    doctor: "Dr. James Wilson",
-    date: "2023-11-15",
-    status: "Dispensed",
-    medicines: [
-      { name: "Amoxicillin", dosage: "500mg", quantity: 21, duration: "7 days" },
-    ],
-    notes: "Take three times daily until finished.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+3"],
-  },
-  {
-    id: "RX-1023",
-    patient: "Emma Williams",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-14",
-    status: "Pending",
-    medicines: [
-      { name: "Atorvastatin", dosage: "20mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take at bedtime.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+4", "https://via.placeholder.com/300x200?text=Prescription+5"],
-  },
-  {
-    id: "RX-1022",
-    patient: "Robert Brown",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-11-14",
-    status: "Approved",
-    medicines: [
-      { name: "Levothyroxine", dosage: "50mcg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take on empty stomach in the morning.",
-    images: [],
-  },
-  {
-    id: "RX-1021",
-    patient: "Lisa Anderson",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-11-13",
-    status: "Dispensed",
-    medicines: [
-      { name: "Albuterol", dosage: "90mcg", quantity: 1, duration: "As needed" },
-    ],
-    notes: "Use inhaler as needed for shortness of breath.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+6"],
-  },
-  {
-    id: "RX-1020",
-    patient: "David Wilson",
-    doctor: "Dr. James Wilson",
-    date: "2023-11-12",
-    status: "Approved",
-    medicines: [
-      { name: "Omeprazole", dosage: "20mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take before breakfast.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+7"],
-  },
-  {
-    id: "RX-1019",
-    patient: "Jennifer Lee",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-11",
-    status: "Expired",
-    medicines: [
-      { name: "Cephalexin", dosage: "500mg", quantity: 28, duration: "7 days" },
-    ],
-    notes: "Finished course on 2023-11-18.",
-    images: [],
-  },
-  {
-    id: "RX-1018",
-    patient: "Thomas Moore",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-11-10",
-    status: "Pending",
-    medicines: [
-      { name: "Metoprolol", dosage: "25mg", quantity: 60, duration: "30 days" },
-    ],
-    notes: "Take twice daily. Monitor blood pressure.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+8"],
-  },
-  {
-    id: "RX-1017",
-    patient: "Anna Davis",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-11-09",
-    status: "Approved",
-    medicines: [
-      { name: "Ibuprofen", dosage: "400mg", quantity: 30, duration: "10 days" },
-    ],
-    notes: "Take as needed for pain.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+9"],
-  },
-  {
-    id: "RX-1016",
-    patient: "James Smith",
-    doctor: "Dr. James Wilson",
-    date: "2023-11-08",
-    status: "Dispensed",
-    medicines: [
-      { name: "Amlodipine", dosage: "5mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take once daily.",
-    images: [],
-  },
-  {
-    id: "RX-1015",
-    patient: "Sophia Garcia",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-07",
-    status: "Pending",
-    medicines: [
-      { name: "Prednisone", dosage: "10mg", quantity: 20, duration: "10 days" },
-    ],
-    notes: "Taper dose as directed.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+10", "https://via.placeholder.com/300x200?text=Prescription+11"],
-  },
-  {
-    id: "RX-1014",
-    patient: "William Martinez",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-11-06",
-    status: "Expired",
-    medicines: [
-      { name: "Azithromycin", dosage: "250mg", quantity: 6, duration: "5 days" },
-    ],
-    notes: "Completed course on 2023-11-11.",
-    images: [],
-  },
-  {
-    id: "RX-1013",
-    patient: "Olivia Taylor",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-11-05",
-    status: "Approved",
-    medicines: [
-      { name: "Sertraline", dosage: "50mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take in the morning.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+12"],
-  },
-  {
-    id: "RX-1012",
-    patient: "Liam Brown",
-    doctor: "Dr. James Wilson",
-    date: "2023-11-04",
-    status: "Dispensed",
-    medicines: [
-      { name: "Hydrochlorothiazide", dosage: "25mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take with food.",
-    images: [],
-  },
-  {
-    id: "RX-1011",
-    patient: "Ava Wilson",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-03",
-    status: "Pending",
-    medicines: [
-      { name: "Loratadine", dosage: "10mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take as needed for allergies.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+13"],
-  },
-  {
-    id: "RX-1010",
-    patient: "Noah Davis",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-11-02",
-    status: "Approved",
-    medicines: [
-      { name: "Gabapentin", dosage: "300mg", quantity: 90, duration: "30 days" },
-    ],
-    notes: "Take three times daily.",
-    images: [],
-  },
-  {
-    id: "RX-1009",
-    patient: "Isabella Martinez",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-11-01",
-    status: "Dispensed",
-    medicines: [
-      { name: "Citalopram", dosage: "20mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take in the evening.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+14"],
-  },
-  {
-    id: "RX-1008",
-    patient: "Mason Lee",
-    doctor: "Dr. James Wilson",
-    date: "2023-10-31",
-    status: "Pending",
-    medicines: [
-      { name: "Losartan", dosage: "50mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Monitor blood pressure daily.",
-    images: [],
-  },
-  {
-    id: "RX-1007",
-    patient: "Mia Thompson",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-10-30",
-    status: "Approved",
-    medicines: [
-      { name: "Simvastatin", dosage: "40mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take at night.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+15"],
-  },
-  {
-    id: "RX-1006",
-    patient: "Ethan Clark",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-10-29",
-    status: "Expired",
-    medicines: [
-      { name: "Clarithromycin", dosage: "500mg", quantity: 14, duration: "7 days" },
-    ],
-    notes: "Completed course on 2023-11-05.",
-    images: [],
-  },
-  {
-    id: "RX-1005",
-    patient: "Charlotte Adams",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-10-28",
-    status: "Dispensed",
-    medicines: [
-      { name: "Montelukast", dosage: "10mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take in the evening for asthma.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+16"],
-  },
-  {
-    id: "RX-1004",
-    patient: "Lucas Walker",
-    doctor: "Dr. James Wilson",
-    date: "2023-10-27",
-    status: "Pending",
-    medicines: [
-      { name: "Furosemide", dosage: "40mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take in the morning.",
-    images: [],
-  },
-  {
-    id: "RX-1003",
-    patient: "Amelia Hall",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-10-26",
-    status: "Approved",
-    medicines: [
-      { name: "Escitalopram", dosage: "10mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take in the morning.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+17"],
-  },
-  {
-    id: "RX-1002",
-    patient: "Henry Young",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-10-25",
-    status: "Dispensed",
-    medicines: [
-      { name: "Warfarin", dosage: "5mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Monitor INR regularly.",
-    images: [],
-  },
-  {
-    id: "RX-1001",
-    patient: "Evelyn King",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-10-24",
-    status: "Pending",
-    medicines: [
-      { name: "Pantoprazole", dosage: "40mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take before meals.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+18"],
-  },
-  // Additional entries for testing
-  {
-    id: "RX-1000",
-    patient: "Sophie Turner",
-    doctor: "Dr. James Wilson",
-    date: "2023-11-15",
-    status: "Rejected",
-    medicines: [
-      { name: "Tramadol", dosage: "50mg", quantity: 20, duration: "10 days" },
-    ],
-    notes: "Take as needed for pain.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+19", "https://via.placeholder.com/300x200?text=Prescription+20"],
-  },
-  {
-    id: "RX-0999",
-    patient: "Daniel Lee",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-14",
-    status: "Approved",
-    medicines: [
-      { name: "Rosuvastatin", dosage: "10mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take at night.",
-    images: [],
-  },
-  {
-    id: "RX-0998",
-    patient: "Grace Kim",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-11-13",
-    status: "Pending",
-    medicines: [
-      { name: "Cetirizine", dosage: "10mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take as needed for allergies.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+21"],
-  },
-  {
-    id: "RX-0997",
-    patient: "Jacob White",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-11-12",
-    status: "Dispensed",
-    medicines: [
-      { name: "Metformin", dosage: "1000mg", quantity: 60, duration: "30 days" },
-    ],
-    notes: "Take with meals.",
-    images: [],
-  },
-  {
-    id: "RX-0996",
-    patient: "Lily Harris",
-    doctor: "Dr. James Wilson",
-    date: "2023-11-11",
-    status: "Rejected",
-    medicines: [
-      { name: "Codeine", dosage: "30mg", quantity: 20, duration: "10 days" },
-    ],
-    notes: "Take as needed for cough.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+22"],
-  },
-  {
-    id: "RX-0995",
-    patient: "Ethan Parker",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-10",
-    status: "Approved",
-    medicines: [
-      { name: "Lisinopril", dosage: "20mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Monitor blood pressure.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+23", "https://via.placeholder.com/300x200?text=Prescription+24"],
-  },
-  {
-    id: "RX-0994",
-    patient: "Chloe Adams",
-    doctor: "Dr. Robert Taylor",
-    date: "2023-11-09",
-    status: "Pending",
-    medicines: [
-      { name: "Fluoxetine", dosage: "20mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take in the morning.",
-    images: [],
-  },
-  {
-    id: "RX-0993",
-    patient: "Mason Scott",
-    doctor: "Dr. Lisa Anderson",
-    date: "2023-11-08",
-    status: "Dispensed",
-    medicines: [
-      { name: "Atenolol", dosage: "50mg", quantity: 30, duration: "30 days" },
-    ],
-    notes: "Take once daily.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+25"],
-  },
-  {
-    id: "RX-0992",
-    patient: "Avery Green",
-    doctor: "Dr. James Wilson",
-    date: "2023-11-07",
-    status: "Rejected",
-    medicines: [
-      { name: "Oxycodone", dosage: "5mg", quantity: 20, duration: "10 days" },
-    ],
-    notes: "Take as needed for pain.",
-    images: [],
-  },
-  {
-    id: "RX-0991",
-    patient: "Harper Lewis",
-    doctor: "Dr. Emily Martinez",
-    date: "2023-11-15",
-    status: "Pending",
-    medicines: [
-      { name: "Levofloxacin", dosage: "500mg", quantity: 7, duration: "7 days" },
-    ],
-    notes: "Take once daily with food.",
-    images: ["https://via.placeholder.com/300x200?text=Prescription+26"],
-  },
-];
+const prescriptionsData = [];
 
 // Updated: Notifications data
 const notificationsData = [
@@ -840,4 +556,54 @@ $(document).ready(function () {
     notificationsTable.row.add([notification.title, notification.message, notification.time]);
   });
   notificationsTable.draw();
+});
+
+//logout functionality 
+// ----- LOGOUT BUTTON -------------------------------------------------
+$('#logoutBtn').on('click', function () {
+  const modalHTML = `
+    <div id="logoutModal" class="modal">
+      <div class="modal-content max-w-md mx-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold text-gray-800">Confirm Logout</h2>
+          <span class="close cursor-pointer text-gray-500 hover:text-red-500 text-2xl" id="closeLogoutModal">&times;</span>
+        </div>
+        <p class="text-gray-700 mb-6">Are you sure you want to logout?</p>
+        <div class="flex justify-end gap-3">
+          <button id="confirmLogout" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-sm">
+            Yes
+          </button>
+          <button id="cancelLogout" class="bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition shadow-sm">
+            No
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  $('body').append(modalHTML);
+  $('#logoutModal').show();
+});
+
+// ----- CONFIRM LOGOUT ------------------------------------------------
+$(document).on('click', '#confirmLogout', function () {
+  $('#logoutModal').remove();
+
+  Toastify({
+    text: "Successfully logged out.",
+    duration: 3000,
+    style: { background: 'linear-gradient(to right, #00b09b, #96c93d)' }
+  }).showToast();
+
+  setTimeout(() => {
+    window.location.href = '../Login/login.html';
+  }, 1500);
+});
+
+// ----- CANCEL / CLOSE LOGOUT -----------------------------------------
+$(document).on('click', '#cancelLogout, #closeLogoutModal, #logoutModal', function (e) {
+  if (e.target.id === 'cancelLogout' || 
+      e.target.id === 'closeLogoutModal' || 
+      e.target.id === 'logoutModal') {
+    $('#logoutModal').remove();
+  }
 });

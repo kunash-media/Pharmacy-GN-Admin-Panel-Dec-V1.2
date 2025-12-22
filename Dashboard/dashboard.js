@@ -1,25 +1,60 @@
 
-    const user = {
-      name: "Shreya Kamble",
-      role: "Admin"
-    };
+    // const user = {
+    //   name: "Shreya Kamble",
+    //   role: "Admin"
+    // };
 
-    function displayUserProfile() {
-      const userInitials = document.getElementById('user-initials');
-      const userName = document.getElementById('user-name');
-      const userRole = document.getElementById('user-role');
+    // function displayUserProfile() {
+    //   const userInitials = document.getElementById('user-initials');
+    //   const userName = document.getElementById('user-name');
+    //   const userRole = document.getElementById('user-role');
 
-      const nameParts = user.name.trim().split(' ');
-      const initials = nameParts.length > 1
-        ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-        : nameParts[0][0];
-      userInitials.textContent = initials.toUpperCase();
+    //   const nameParts = user.name.trim().split(' ');
+    //   const initials = nameParts.length > 1
+    //     ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+    //     : nameParts[0][0];
+    //   userInitials.textContent = initials.toUpperCase();
 
-      userName.textContent = user.name;
-      userRole.textContent = user.role;
-    }
+    //   userName.textContent = user.name;
+    //   userRole.textContent = user.role;
+    // }
 
-    displayUserProfile();
+    // displayUserProfile();
+
+
+    // NEW: Dynamically get admin data from auth.js (localStorage)
+function displayUserProfile() {
+  const admin = Auth.getCurrentAdmin(); // This returns the admin object like { id: 4, firstName: "Sumer", lastName: "Khan", ... }
+
+  const userInitials = document.getElementById('user-initials');
+  const userName = document.getElementById('user-name');
+  const userRole = document.getElementById('user-role');
+
+  if (!admin || !admin.firstName) {
+    // Fallback if no admin is logged in (shouldn't happen due to Auth.requireAuth())
+    userName.textContent = "Guest";
+    userRole.textContent = "Unknown";
+    userInitials.textContent = "??";
+    return;
+  }
+
+  // Full name
+  const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
+
+  // Generate initials (e.g., "SK" for Sumer Khan)
+  const nameParts = fullName.trim().split(' ');
+  const initials = nameParts.length > 1
+    ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+    : (nameParts[0]?.[0] || '?');
+
+  // Update DOM
+  userInitials.textContent = initials.toUpperCase();
+  userName.textContent = fullName;
+  userRole.textContent = "Admin"; // You can make this dynamic later if needed
+}
+
+// Call it when page loads
+document.addEventListener("DOMContentLoaded", displayUserProfile);
 
     const toggleSidebarLogo = document.getElementById('toggle-sidebar-logo');
     const sidebarArrow = document.getElementById('sidebar-arrow');
@@ -44,6 +79,133 @@
         el.classList.toggle('mx-auto');
       });
     });
+
+
+
+
+     function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarArrow = document.getElementById('sidebar-arrow');
+    const logoDiv = document.querySelector('div > div'); // Logo container
+    const navTexts = document.querySelectorAll('.nav-text');
+    const navIcons = document.querySelectorAll('.nav-icon');
+    
+    if (window.innerWidth < 768) {
+        // Mobile: Just toggle visibility with smooth transition
+        sidebar.classList.toggle('-translate-x-full');
+        sidebar.classList.toggle('translate-x-0');
+    } else {
+        // Desktop: Toggle between collapsed and expanded
+        sidebar.classList.toggle('collapsed');
+        
+        if (sidebar.classList.contains('collapsed')) {
+            // Collapsed state
+            sidebar.style.width = '64px'; // Smaller width when collapsed
+            sidebarArrow.classList.remove('fa-chevron-left');
+            sidebarArrow.classList.add('fa-chevron-right');
+            
+            // Hide logo smoothly
+            logoDiv.style.opacity = '0';
+            logoDiv.style.width = '0';
+            
+            // Hide nav texts with delay
+            navTexts.forEach((text, index) => {
+                text.style.opacity = '0';
+                text.style.width = '0';
+                text.style.overflow = 'hidden';
+                text.style.transitionDelay = `${index * 20}ms`;
+            });
+            
+            // Center icons
+            navIcons.forEach(icon => {
+                icon.style.marginLeft = '0';
+                icon.style.marginRight = '0';
+            });
+            
+        } else {
+            // Expanded state
+            sidebar.style.width = '256px'; // Original width
+            sidebarArrow.classList.remove('fa-chevron-right');
+            sidebarArrow.classList.add('fa-chevron-left');
+            
+            // Show logo smoothly
+            logoDiv.style.opacity = '1';
+            logoDiv.style.width = 'auto';
+            
+            // Show nav texts with staggered animation
+            navTexts.forEach((text, index) => {
+                text.style.opacity = '1';
+                text.style.width = 'auto';
+                text.style.overflow = 'visible';
+                text.style.transitionDelay = `${index * 20}ms`;
+            });
+            
+            // Restore icon margins
+            navIcons.forEach(icon => {
+                icon.style.marginLeft = '0';
+                icon.style.marginRight = '0.75rem'; // mr-3
+            });
+        }
+    }
+}
+
+
+// Add event listeners
+document.getElementById('toggle-sidebar-logo').addEventListener('click', toggleSidebar);
+document.getElementById('close-sidebar').addEventListener('click', () => {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.add('-translate-x-full');
+    sidebar.classList.remove('translate-x-0');
+});
+
+// Optional: Close sidebar when clicking outside on mobile
+document.addEventListener('click', (event) => {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggle-sidebar-logo');
+    
+    if (window.innerWidth < 768 && 
+        !sidebar.contains(event.target) && 
+        !toggleBtn.contains(event.target) &&
+        sidebar.classList.contains('translate-x-0')) {
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+    }
+});
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarArrow = document.getElementById('sidebar-arrow');
+        
+        // Set initial state based on screen width
+        if (window.innerWidth >= 768) {
+            // Desktop: Start expanded
+            sidebar.classList.remove('collapsed');
+            sidebarArrow.classList.remove('fa-chevron-right');
+            sidebarArrow.classList.add('fa-chevron-left');
+        } else {
+            // Mobile: Start hidden
+            sidebar.classList.remove('translate-x-0');
+        }
+    }
+
+    function handleResponsiveSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        
+        if (window.innerWidth >= 768) {
+            // Desktop: Ensure sidebar is visible
+            sidebar.classList.remove('translate-x-0');
+            
+            // Reset to expanded state on desktop if it was collapsed
+            if (!sidebar.classList.contains('collapsed')) {
+                sidebar.classList.remove('collapsed');
+                const sidebarArrow = document.getElementById('sidebar-arrow');
+                sidebarArrow.classList.remove('fa-chevron-right');
+                sidebarArrow.classList.add('fa-chevron-left');
+            }
+        } else {
+            // Mobile: Ensure sidebar is hidden by default
+            sidebar.classList.remove('translate-x-0');
+        }
+    }
 
     toggleSidebarMobile.addEventListener('click', () => {
       sidebar.classList.toggle('-translate-x-full');
@@ -401,31 +563,35 @@
       plugins: [ChartDataLabels]
     });
 
-    const logoutBtn = document.getElementById('logout-btn');
-    const logoutModal = document.getElementById('logoutModal');
-    const confirmLogout = document.getElementById('confirmLogout');
-    const cancelLogout = document.getElementById('cancelLogout');
-    const closeModal = document.querySelector('#logoutModal .close');
+// Logout Modal Logic
+const logoutBtn = document.getElementById('logoutBtn');
+const logoutModal = document.getElementById('logoutModal');
+const confirmLogout = document.getElementById('confirmLogout');
+const cancelLogout = document.getElementById('cancelLogout');
+const closeLogoutModal = document.getElementById('closeLogoutModal');
 
-    logoutBtn.addEventListener('click', () => {
-      logoutModal.style.display = 'block';
-    });
+// Open modal
+logoutBtn.addEventListener('click', (e) => {
+  e.preventDefault();
+  logoutModal.classList.remove('hidden');
+});
 
-    confirmLogout.addEventListener('click', () => {
-      window.location.href = '../Login/login.html?logout=success';
-    });
+// Close modal
+function closeModal() {
+  logoutModal.classList.add('hidden');
+}
 
-    cancelLogout.addEventListener('click', () => {
-      logoutModal.style.display = 'none';
-    });
+cancelLogout.addEventListener('click', closeModal);
+closeLogoutModal.addEventListener('click', closeModal);
 
-    closeModal.addEventListener('click', () => {
-      logoutModal.style.display = 'none';
-    });
+// Close when clicking outside
+logoutModal.addEventListener('click', (e) => {
+  if (e.target === logoutModal) {
+    closeModal();
+  }
+});
 
-    window.addEventListener('click', (event) => {
-      if (event.target === logoutModal) {
-        logoutModal.style.display = 'none';
-      }
-    });
- 
+// Confirm logout
+confirmLogout.addEventListener('click', () => {
+  window.location.href = '../Login/login.html';
+});
