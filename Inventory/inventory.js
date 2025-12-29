@@ -565,7 +565,7 @@ $(document).ready(function() {
   };
 
   $('#export-csv').click(function() {
-    fetch(`http://localhost:8083/api/products/get-all-product?page=0&size=1000`)
+    fetch(`http://localhost:8083/api/products/get-all-products?page=0&size=1000`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`Failed to fetch products for export: ${response.status}`);
@@ -746,7 +746,7 @@ function updateDataTable(data) {
 }
 
 function fetchAllProducts() {
-  fetch('http://localhost:8083/api/products/get-all-product?page=0&size=1000')
+  fetch('http://localhost:8083/api/products/get-all-products?page=0&size=1000')
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);

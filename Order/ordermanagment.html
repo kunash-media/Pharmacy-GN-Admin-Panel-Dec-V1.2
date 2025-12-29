@@ -705,25 +705,27 @@ li:nth-child(11) { transition-delay: 200ms; }
         });
 
         // User profile function
-        function displayUserProfile() {
-            const user = {
-                name: "Shreya Kamble",
-                role: "Admin",
-            };
+        // function displayUserProfile() {
+        //     const user = {
+        //         name: "Shreya Kamble",
+        //         role: "Admin",
+        //     };
             
-            const userInitials = document.getElementById("user-initials");
-            const userName = document.getElementById("user-name");
-            const userRole = document.getElementById("user-role");
+        //     const userInitials = document.getElementById("user-initials");
+        //     const userName = document.getElementById("user-name");
+        //     const userRole = document.getElementById("user-role");
             
-            const nameParts = user.name.trim().split(" ");
-            const initials = nameParts.length > 1 
-                ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}` 
-                : nameParts[0][0];
+        //     const nameParts = user.name.trim().split(" ");
+        //     const initials = nameParts.length > 1 
+        //         ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}` 
+        //         : nameParts[0][0];
                 
-            userInitials.textContent = initials.toUpperCase();
-            if (userName) userName.textContent = user.name;
-            if (userRole) userRole.textContent = user.role;
-        }
+        //     userInitials.textContent = initials.toUpperCase();
+        //     if (userName) userName.textContent = user.name;
+        //     if (userRole) userRole.textContent = user.role;
+        // }
+
+        
 
         async function fetchAllOrders(silent = false) {
             try {

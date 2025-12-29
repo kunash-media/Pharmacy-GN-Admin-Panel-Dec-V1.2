@@ -457,3 +457,5 @@ document.getElementById('toggle-sidebar-logo').addEventListener('click', () => {
 });
 document.getElementById('close-sidebar').addEventListener('click', () => document.getElementById('sidebar').classList.add('-translate-x-full'));
 document.getElementById('toggle-sidebar-mobile').addEventListener('click', () => document.getElementById('sidebar').classList.remove('-translate-x-full'));
+
+
