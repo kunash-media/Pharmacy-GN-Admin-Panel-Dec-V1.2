@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -344,6 +344,89 @@
         .action-buttons .reject-btn {
             color: #ef4444;
         }
+
+
+        /* Action Buttons - Updated with verification colors */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+.action-buttons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+}
+
+.action-buttons button:hover {
+    background-color: #f3f4f6;
+}
+
+.action-buttons .view-btn {
+    color: #3b82f6;
+}
+
+.action-buttons .edit-btn {
+    color: #f59e0b;
+}
+
+.action-buttons .delete-btn {
+    color: #ef4444;
+}
+
+/* Verification action buttons with specific colors */
+.action-buttons .verify-btn {
+    color: #10b981 !important;
+}
+
+.action-buttons .reject-btn {
+    color: #ef4444 !important;
+}
+
+.action-buttons .unapprove-btn {
+    color: #ef4444 !important;
+}
+
+.action-buttons .reapprove-btn {
+    color: #10b981 !important;
+}
+
+/* Make sure icon colors override any parent styles */
+.action-buttons .verify-btn i,
+.action-buttons .reapprove-btn i {
+    color: #10b981 !important;
+}
+
+.action-buttons .reject-btn i,
+.action-buttons .unapprove-btn i {
+    color: #ef4444 !important;
+}
+
+/* Status colors for reference */
+.status-approved {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.status-rejected {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
 
         /* ============ PRODUCT TABLE FIXES - START ============ */
         /* Product Table Container */
@@ -1409,62 +1492,110 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 </select>
                             </div>
                         </div>
-                        <div class="info-section">
-                            <h3>Stock & Pricing</h3>
-                            <div class="mb-4">
-                                <label for="edit-quantity">Quantity in Stock *</label>
-                                <input type="number" id="edit-quantity" min="0" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-unit">Unit *</label>
-                                <select id="edit-unit" required>
-                                    <option value="">Select Unit</option>
-                                    <option value="Tablet Strip">Tablet Strip</option>
-                                    <option value="Bottle">Bottle</option>
-                                    <option value="Pack">Pack</option>
-                                    <option value="Tube">Tube</option>
-                                    <option value="Box">Box</option>
-                                    <option value="Piece">Piece</option>
-                                    <option value="Strip">Strip</option>
-                                    <option value="Capsule">Capsule</option>
-                                    <option value="Syrup">Syrup</option>
-                                    <option value="Cream">Cream</option>
-                                    <option value="Ointment">Ointment</option>
-                                    <option value="Injection">Injection</option>
-                                    <option value="Drop">Drop</option>
-                                    <option value="Powder">Powder</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-mrp">MRP (₹) *</label>
-                                <input type="number" id="edit-mrp" min="0" step="0.01" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-price">Selling Price (₹) *</label>
-                                <input type="number" id="edit-price" min="0" step="0.01" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-old-price">Old Price (₹)</label>
-                                <input type="number" id="edit-old-price" min="0" step="0.01">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-rating">Rating (0-5) *</label>
-                                <input type="number" id="edit-rating" min="0" max="5" step="0.1" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-batch">Batch Number *</label>
-                                <input type="text" id="edit-batch" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-mfg-date">Manufacturing Date *</label>
-                                <input type="date" id="edit-mfg-date" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-expiry">Expiry Date *</label>
-                                <input type="date" id="edit-expiry" required>
-                            </div>
-                        </div>
+<!-- Line 406-460: Update this section in your editProductModal -->
+<div class="info-section">
+    <h3>Stock & Pricing</h3>
+    
+    <!-- Price Type Selection -->
+    <div class="mb-4">
+        <label for="edit-price-type">Price Type *</label>
+        <select id="edit-price-type" required>
+            <option value="single">Single Price</option>
+            <option value="multiple">Multiple Prices (for sizes/variants)</option>
+        </select>
+    </div>
+    
+<!-- Single Price Section -->
+<div id="single-price-section" class="mb-4">
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <label for="edit-price">Selling Price (₹) *</label>
+            <input type="number" id="edit-price" min="0" step="0.01" class="single-price-input">
+        </div>
+        <div>
+            <label for="edit-old-price">Old Price (₹)</label>
+            <input type="number" id="edit-old-price" min="0" step="0.01">
+        </div>
+    </div>
+    <!-- <div class="mt-4">
+        <label for="edit-mrp">MRP (₹) *</label>
+        <input type="number" id="edit-mrp" min="0" step="0.01" class="single-price-input">
+    </div> -->
+</div>
+    
+<!-- Multiple Prices Section -->
+<div id="multiple-price-section" class="hidden mt-4">
+    <div class="border border-gray-200 rounded-lg bg-white p-4">
+        <div class="grid grid-cols-4 gap-4 mb-3 px-2 py-3 bg-gray-50 rounded-lg border border-gray-100">
+            <span class="font-medium text-gray-700 text-sm">Variant/Size</span>
+            <span class="font-medium text-gray-700 text-sm">Current Price (₹)</span>
+            <span class="font-medium text-gray-700 text-sm">Original Price (₹)</span>
+            <span class="font-medium text-gray-700 text-sm text-center">Actions</span>
+        </div>
+        
+        <div class="price-items-container space-y-3 mb-4">
+            <!-- Initial price item row -->
+            <div class="price-item-row grid grid-cols-4 gap-4 items-center p-3 border border-gray-200 rounded-lg bg-white hover:border-blue-300 transition-colors">
+                <input type="text" placeholder="e.g., 500ml, 100 tablets" 
+                       class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                <input type="number" placeholder="0.00" step="0.01" 
+                       class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                <input type="number" placeholder="0.00" step="0.01" 
+                       class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+                <button type="button" class="remove-price-btn flex justify-center">
+                    <i class="fas fa-times-circle text-red-500 text-lg hover:text-red-700 transition-colors"></i>
+                </button>
+            </div>
+        </div>
+        
+        <button type="button" class="add-price-btn w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center shadow-sm hover:shadow-md">
+            <i class="fas fa-plus mr-2"></i> Add Price Item
+        </button>
+    </div>
+</div>
+    
+    <div class="mb-4">
+        <label for="edit-quantity">Quantity in Stock *</label>
+        <input type="number" id="edit-quantity" min="0" required>
+    </div>
+    <!-- <div class="mb-4">
+        <label for="edit-unit">Unit *</label>
+        <select id="edit-unit" required>
+            <option value="">Select Unit</option>
+            <option value="Tablet Strip">Tablet Strip</option>
+            <option value="Bottle">Bottle</option>
+            <option value="Pack">Pack</option>
+            <option value="Tube">Tube</option>
+            <option value="Box">Box</option>
+            <option value="Piece">Piece</option>
+            <option value="Strip">Strip</option>
+            <option value="Capsule">Capsule</option>
+            <option value="Syrup">Syrup</option>
+            <option value="Cream">Cream</option>
+            <option value="Ointment">Ointment</option>
+            <option value="Injection">Injection</option>
+            <option value="Drop">Drop</option>
+            <option value="Powder">Powder</option>
+            <option value="Other">Other</option>
+        </select>
+    </div> -->
+    <div class="mb-4">
+        <label for="edit-rating">Rating (0-5) *</label>
+        <input type="number" id="edit-rating" min="0" max="5" step="0.1" required>
+    </div>
+    <div class="mb-4">
+        <label for="edit-batch">Batch Number *</label>
+        <input type="text" id="edit-batch" required>
+    </div>
+    <div class="mb-4">
+        <label for="edit-mfg-date">Manufacturing Date *</label>
+        <input type="date" id="edit-mfg-date" required>
+    </div>
+    <div class="mb-4">
+        <label for="edit-expiry">Expiry Date *</label>
+        <input type="date" id="edit-expiry" required>
+    </div>
+</div>
                         <div class="info-section md:col-span-2">
                             <h3>Additional Information</h3>
                             <div class="mb-4">
@@ -1475,10 +1606,10 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <label for="edit-benefits">Benefits (One per line) *</label>
                                 <textarea id="edit-benefits" rows="3" placeholder="Enter each benefit on a new line" required></textarea>
                             </div>
-                            <div class="mb-4">
+                            <!-- <div class="mb-4">
                                 <label for="edit-directions">Directions for Use (One per line) *</label>
                                 <textarea id="edit-directions" rows="3" placeholder="Enter each direction on a new line" required></textarea>
-                            </div>
+                            </div> -->
                             <div class="mb-4">
                                 <label for="edit-ingredients">Ingredients (Comma separated) *</label>
                                 <textarea id="edit-ingredients" rows="2" placeholder="Enter ingredients separated by commas" required></textarea>
@@ -1530,6 +1661,98 @@ li:nth-child(11) { transition-delay: 200ms; }
                     </form>
                 </div>
             </div>
+
+            <!-- Verification Modal Overlay -->
+<div id="verificationModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4">
+        <div class="p-6">
+            <!-- Header -->
+            <div class="flex items-center mb-6">
+                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-clipboard-check text-blue-600 text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800" id="verificationModalTitle">Verify Product</h3>
+                    <p class="text-sm text-gray-500" id="verificationModalSubtitle">Review product details before action</p>
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="font-semibold text-gray-700 mb-2" id="verificationProductName">Product Name</h4>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <span class="text-gray-500">SKU:</span>
+                        <span class="font-medium ml-2" id="verificationSku">N/A</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Category:</span>
+                        <span class="font-medium ml-2" id="verificationCategory">N/A</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Brand:</span>
+                        <span class="font-medium ml-2" id="verificationBrand">N/A</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-500">Status:</span>
+                        <span class="font-medium ml-2" id="verificationStatus">N/A</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Selection -->
+            <div class="mb-6">
+                <h4 class="font-semibold text-gray-700 mb-3">Verification Action</h4>
+                <div class="space-y-3">
+                    <label class="flex items-center p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition-colors">
+                        <input type="radio" name="verificationAction" value="APPROVE" class="mr-3 h-5 w-5 text-blue-600">
+                        <div>
+                            <div class="font-medium text-gray-800">Approve Product</div>
+                            <div class="text-sm text-gray-500">Product will be visible to customers</div>
+                        </div>
+                        <i class="fas fa-check-circle text-green-500 text-xl ml-auto"></i>
+                    </label>
+                    
+                    <label class="flex items-center p-3 border rounded-lg hover:bg-red-50 cursor-pointer transition-colors">
+                        <input type="radio" name="verificationAction" value="REJECT" class="mr-3 h-5 w-5 text-red-600">
+                        <div>
+                            <div class="font-medium text-gray-800">Reject Product</div>
+                            <div class="text-sm text-gray-500">Product will be hidden from customers</div>
+                        </div>
+                        <i class="fas fa-times-circle text-red-500 text-xl ml-auto"></i>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Notes (Optional) -->
+            <!-- <div class="mb-6"> -->
+                <!-- <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label> -->
+                <!-- <textarea 
+                    id="verificationNotes" 
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows="3" 
+                ></textarea>
+            </div> -->
+
+            <!-- Buttons -->
+            <div class="flex space-x-3">
+                <button 
+                    id="cancelVerification" 
+                    class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                    Cancel
+                </button>
+                <button 
+                    id="submitVerification" 
+                    class="flex-1 px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled
+                >
+                    Submit Verification
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
             <!-- NEW: Verification Modal -->
             <!-- <div id="verificationModal" class="modal">
@@ -1631,58 +1854,52 @@ li:nth-child(11) { transition-delay: 200ms; }
             </div>
         </main>
     </div>
-     <script src="/auth.js"></script>
-  <script>
-      // This will redirect to login if session is missing or expired
-      Auth.requireAuth();
+    <script src="/auth.js"></script>
+    <script>
+        // This will redirect to login if session is missing or expired
+        Auth.requireAuth();
 
-      // Optional: start background timer to warn on expiration
-      Auth.startSessionTimer();
+        // Optional: start background timer to warn on expiration
+        Auth.startSessionTimer();
 
-      // Example: display admin name
-      document.addEventListener("DOMContentLoaded", () => {
-          const admin = Auth.getCurrentAdmin();
-          if (admin) {
-              console.log("Logged in as:", admin.firstName + " " + admin.lastName);
-              // e.g., document.getElementById('adminName').textContent = admin.firstName;
-          }
-      });
+        // Example: display admin name
+        document.addEventListener("DOMContentLoaded", () => {
+            const admin = Auth.getCurrentAdmin();
+            if (admin) {
+                console.log("Logged in as:", admin.firstName + " " + admin.lastName);
+                // Update user profile display
+                displayUserProfile();
+            }
+        });
 
-      function displayUserProfile() {
-  const admin = Auth.getCurrentAdmin(); // This returns the admin object like { id: 4, firstName: "Sumer", lastName: "Khan", ... }
+        function displayUserProfile() {
+            const admin = Auth.getCurrentAdmin();
+            const userInitials = document.getElementById('user-initials');
+            const userName = document.getElementById('user-name');
+            const userRole = document.getElementById('user-role');
 
-  const userInitials = document.getElementById('user-initials');
-  const userName = document.getElementById('user-name');
-  const userRole = document.getElementById('user-role');
+            if (!admin || !admin.firstName) {
+                userName.textContent = "Guest";
+                userRole.textContent = "Unknown";
+                userInitials.textContent = "??";
+                return;
+            }
 
-  if (!admin || !admin.firstName) {
-    // Fallback if no admin is logged in (shouldn't happen due to Auth.requireAuth())
-    userName.textContent = "Guest";
-    userRole.textContent = "Unknown";
-    userInitials.textContent = "??";
-    return;
-  }
+            const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
+            const role = `${admin.role}`.trim();
+            
+            const nameParts = fullName.trim().split(' ');
+            const initials = nameParts.length > 1
+                ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
+                : (nameParts[0]?.[0] || '?');
 
-  // Full name
-  const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
-
-  // Generate initials (e.g., "SK" for Sumer Khan)
-  const nameParts = fullName.trim().split(' ');
-  const initials = nameParts.length > 1
-    ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-    : (nameParts[0]?.[0] || '?');
-
-  // Update DOM
-  userInitials.textContent = initials.toUpperCase();
-  userName.textContent = fullName;
-  userRole.textContent = "Admin"; // You can make this dynamic later if needed
-}
-
-// Call it when page loads
-document.addEventListener("DOMContentLoaded", displayUserProfile);
-
-  </script>
-    <!-- JavaScript file -->
-    <script src="../Product Management/product.js"></script>
+            userInitials.textContent = initials.toUpperCase();
+            userName.textContent = fullName;
+            userRole.textContent = role;
+        }
+    </script>
+    
+    <!-- JavaScript file - MUST BE LOADED LAST -->
+    <script src="../Product Management/product.js?v=1.1.3"></script>
 </body>
 </html>

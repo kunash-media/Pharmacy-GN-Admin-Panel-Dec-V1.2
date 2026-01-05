@@ -217,7 +217,7 @@
 }
 
 /* Action Buttons */
-.action-buttons {
+/* .action-buttons {
     display: flex;
     justify-content: center;
     gap: 8px;
@@ -235,8 +235,8 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-}
-
+} */
+/* 
 .action-buttons button:hover {
     background-color: #f3f4f6;
 }
@@ -251,7 +251,8 @@
 
 .action-buttons .delete-btn {
     color: #ef4444;
-}
+} */
+
 
 /* Table Container - FIXED FOR STICKY ACTIONS */
 .product-table-container {
@@ -289,6 +290,219 @@
     max-height: 430px !important;
     overflow-y: auto !important;
     overflow-x: auto !important;
+}
+
+/* ============ PRICE MANAGEMENT STYLES ============ */
+/* Price List Styles */
+.price-list-container {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 10px;
+}
+
+.price-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto; 
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+
+.price-item-row input:focus {
+    border-color: #3b82f6;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+/* Optional: Style for the price rows container */
+.price-item-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 80px;
+    gap: 12px;
+    margin-bottom: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.price-item-row:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.1);
+}
+
+.price-item-row input {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    width: 100%;
+    font-size: 14px;
+    background-color: white;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.price-item input {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.price-item:last-child {
+    margin-bottom: 0;
+}
+
+.price-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 80px;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    font-size: 13px;
+}
+
+.price-header span:last-child {
+    text-align: center;
+}
+
+    .remove-price-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin: 0 auto;
+}
+
+.add-price-btn-green {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    margin-top: 15px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.add-price-btn-green:hover {
+    background-color: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+}
+
+.add-price-btn-green i {
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.price-list-container {
+    margin-top: 15px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Price type toggle styling */
+#single-price-section, #multiple-price-section {
+    transition: all 0.3s ease;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #f9fafb;
+    margin-bottom: 20px;
+}
+
+#single-price-section .grid {
+    gap: 20px;
+}
+
+#single-price-section input {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#single-price-section input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.remove-price-btn:hover {
+    background-color: #fee2e2;
+    transform: scale(1.1);
+}
+
+.remove-price-btn i {
+    font-size: 18px;
+    color: #dc2626;
+}
+
+.remove-price-btn:hover i {
+    color: #b91c1c;
+}
+
+.add-price-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.add-price-btn:hover {
+  background-color: #45a049;
+}
+
+
+.price-display {
+    background-color: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.price-display:last-child {
+    margin-bottom: 0;
+}
+
+/* For price type sections */
+.hidden {
+    display: none !important;
 }
 
 #productTable {
@@ -564,6 +778,10 @@ select.border:focus {
     outline: none;
 }
 
+
+
+
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .modal-container {
@@ -639,3 +857,5 @@ select.border:focus {
         box-shadow: none !important;
     }
 }
+
+

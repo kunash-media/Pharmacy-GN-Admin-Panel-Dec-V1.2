@@ -1,45 +1,410 @@
-// User profile functionality
-// const user = {
-//   name: "Shreya Kamble",
-//   role: "Admin",
-// };
+const API_BASE_URL = 'http://localhost:8083/api/prescriptions';
 
-function displayUserProfile() {
-  const admin = Auth.getCurrentAdmin(); // This returns the admin object like { id: 4, firstName: "Sumer", lastName: "Khan", ... }
+let prescriptions = [];
+let filteredPrescriptions = [];
+let currentPage = 1;
+const pageSize = 10;
 
-  const userInitials = document.getElementById('user-initials');
-  const userName = document.getElementById('user-name');
-  const userRole = document.getElementById('user-role');
+const els = {
+  prescriptionsBody: document.getElementById('prescriptionsBody'),
+  historyBody: document.getElementById('historyBody'),
+  loading: document.getElementById('loadingOverlay'),
+  toastContainer: document.getElementById('toastContainer'),
+  dateFrom: document.getElementById('date-from'),
+  dateTo: document.getElementById('date-to'),
+  filterStatus: document.getElementById('filter-status'),
+  historyFrom: document.getElementById('history-date-from'),
+  historyTo: document.getElementById('history-date-to'),
+  totalOrders: document.getElementById('total-orders'),
+  todaysOrders: document.getElementById('todays-orders'),
+  approvedOrders: document.getElementById('approved-orders'),
+  rejectedOrders: document.getElementById('rejected-orders'),
+  prescriptionsPagination: document.getElementById('prescriptionsPagination'),
+  historyPagination: document.getElementById('historyPagination')
+};
 
-  if (!admin || !admin.firstName) {
-    // Fallback if no admin is logged in (shouldn't happen due to Auth.requireAuth())
-    userName.textContent = "Guest";
-    userRole.textContent = "Unknown";
-    userInitials.textContent = "??";
-    return;
-  }
-
-  // Full name
-  const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
-
-  // Generate initials (e.g., "SK" for Sumer Khan)
-  const nameParts = fullName.trim().split(' ');
-  const initials = nameParts.length > 1
-    ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-    : (nameParts[0]?.[0] || '?');
-
-  // Update DOM
-  userInitials.textContent = initials.toUpperCase();
-  userName.textContent = fullName;
-  userRole.textContent = "Admin"; // You can make this dynamic later if needed
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} mr-2"></i>${message}`;
+  els.toastContainer.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
 }
 
-// Call it when page loads
-document.addEventListener("DOMContentLoaded", displayUserProfile);
+function showLoading() { els.loading.classList.add('active'); }
+function hideLoading() { els.loading.classList.remove('active'); }
+
+function formatDate(dateString) {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB') + ' ' + date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+
+function getStatusClass(status, isApproved) {
+  if (status === 'PENDING' && isApproved) return 'status-approved';
+  const map = {
+    PENDING: 'status-pending',
+    APPROVED: 'status-approved',
+    PROCESSING: 'status-processing',
+    SHIPPED: 'status-shipped',
+    DELIVERED: 'status-delivered',
+    REJECTED: 'status-rejected',
+    CANCELLED: 'status-cancelled'
+  };
+  return map[status] || 'status-pending';
+}
+
+function getDisplayStatus(status, isApproved) {
+  return (status === 'PENDING' && isApproved) ? 'APPROVED' : status;
+}
+
+async function getAllPrescriptions() {
+  const res = await fetch(`${API_BASE_URL}/get-all-orders?page=0&size=1000&sortBy=createdAt&sortDirection=DESC`);
+  if (!res.ok) throw new Error('Failed to fetch prescriptions');
+  return await res.json();
+}
+
+async function createPrescription(formData) {
+  const res = await fetch(`${API_BASE_URL}/create-order`, { method: 'POST', body: formData });
+  if (!res.ok) throw new Error('Failed to create prescription');
+  return await res.json();
+}
+
+async function approvePrescription(id) {
+  await fetch(`${API_BASE_URL}/${id}/approve?isApproved=true`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+  await fetch(`${API_BASE_URL}/patch-status/${id}?status=APPROVED`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+}
+
+async function rejectPrescription(id) {
+  await fetch(`${API_BASE_URL}/reject-order-by-status/${id}/reject-order`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+}
+
+async function deletePrescription(id) {
+  await fetch(`${API_BASE_URL}/delete-order-by-prescriptionId/${id}`, { method: 'DELETE' });
+}
+
+async function getPrescriptionImage(id, userId = 1) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/${id}/image?userId=${userId}`);
+    if (!res.ok || res.status === 404) return null;
+    const blob = await res.blob();
+    return blob.size > 0 && blob.type.startsWith('image/') ? URL.createObjectURL(blob) : null;
+  } catch { return null; }
+}
+
+async function loadAndRender() {
+  try {
+    showLoading();
+    const data = await getAllPrescriptions();
+    prescriptions = data.content || [];
+    filteredPrescriptions = [...prescriptions];
+
+    updateStats();
+    renderTable('prescriptionsBody', 'prescriptionsPagination', filteredPrescriptions);
+    renderTable('historyBody', 'historyPagination', filteredPrescriptions);
+    hideLoading();
+  } catch (err) {
+    hideLoading();
+    showToast('Failed to load prescriptions', 'error');
+  }
+}
+
+function updateStats() {
+  const today = new Date().toISOString().split('T')[0];
+  const todaysCount = prescriptions.filter(p => new Date(p.createdAt).toISOString().split('T')[0] === today).length;
+  const approvedCount = prescriptions.filter(p => p.isApproved || p.orderStatus === 'APPROVED').length;
+  const rejectedCount = prescriptions.filter(p => p.orderStatus === 'REJECTED').length;
+
+  els.totalOrders.textContent = prescriptions.length;
+  els.todaysOrders.textContent = todaysCount;
+  els.approvedOrders.textContent = approvedCount;
+  els.rejectedOrders.textContent = rejectedCount;
+}
+
+function renderTable(bodyId, paginationId, data) {
+  const tbody = document.getElementById(bodyId);
+  const pagination = document.getElementById(paginationId);
+  const isMain = bodyId === 'prescriptionsBody';
+  const start = (currentPage - 1) * pageSize;
+  const end = start + pageSize;
+  const pageData = data.slice(start, end);
+  const totalPages = Math.ceil(data.length / pageSize) || 1;
+
+  tbody.innerHTML = '';
+  pageData.forEach((p, i) => {
+    const row = document.createElement('tr');
+    const idx = start + i + 1;
+    const statusClass = getStatusClass(p.orderStatus, p.isApproved);
+    const displayStatus = getDisplayStatus(p.orderStatus, p.isApproved);
+    const isPending = p.orderStatus === 'PENDING' && !p.isApproved;
+
+    row.innerHTML = `
+      <td class="text-center">${idx}</td>
+      <td>${p.prescriptionId}</td>
+      <td>${p.firstName} ${p.lastName}</td>
+      <td>${p.doctorName || 'N/A'}</td>
+      <td>${formatDate(p.createdAt)}</td>
+      <td><span class="status-badge ${statusClass}">${displayStatus}</span></td>
+      ${isMain ? `<td class="text-center space-x-1">
+        <button class="action-btn bg-blue-100 text-blue-700 view-btn" data-id="${p.prescriptionId}"><i class="fas fa-eye"></i></button>
+        ${isPending ? `
+          <button class="action-btn bg-green-100 text-green-700 approve-btn" data-id="${p.prescriptionId}"><i class="fas fa-check"></i></button>
+          <button class="action-btn bg-red-100 text-red-700 reject-btn" data-id="${p.prescriptionId}"><i class="fas fa-times"></i></button>
+        ` : ''}
+        <button class="action-btn bg-gray-100 text-gray-700 delete-btn" data-id="${p.prescriptionId}"><i class="fas fa-trash"></i></button>
+      </td>` : '<td></td>'}
+    `;
+    tbody.appendChild(row);
+  });
+
+  // Pagination
+  pagination.innerHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.className = i === currentPage ? 'active' : '';
+    btn.onclick = () => { currentPage = i; renderTable(bodyId, paginationId, data); };
+    pagination.appendChild(btn);
+  }
+}
+
+function applyFilters() {
+  let filtered = [...prescriptions];
+
+  const status = els.filterStatus.value;
+  if (status) {
+    filtered = filtered.filter(p => getDisplayStatus(p.orderStatus, p.isApproved) === status);
+  }
+
+  const from = els.dateFrom.value;
+  const to = els.dateTo.value;
+  if (from || to) {
+    filtered = filtered.filter(p => {
+      const date = new Date(p.createdAt).toISOString().split('T')[0];
+      return (!from || date >= from) && (!to || date <= to);
+    });
+  }
+
+  filteredPrescriptions = filtered;
+  currentPage = 1;
+  renderTable('prescriptionsBody', 'prescriptionsPagination', filteredPrescriptions);
+  renderTable('historyBody', 'historyPagination', filteredPrescriptions);
+}
+
+// Event Listeners
+document.getElementById('add-prescription').onclick = () => {
+  document.getElementById('prescriptionModal').classList.add('active');
+};
+
+document.getElementById('prescriptionForm').onsubmit = async (e) => {
+  e.preventDefault();
+  showLoading();
+
+  const orderData = {
+    firstName: document.getElementById('firstName').value.trim(),
+    lastName: document.getElementById('lastName').value.trim(),
+    mobileNumber: document.getElementById('mobileNumber').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    doctorName: document.getElementById('doctorName').value.trim(),
+    paymentMethod: document.getElementById('paymentMethod').value,
+    orderStatus: 'PENDING',
+    isApproved: false,
+    userId: 1
+  };
+
+  const formData = new FormData();
+  formData.append('orderData', new Blob([JSON.stringify(orderData)], { type: 'application/json' }));
+
+  const file = document.getElementById('prescriptionImage').files[0];
+  if (file) {
+    formData.append('prescriptionImg', file);
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/create-order`, {
+      method: 'POST',
+      body: formData,
+      // DO NOT set headers: { 'Content-Type': 'multipart/form-data' } ← This breaks it!
+      // Let the browser set the correct multipart boundary automatically
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(errorText || 'Failed to create prescription');
+    }
+
+    const result = await res.json();
+    showToast('Prescription created successfully!', 'success');
+    document.getElementById('prescriptionModal').classList.remove('active');
+    document.getElementById('prescriptionForm').reset();
+    await loadAndRender();
+  } catch (err) {
+    console.error('Create error:', err);
+    showToast(err.message || 'Failed to create prescription', 'error');
+    hideLoading();
+  }
+};
 
 
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.action-btn');
+  if (!btn) return;
 
- function toggleSidebar() {
+  const id = btn.dataset.id;
+
+  if (btn.classList.contains('view-btn')) {
+    try {
+      showLoading();
+      const res = await fetch(`${API_BASE_URL}/get-by-prescriptionId/${id}`);
+      const p = await res.json();
+      const userId = p.userId || 1;
+      let html = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div><strong>Prescription ID:</strong> ${p.prescriptionId}</div>
+          <div><strong>Date:</strong> ${formatDate(p.createdAt)}</div>
+          <div><strong>Patient:</strong> ${p.firstName} ${p.lastName}</div>
+          <div><strong>Doctor:</strong> ${p.doctorName || 'N/A'}</div>
+          <div><strong>Contact:</strong> ${p.mobileNumber}</div>
+          <div><strong>Email:</strong> ${p.email}</div>
+          <div><strong>Status:</strong> <span class="status-badge ${getStatusClass(p.orderStatus, p.isApproved)}">${getDisplayStatus(p.orderStatus, p.isApproved)}</span></div>
+          <div><strong>Payment:</strong> ${p.paymentMethod || 'N/A'}</div>
+        </div>`;
+
+      const imageUrl = await getPrescriptionImage(id, userId);
+      if (imageUrl) {
+        html += `<div class="mt-6"><strong>Image:</strong><br><img src="${imageUrl}" class="max-w-full rounded-lg mt-2 cursor-pointer" onclick="document.getElementById('imageContainer').innerHTML='<img src=\\'${imageUrl}\\' class=\\'max-w-full max-h-screen\\'>'; document.getElementById('imageModal').classList.add('active');"></div>`;
+      } else {
+        html += `<div class="mt-6 text-gray-500 italic">No image available</div>`;
+      }
+
+      document.getElementById('prescriptionDetails').innerHTML = html;
+      document.getElementById('viewModal').classList.add('active');
+      hideLoading();
+    } catch { showToast('Failed to load details', 'error'); hideLoading(); }
+
+  } else if (btn.classList.contains('approve-btn')) {
+    if (!confirm('Approve this prescription?')) return;
+    try {
+      showLoading();
+      await approvePrescription(id);
+      showToast('Approved successfully', 'success');
+      await loadAndRender();
+    } catch { showToast('Approve failed', 'error'); hideLoading(); }
+
+  } else if (btn.classList.contains('reject-btn')) {
+    if (!confirm('Reject this prescription?')) return;
+    try {
+      showLoading();
+      await rejectPrescription(id);
+      showToast('Rejected successfully', 'success');
+      await loadAndRender();
+    } catch { showToast('Reject failed', 'error'); hideLoading(); }
+
+  } else if (btn.classList.contains('delete-btn')) {
+    if (!confirm('Delete this prescription?')) return;
+    try {
+      showLoading();
+      await deletePrescription(id);
+      showToast('Deleted successfully', 'success');
+      await loadAndRender();
+    } catch { showToast('Delete failed', 'error'); hideLoading(); }
+  }
+});
+
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal || e.target.classList.contains('close')) {
+      modal.classList.remove('active');
+    }
+  });
+});
+
+flatpickr("#date-from, #date-to, #history-date-from, #history-date-to", { dateFormat: "Y-m-d" });
+
+els.filterStatus.onchange = applyFilters;
+els.dateFrom.onchange = els.dateTo.onchange = applyFilters;
+
+document.getElementById('filter-this-week').onclick = () => setHistoryDateRange('week', 0);
+document.getElementById('filter-last-week').onclick = () => setHistoryDateRange('week', -7);
+document.getElementById('filter-this-month').onclick = () => setHistoryDateRange('month', 0);
+
+function setHistoryDateRange(type, offsetDays) {
+  const today = new Date();
+  let from, to;
+
+  if (type === 'week') {
+    from = new Date(today);
+    from.setDate(today.getDate() - today.getDay() + offsetDays);
+    to = new Date(from);
+    to.setDate(from.getDate() + 6);
+  } else if (type === 'month') {
+    from = new Date(today.getFullYear(), today.getMonth(), 1);
+    to = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  }
+
+  els.historyFrom.value = from.toISOString().split('T')[0];
+  els.historyTo.value = to.toISOString().split('T')[0];
+  applyFilters();
+}
+
+document.getElementById('export-reports').onclick = () => {
+  if (prescriptions.length === 0) return showToast('No data to export', 'info');
+
+  let csv = "Prescription ID,Patient Name,Doctor Name,Date,Status,Approved\n";
+  prescriptions.forEach(p => {
+    csv += `${p.prescriptionId},"${p.firstName} ${p.lastName}","${p.doctorName || ''}","${formatDate(p.createdAt)}","${getDisplayStatus(p.orderStatus, p.isApproved)}","${p.isApproved ? 'Yes' : 'No'}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `prescriptions_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Report exported!', 'success');
+};
+
+
+ // Logout Modal Logic
+            const logoutBtn = document.getElementById('logoutBtn');
+            const modal = document.getElementById('logoutConfirmModal');
+            const yesBtn = document.getElementById('logoutConfirmYes');
+            const noBtn = document.getElementById('logoutConfirmNo');
+            const closeBtn = document.getElementById('closeLogoutModal');
+
+            // Open modal
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                modal.classList.remove('hidden');
+            });
+
+            // Close modal
+            function closeModal() {
+                modal.classList.add('hidden');
+            }
+
+            noBtn.addEventListener('click', closeModal);
+            closeBtn.addEventListener('click', closeModal);
+
+            // Close on outside click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+
+            // Confirm logout
+            yesBtn.addEventListener('click', () => {
+                window.location.href = '../Login/login.html';
+            });
+
+            // Success popup close
+            document.getElementById('closeSuccessPopup')?.addEventListener('click', () => {
+                document.getElementById('successPopup').style.display = 'none';
+            });
+        
+
+
+function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const sidebarArrow = document.getElementById('sidebar-arrow');
     const logoDiv = document.querySelector('div > div'); // Logo container
@@ -142,468 +507,6 @@ document.addEventListener('click', (event) => {
             sidebar.classList.remove('translate-x-0');
         }
     }
+document.addEventListener('DOMContentLoaded', loadAndRender);
 
-// function displayUserProfile() {
-//   const userInitials = document.getElementById("user-initials");
-//   const userName = document.getElementById("user-name");
-//   const userRole = document.getElementById("user-role");
 
-//   const nameParts = user.name.trim().split(" ");
-//   const initials =
-//     nameParts.length > 1
-//       ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-//       : nameParts[0][0];
-//   userInitials.textContent = initials.toUpperCase();
-
-//   userName.textContent = user.name;
-//   userRole.textContent = user.role;
-// }
-
-// displayUserProfile();
-
-// Updated: Expanded prescriptionsData with 35 entries
-const prescriptionsData = [];
-
-// Updated: Notifications data
-const notificationsData = [
-  {
-    title: "Expiring Soon",
-    message: "Prescription RX-1018 for David Wilson expires in 2 days.",
-    time: "2 hours ago",
-  },
-  {
-    title: "Clarification Needed",
-    message: "Dr. Martinez needs clarification on prescription RX-1023.",
-    time: "5 hours ago",
-  },
-  {
-    title: "Ready for Pickup",
-    message: "3 prescriptions are ready for patient pickup.",
-    time: "Yesterday",
-  },
-];
-
-// DOM Ready
-$(document).ready(function () {
-  // Initialize Flatpickr for date filters
-  flatpickr("#date-from", { dateFormat: "Y-m-d" });
-  flatpickr("#date-to", { dateFormat: "Y-m-d" });
-  flatpickr("#history-date-from", { dateFormat: "Y-m-d" });
-  flatpickr("#history-date-to", { dateFormat: "Y-m-d" });
-
-  // Initialize DataTables
-  const table = $("#prescriptionsTable").DataTable({
-    responsive: false,
-    pageLength: 10,
-    lengthMenu: [5, 10, 25, 50],
-    order: [[0, "desc"]],
-    dom: '<"top-controls mb-4"lf>rt<"bottom-controls mt-4"ip>',
-    scrollX: true,
-    scrollY: '400px',
-    scrollCollapse: true,
-    paging: true,
-    drawCallback: function () {
-      this.api().columns.adjust();
-    },
-  });
-
-  const historyTable = $("#historyTable").DataTable({
-    responsive: false,
-    pageLength: 10,
-    lengthMenu: [5, 10, 25, 50],
-    order: [[4, "desc"]],
-    dom: '<"top-controls mb-4"lf>rt<"bottom-controls mt-4"ip>',
-    scrollX: true,
-    scrollY: '400px',
-    scrollCollapse: true,
-    paging: true,
-    drawCallback: function () {
-      this.api().columns.adjust();
-    },
-  });
-
-  const notificationsTable = $("#notificationsTable").DataTable({
-    responsive: false,
-    searching: false,
-    paging: false,
-    info: false,
-    order: [[2, "desc"]],
-    scrollY: '200px',
-    scrollCollapse: true,
-    drawCallback: function () {
-      this.api().columns.adjust();
-    },
-  });
-
-  // Sidebar functionality
-  $("#toggle-sidebar-mobile, #close-sidebar").on("click", function () {
-    $("#sidebar").toggleClass("-translate-x-full");
-  });
-
-  $("#toggle-sidebar-logo").on("click", function () {
-    $("#sidebar").toggleClass("w-64 w-20");
-    $("#sidebar-title, .nav-text").toggleClass("hidden");
-    $("#sidebar-arrow").toggleClass("fa-chevron-right fa-chevron-left");
-    $("#sidebar-logo").toggleClass("mr-2 mx-auto");
-    $(".nav-icon").toggleClass("mr-3 mx-auto");
-  });
-
-  // Modal functionality
-  function openModal(modalId) {
-    $("#" + modalId).css("display", "flex").removeClass("hidden");
-  }
-
-  window.closeModal = function (modalId) {
-    $("#" + modalId).css("display", "none").addClass("hidden");
-  };
-
-  $("#toggle-notifications").on("click", function () {
-    openModal("notificationModal");
-  });
-
-  $("#closeNotifications").on("click", function () {
-    closeModal("notificationModal");
-  });
-
-  // Updated: Image overlay close
-  $("#closeImageOverlay").on("click", function () {
-    closeModal("imageOverlay");
-  });
-
-  // Add medicine entry
-  $("#addMedicine").on("click", function () {
-    $("#medicineList").append(`
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 medicine-entry">
-        <input type="text" placeholder="Drug Name" class="w-full" required />
-        <input type="text" placeholder="Dosage" class="w-full" required />
-        <input type="number" placeholder="Quantity" min="1" class="w-full" required />
-        <input type="text" placeholder="Duration" class="w-full" required />
-        <button type="button" class="text-red-500 delete-medicine md:col-span-4 text-right"><i class="fas fa-trash"></i> Remove</button>
-      </div>
-    `);
-  });
-
-  // Remove medicine entry
-  $(document).on("click", ".delete-medicine", function () {
-    $(this).closest(".medicine-entry").remove();
-  });
-
-  // Form submission
-  $("#prescriptionForm").on("submit", function (e) {
-    e.preventDefault();
-    alert("Prescription saved successfully!");
-    closeModal("prescriptionModal");
-  });
-
-  $("#add-prescription").on("click", function () {
-    $("#modalTitle").text("Add Prescription");
-    $("#prescriptionForm")[0].reset();
-    $("#medicineList").html(`
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 medicine-entry">
-        <input type="text" placeholder="Drug Name" class="w-full" required />
-        <input type="text" placeholder="Dosage" class="w-full" required />
-        <input type="number" placeholder="Quantity" min="1" class="w-full" required />
-        <input type="text" placeholder="Duration" class="w-full" required />
-      </div>
-    `);
-    openModal("prescriptionModal");
-  });
-
-  $("#export-reports").on("click", function () {
-    alert("Export functionality would be implemented here.");
-  });
-
-  // View prescription details
-  $(document).on("click", ".view-btn", function () {
-    const prescriptionId = $(this).data("id");
-    const prescription = prescriptionsData.find((p) => p.id === prescriptionId);
-
-    if (prescription) {
-      $("#verificationDetails").html(`
-        <p><strong>Prescription ID:</strong> ${prescription.id}</p>
-        <p><strong>Patient:</strong> ${prescription.patient}</p>
-        <p><strong>Doctor:</strong> ${prescription.doctor}</p>
-        <p><strong>Date:</strong> ${prescription.date}</p>
-        <p><strong>Medicines:</strong> ${prescription.medicines
-          .map(
-            (m) => `${m.name} ${m.dosage}, ${m.quantity} for ${m.duration}`
-          )
-          .join("; ")}</p>
-        <p><strong>Notes:</strong> ${prescription.notes}</p>
-      `);
-      // Updated: Store prescription ID for image overlay
-      $("#view-prescription-images").data("id", prescriptionId);
-      openModal("verificationModal");
-    }
-  });
-
-  // Updated: View prescription images
-  $(document).on("click", "#view-prescription-images", function () {
-    const prescriptionId = $(this).data("id");
-    const prescription = prescriptionsData.find((p) => p.id === prescriptionId);
-
-    if (prescription) {
-      $("#prescriptionImages").html(
-        prescription.images.length > 0
-          ? prescription.images
-              .map(
-                (img) =>
-                  `<img src="${img}" alt="Prescription Scan" class="rounded-lg border border-gray-200 shadow-sm max-w-full h-auto">`
-              )
-              .join("")
-          : `<p class="text-gray-500">No images available.</p>`
-      );
-      openModal("imageOverlay");
-    }
-  });
-
-  // Updated: Status change handlers with console logs for testing
-  $(document).on("click", ".pending-btn", function () {
-    const prescriptionId = $(this).data("id");
-    console.log(`[TEST] Clicking Pending button for ${prescriptionId}`);
-    updatePrescriptionStatus(prescriptionId, "Pending", table, historyTable);
-  });
-
-  $(document).on("click", ".approve-btn", function () {
-    const prescriptionId = $(this).data("id");
-    console.log(`[TEST] Clicking Approve button for ${prescriptionId}`);
-    updatePrescriptionStatus(prescriptionId, "Approved", table, historyTable);
-  });
-
-  $(document).on("click", ".reject-btn", function () {
-    const prescriptionId = $(this).data("id");
-    console.log(`[TEST] Clicking Reject button for ${prescriptionId}`);
-    updatePrescriptionStatus(prescriptionId, "Rejected", table, historyTable);
-  });
-
-  // Date filter for prescriptions table
-  $("#date-from, #date-to").on("change", function () {
-    const fromDate = $("#date-from").val();
-    const toDate = $("#date-to").val();
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-      const date = data[4];
-      if (!fromDate && !toDate) return true;
-      if (fromDate && !toDate && date >= fromDate) return true;
-      if (!fromDate && toDate && date <= toDate) return true;
-      if (fromDate && toDate && date >= fromDate && date <= toDate) return true;
-      return false;
-    });
-    table.draw();
-    $.fn.dataTable.ext.search.pop();
-  });
-
-  // History table quick filters
-  $("#filter-this-week").on("click", function () {
-    const today = new Date("2023-11-15");
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay());
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    applyHistoryDateFilter(
-      weekStart.toISOString().split("T")[0],
-      weekEnd.toISOString().split("T")[0],
-      historyTable
-    );
-  });
-
-  $("#filter-last-week").on("click", function () {
-    const today = new Date("2023-11-15");
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - today.getDay() - 7);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    applyHistoryDateFilter(
-      weekStart.toISOString().split("T")[0],
-      weekEnd.toISOString().split("T")[0],
-      historyTable
-    );
-  });
-
-  $("#filter-this-month").on("click", function () {
-    const today = new Date("2023-11-15");
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    applyHistoryDateFilter(
-      monthStart.toISOString().split("T")[0],
-      monthEnd.toISOString().split("T")[0],
-      historyTable
-    );
-  });
-
-  $("#history-date-from, #history-date-to").on("change", function () {
-    const fromDate = $("#history-date-from").val();
-    const toDate = $("#history-date-to").val();
-    applyHistoryDateFilter(fromDate, toDate, historyTable);
-  });
-
-  function applyHistoryDateFilter(fromDate, toDate, table) {
-    $("#history-date-from").val(fromDate);
-    $("#history-date-to").val(toDate);
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-      const date = data[4];
-      if (!fromDate && !toDate) return true;
-      if (fromDate && !toDate && date >= fromDate) return true;
-      if (!fromDate && toDate && date <= toDate) return true;
-      if (fromDate && toDate && date >= fromDate && date <= toDate) return true;
-      return false;
-    });
-    table.draw();
-    $.fn.dataTable.ext.search.pop();
-  }
-
-  // Updated: Status update with mock API response
-  function updatePrescriptionStatus(prescriptionId, status, mainTable, historyTable) {
-    const prescription = prescriptionsData.find((p) => p.id === prescriptionId);
-    if (prescription) {
-      console.log(`[TEST] Updating ${prescriptionId} to ${status}`);
-      // Mock API response for testing
-      const mockResponse = {
-        ok: true,
-        json: () => Promise.resolve({ success: true }),
-      };
-      Promise.resolve(mockResponse)
-        .then((response) => {
-          if (!response.ok) throw new Error(`Mock HTTP error! status: ${response.status}`);
-          return response.json();
-        })
-        .then((data) => {
-          console.log(`[TEST] Success: Prescription ${prescriptionId} updated to ${status}`);
-          alert(`Prescription ${status.toLowerCase()} successfully!`);
-          prescription.status = status;
-          updateTableAndCounts(mainTable, historyTable);
-        })
-        .catch((error) => {
-          console.error(`[TEST] Error updating ${prescriptionId} to ${status}:`, error);
-          alert(`Failed to update prescription: ${error.message}`);
-        });
-    } else {
-      console.error(`[TEST] Prescription ${prescriptionId} not found`);
-    }
-  }
-
-  // Close modals
-  $("#closeModal, #closeVerification, #closePatient, #closeDoctor").on("click", function () {
-    $(this).closest(".modal").css("display", "none").addClass("hidden");
-  });
-
-  $(window).on("click", function (e) {
-    if ($(e.target).hasClass("modal")) {
-      $(e.target).css("display", "none").addClass("hidden");
-    }
-  });
-
-  // Status filter
-  $("#filter-status").on("change", function () {
-    const status = $(this).val();
-    table.column(5).search(status).draw();
-  });
-
-  // Search functionality
-  $("#search").on("keyup", function () {
-    table.search(this.value).draw();
-  });
-
-  // Update tables and counts
-  function updateTableAndCounts(mainTable, historyTable) {
-    mainTable.clear();
-    prescriptionsData.forEach((prescription, index) => {
-      mainTable.row.add([
-        index + 1,
-        prescription.id,
-        prescription.patient,
-        prescription.doctor,
-        prescription.date,
-        `<span class="status-badge status-${prescription.status.toLowerCase()}">${prescription.status}</span>`,
-        `
-          <button class="action-btn bg-blue-100 text-blue-700 view-btn" data-id="${prescription.id}"><i class="fas fa-eye"></i></button>
-          <button class="action-btn bg-yellow-100 text-yellow-700 pending-btn" data-id="${prescription.id}"><i class="fas fa-clock"></i></button>
-          <button class="action-btn bg-green-100 text-green-700 approve-btn" data-id="${prescription.id}"><i class="fas fa-check"></i></button>
-          <button class="action-btn bg-red-100 text-red-700 reject-btn" data-id="${prescription.id}"><i class="fas fa-times"></i></button>
-        `,
-      ]);
-    });
-    mainTable.draw();
-
-    historyTable.clear();
-    prescriptionsData.forEach((prescription, index) => {
-      historyTable.row.add([
-        index + 1,
-        prescription.id,
-        prescription.patient,
-        prescription.doctor,
-        prescription.date,
-        `<span class="status-badge status-${prescription.status.toLowerCase()}">${prescription.status}</span>`,
-      ]);
-    });
-    historyTable.draw();
-
-    const totalOrders = prescriptionsData.length;
-    const todaysOrders = prescriptionsData.filter((p) => p.date === "2023-11-15").length;
-    const approvedOrders = prescriptionsData.filter((p) => p.status === "Approved" || p.status === "Dispensed").length;
-    const rejectedOrders = prescriptionsData.filter((p) => p.status === "Rejected").length;
-
-    $("#total-orders").text(totalOrders);
-    $("#todays-orders").text(todaysOrders);
-    $("#approved-orders").text(approvedOrders);
-    $("#rejected-orders").text(rejectedOrders);
-  }
-
-  // Populate tables and notifications
-  updateTableAndCounts(table, historyTable);
-
-  notificationsTable.clear();
-  notificationsData.forEach((notification) => {
-    notificationsTable.row.add([notification.title, notification.message, notification.time]);
-  });
-  notificationsTable.draw();
-});
-
-//logout functionality 
-// ----- LOGOUT BUTTON -------------------------------------------------
-$('#logoutBtn').on('click', function () {
-  const modalHTML = `
-    <div id="logoutModal" class="modal">
-      <div class="modal-content max-w-md mx-auto">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-semibold text-gray-800">Confirm Logout</h2>
-          <span class="close cursor-pointer text-gray-500 hover:text-red-500 text-2xl" id="closeLogoutModal">&times;</span>
-        </div>
-        <p class="text-gray-700 mb-6">Are you sure you want to logout?</p>
-        <div class="flex justify-end gap-3">
-          <button id="confirmLogout" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-sm">
-            Yes
-          </button>
-          <button id="cancelLogout" class="bg-gray-300 text-gray-700 py-2 px-6 rounded-lg hover:bg-gray-400 transition shadow-sm">
-            No
-          </button>
-        </div>
-      </div>
-    </div>`;
-
-  $('body').append(modalHTML);
-  $('#logoutModal').show();
-});
-
-// ----- CONFIRM LOGOUT ------------------------------------------------
-$(document).on('click', '#confirmLogout', function () {
-  $('#logoutModal').remove();
-
-  Toastify({
-    text: "Successfully logged out.",
-    duration: 3000,
-    style: { background: 'linear-gradient(to right, #00b09b, #96c93d)' }
-  }).showToast();
-
-  setTimeout(() => {
-    window.location.href = '../Login/login.html';
-  }, 1500);
-});
-
-// ----- CANCEL / CLOSE LOGOUT -----------------------------------------
-$(document).on('click', '#cancelLogout, #closeLogoutModal, #logoutModal', function (e) {
-  if (e.target.id === 'cancelLogout' || 
-      e.target.id === 'closeLogoutModal' || 
-      e.target.id === 'logoutModal') {
-    $('#logoutModal').remove();
-  }
-});

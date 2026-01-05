@@ -200,22 +200,25 @@
             color: #374151;
         }
 
-        .info-section {
-            background-color: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid #e5e7eb;
-        }
+       .info-section {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+}
 
-        .info-section h3 {
-            font-weight: 600;
-            font-size: 18px;
-            color: #111827;
-            margin-bottom: 16px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #3b82f6;
-        }
+ .info-section h3 {
+    font-weight: 600;
+    font-size: 16px;
+    color: #111827;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #3b82f6;
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
 
         .info-item {
             display: grid;
@@ -247,38 +250,45 @@
         }
 
         /* Form Styles */
-        .edit-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #374151;
-            font-size: 14px;
-        }
+       .edit-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 14px;
+}
 
-        .edit-form input,
-        .edit-form select,
-        .edit-form textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.2s;
-            background-color: white;
-        }
 
-        .edit-form input:focus,
-        .edit-form select:focus,
-        .edit-form textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
+.edit-form input,
+.edit-form select,
+.edit-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background-color: white;
+}
 
-        .edit-form textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
+
+.edit-form input:focus,
+.edit-form select:focus,
+.edit-form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.edit-form textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.edit-form .grid {
+    display: grid;
+    gap: 1.5rem;
+}
 
         /* Popup Styles */
         .popup-container {
@@ -342,25 +352,41 @@
             color: #d97706;
         }
 
+        /* Verification Status Badges */
+        .status-approved {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-rejected {
+            background-color: #fee2e2;
+            color: #dc2626;
+        }
+
         /* Action Buttons */
         .action-buttons {
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .action-buttons button {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 6px;
+            padding: 4px;
             border-radius: 4px;
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
         }
 
         .action-buttons button:hover {
@@ -379,6 +405,14 @@
             color: #ef4444;
         }
 
+        .action-buttons .verify-btn {
+            color: #10b981;
+        }
+
+        .action-buttons .reject-btn {
+            color: #ef4444;
+        }
+
         /* DataTables Custom Styling */
         #productTable_wrapper {
             font-size: 13px !important;
@@ -387,6 +421,7 @@
         #productTable {
             font-size: 13px !important;
             width: 100% !important;
+            min-width: 1400px !important;
         }
 
         #productTable thead th {
@@ -409,6 +444,27 @@
 
         #productTable tbody tr:hover {
             background-color: #f9fafb;
+        }
+
+        /* Row Highlighting */
+        .verification-pending-row {
+            background-color: #fff7ed !important;
+        }
+
+        .verification-rejected-row {
+            background-color: #fef2f2 !important;
+        }
+
+        .status-low-stock-row {
+            background-color: #fef3c7 !important;
+        }
+
+        .status-expiring-row {
+            background-color: #fee2e2 !important;
+        }
+
+        .status-in-stock-row {
+            background-color: #dcfce7 !important;
         }
 
         /* Product Images */
@@ -452,31 +508,31 @@
         }
 
         /* Price List Styles */
-        .price-list-container {
-            background-color: #f8fafc;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 10px;
-        }
+.price-list-container {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 10px;
+}
 
-        .price-item {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-            padding: 8px;
-            background-color: white;
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
+.price-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
 
-        .price-item input {
-            padding: 6px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 13px;
-        }
+.price-item input {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+}
 
         .price-item:last-child {
             margin-bottom: 0;
@@ -511,25 +567,26 @@
             background-color: #dc2626;
         }
 
-        .add-price-btn {
-            background-color: #10b981;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            margin-top: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
+.add-price-btn {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+}
 
-        .add-price-btn:hover {
-            background-color: #059669;
-        }
+.add-price-btn:hover {
+    background-color: #059669;
+}
 
         .price-display {
             background-color: #f1f5f9;
@@ -547,14 +604,6 @@
         #sidebar {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        /* #sidebar.collapsed {
-            width: 70px !important;
-        }
-
-        #sidebar:not(.collapsed) {
-            width: 256px !important;
-        } */
 
         /* For smoother hover effects */
         li {
@@ -579,6 +628,47 @@
             transition: all 0.3s ease-in-out;
             min-width: 20px;
         }
+
+        /* Add to your existing CSS */
+select:disabled {
+    background-color: #f9fafb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+select option:first-child {
+    color: #9ca3af;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+.category-mother-care {
+    background-color: #fce7f3;
+    color: #db2777;
+}
+
+.category-baby-care {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.subcategory-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    background-color: #f3f4f6;
+    color: #6b7280;
+    margin: 2px;
+}
 
         .collapsed .nav-icon {
             margin-right: 0 !important;
@@ -614,50 +704,124 @@
             transition: transform 0.3s ease-in-out;
         }
 
-       
+        /* Smooth transition classes */
+        #sidebar {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        #sidebar.collapsed {
+            width: 64px !important;
+        }
+        
+        #sidebar:not(.collapsed) {
+            width: 256px !important;
+        }
+        
+        .nav-text {
+            transition: all 0.3s ease-in-out;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        
+        .nav-icon {
+            transition: all 0.3s ease-in-out;
+            min-width: 20px;
+        }
+        
+        /* For smoother hover effects */
+        li {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Staggered animation for nav items */
+        li:nth-child(1) { transition-delay: 0ms; }
+        li:nth-child(2) { transition-delay: 20ms; }
+        li:nth-child(3) { transition-delay: 40ms; }
+        li:nth-child(4) { transition-delay: 60ms; }
+        li:nth-child(5) { transition-delay: 80ms; }
+        li:nth-child(6) { transition-delay: 100ms; }
+        li:nth-child(7) { transition-delay: 120ms; }
+        li:nth-child(8) { transition-delay: 140ms; }
+        li:nth-child(9) { transition-delay: 160ms; }
+        li:nth-child(10) { transition-delay: 180ms; }
+        li:nth-child(11) { transition-delay: 200ms; }
+
+        /* Verification Modal */
+        .verification-modal {
+            max-width: 500px !important;
+        }
+
+        .verification-option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .verification-option:hover {
+            background-color: #f9fafb;
+        }
+
+        .verification-option input[type="radio"] {
+            margin-right: 12px;
+        }
+
+        .verification-option.approve {
+            border-color: #10b981;
+            background-color: #f0fdf4;
+        }
+
+        .verification-option.reject {
+            border-color: #ef4444;
+            background-color: #fef2f2;
+        }
+
+        .verification-option.approve label {
+            color: #065f46;
+        }
+
+        .verification-option.reject label {
+            color: #991b1b;
+        }
+
+        /* Add verification column styling */
+        .verification-column {
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+    .edit-form .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
 
 
-    /* Smooth transition classes */
-#sidebar {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
- 
-#sidebar.collapsed {
-    width: 64px !important;
-}
- 
-#sidebar:not(.collapsed) {
-    width: 256px !important;
-}
- 
-.nav-text {
-    transition: all 0.3s ease-in-out;
-    white-space: nowrap;
-    overflow: hidden;
-}
- 
-.nav-icon {
-    transition: all 0.3s ease-in-out;
-    min-width: 20px;
-}
- 
-/* For smoother hover effects */
-li {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
- 
-/* Staggered animation for nav items */
-li:nth-child(1) { transition-delay: 0ms; }
-li:nth-child(2) { transition-delay: 20ms; }
-li:nth-child(3) { transition-delay: 40ms; }
-li:nth-child(4) { transition-delay: 60ms; }
-li:nth-child(5) { transition-delay: 80ms; }
-li:nth-child(6) { transition-delay: 100ms; }
-li:nth-child(7) { transition-delay: 120ms; }
-li:nth-child(8) { transition-delay: 140ms; }
-li:nth-child(9) { transition-delay: 160ms; }
-li:nth-child(10) { transition-delay: 180ms; }
-li:nth-child(11) { transition-delay: 200ms; }
+        /* Mobile responsive table */
+        @media (max-width: 768px) {
+            #productTable {
+                font-size: 11px !important;
+                min-width: 1200px !important;
+            }
+            
+            #productTable thead th,
+            #productTable tbody td {
+                padding: 6px 8px !important;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 2px;
+            }
+            
+            .action-buttons button {
+                width: 24px;
+                height: 24px;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 h-screen flex overflow-hidden">
@@ -803,8 +967,8 @@ li:nth-child(11) { transition-delay: 200ms; }
 
         <!-- Product Content -->
         <main class="flex-1 overflow-y-auto p-6 bg-gray-50">
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Stats Cards - UPDATED with verification stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <div class="bg-white rounded-xl border-l-4 border-blue-500 shadow-md p-5 stats-card">
                     <div class="flex justify-between items-center">
                         <div>
@@ -849,6 +1013,18 @@ li:nth-child(11) { transition-delay: 200ms; }
                         </div>
                     </div>
                 </div>
+                <!-- New Verification Stats Card -->
+                <div class="bg-white rounded-xl border-l-4 border-purple-500 shadow-md p-5 stats-card">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <p class="text-gray-500 text-sm font-medium">Pending Verification</p>
+                            <h2 id="pendingVerification" class="text-2xl font-bold text-gray-800 mt-1">0</h2>
+                        </div>
+                        <div class="bg-purple-100 p-3 rounded-full">
+                            <i class="fas fa-clock text-purple-500 text-xl"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Product List -->
@@ -880,10 +1056,25 @@ li:nth-child(11) { transition-delay: 200ms; }
                             </select>
                         </div>
                         
+                        <!-- Verification Filter -->
+                        <div class="relative">
+                            <select id="verificationFilter" class="border rounded-lg py-2 px-4 pr-10 bg-white border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition w-full md:w-48">
+                                <option value="">Verification Status</option>
+                                <!-- <option value="PENDING">Pending</option> -->
+                                <option value="APPROVED">Approved</option>
+                                <option value="REJECTED">Rejected</option>
+                            </select>
+                        </div>
+                        
                         <!-- Add Product Button -->
                         <button id="addProductBtn" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition shadow-sm hover:shadow-md whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Add Product
                         </button>
+
+                        <!-- Reset Filter Button -->
+<button id="resetFilterBtn" class="bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition shadow-sm hover:shadow-md whitespace-nowrap">
+    <i class="fas fa-redo-alt mr-2"></i>Reset Filter
+</button>
                         
                         <!-- Export Button -->
                         <button id="exportBtn" class="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition shadow-sm hover:shadow-md whitespace-nowrap">
@@ -906,11 +1097,12 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <th>Stock</th>
                                 <th>Price (₹)</th>
                                 <th>Rating</th>
+                                <th class="text-center">Verification</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="productTableBody" class="text-gray-700">
-                            <!-- Table rows will be populated by DataTables -->
+                            <!-- Table rows will be populated by JavaScript -->
                         </tbody>
                     </table>
                 </div>
@@ -996,6 +1188,23 @@ li:nth-child(11) { transition-delay: 200ms; }
                                 <span class="info-label">Specifications:</span>
                                 <pre id="detail-specifications" class="info-value text-xs bg-gray-100 p-2 rounded"></pre>
                             </div>
+                            <!-- Verification Details -->
+                            <div class="info-item">
+                                <span class="info-label">Verification Status:</span>
+                                <span class="info-value" id="detail-verification-status"></span>
+                            </div>
+                            <div class="info-item" id="detail-verified-by-container" style="display: none;">
+                                <span class="info-label">Verified By:</span>
+                                <span class="info-value" id="detail-verified-by"></span>
+                            </div>
+                            <div class="info-item" id="detail-verified-at-container" style="display: none;">
+                                <span class="info-label">Verified At:</span>
+                                <span class="info-value" id="detail-verified-at"></span>
+                            </div>
+                            <!-- <div class="info-item" id="detail-rejection-reason-container" style="display: none;">
+                                <span class="info-label">Rejection Reason:</span>
+                                <span class="info-value" id="detail-rejection-reason"></span>
+                            </div> -->
                             <div class="info-item">
                                 <span class="info-label">Created:</span>
                                 <span class="info-value" id="detail-created"></span>
@@ -1014,138 +1223,208 @@ li:nth-child(11) { transition-delay: 200ms; }
                 </div>
             </div>
 
-            <!-- Add/Edit Product Modal -->
-            <div id="editProductModal" class="modal">
-                <div class="modal-container" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
-                    <span class="close-btn" id="closeEditModal">&times;</span>
-                    <h2 class="text-xl font-semibold text-gray-800 mb-6" id="editModalTitle">Add New Product</h2>
-                    <form id="editProductForm" class="edit-form grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="info-section">
-                            <h3>Basic Information</h3>
-                            <div class="mb-4">
-                                <label for="edit-sku">SKU *</label>
-                                <input type="text" id="edit-sku" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-title">Product Title *</label>
-                                <input type="text" id="edit-title" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-category">Category *</label>
-                                <select id="edit-category" required>
-                                    <option value="">Select Category</option>
-                                    <option value="clothes">Clothes</option>
-                                    <option value="medicine">Medicine</option>
-                                    <option value="body-wash">Body Wash</option>
-                                    <option value="serum">Serum</option>
-                                    <option value="diapers">Diapers</option>
-                                    <option value="baby-food">Baby Food</option>
-                                    <option value="accessories">Accessories</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-subcategory">Subcategory/Variant</label>
-                                <input type="text" id="edit-subcategory" placeholder="e.g., Size, Quantity, Type">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-brand">Brand *</label>
-                                <input type="text" id="edit-brand" required>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-instock">In Stock *</label>
-                                <select id="edit-instock" required>
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
+<!-- Add/Edit Product Modal -->
+<div id="editProductModal" class="modal">
+    <div class="modal-container" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+        <span class="close-btn" id="closeEditModal">&times;</span>
+        <h2 class="text-xl font-semibold text-gray-800 mb-6" id="editModalTitle">Add New Product</h2>
+        <form id="editProductForm" class="edit-form">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left Column -->
+                <div>
+                    <div class="info-section">
+                        <h3>Basic Information</h3>
+                        <div class="mb-4">
+                            <label for="edit-sku">SKU *</label>
+                            <input type="text" id="edit-sku" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-title">Product Title *</label>
+                            <input type="text" id="edit-title" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-category">Category *</label>
+                            <select id="edit-category" required>
+                                <option value="">Select Category</option>
+                                <option value="Mother Care">Mother Care</option>
+                                <option value="Baby Care">Baby Care</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-subcategory">Subcategory *</label>
+                            <select id="edit-subcategory" required disabled>
+                                <option value="">Select category first</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-brand">Brand *</label>
+                            <input type="text" id="edit-brand" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-instock">In Stock *</label>
+                            <select id="edit-instock" required>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div>
+                    <div class="info-section">
+                        <h3>Pricing & Stock</h3>
+                        <div class="mb-4">
+                            <label for="edit-review-count">Review Count</label>
+                            <input type="number" id="edit-review-count" min="0" placeholder="0">
+                        </div>
+                        
+                        <!-- Prices Section (Multiple prices) -->
+                        <div class="mb-4">
+                            <label>Prices (₹) *</label>
+                            <div class="price-list-container">
+                                <div class="price-header">
+                                    <span>Variant/Size</span>
+                                    <span>Current Price (₹)</span>
+                                    <span>Original Price (₹)</span>
+                                </div>
+                                <div id="price-list-items">
+                                    <!-- Price items will be added here -->
+                                </div>
+                                <button type="button" id="add-price-item" class="add-price-btn">
+                                    <i class="fas fa-plus"></i> Add Price Item
+                                </button>
                             </div>
                         </div>
-                        <div class="info-section">
-                            <h3>Pricing & Stock</h3>
-                            <div class="mb-4">
-                                <label for="edit-price-type">Price Type *</label>
-                                <select id="edit-price-type" required>
-                                    <option value="single">Single Price</option>
-                                    <option value="multiple">Multiple Prices (for sizes/variants)</option>
-                                </select>
+                        
+                        <div class="mb-4">
+                            <label for="edit-discount">Discount (%)</label>
+                            <input type="number" id="edit-discount" min="0" max="100" placeholder="0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-rating">Rating (0-5)</label>
+                            <input type="number" id="edit-rating" min="0" max="5" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="mb-4">
+                            <label for="edit-stock-quantity">Stock Quantity *</label>
+                            <input type="number" id="edit-stock-quantity" min="0" required placeholder="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Information Section (Full Width) -->
+            <div class="info-section mt-6">
+                <h3>Additional Information</h3>
+                <div class="mb-4">
+                    <label for="edit-description">Description (One per line)</label>
+                    <textarea id="edit-description" rows="3" placeholder="Enter each description point on a new line"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="edit-features">Features (One per line)</label>
+                    <textarea id="edit-features" rows="3" placeholder="Enter each feature on a new line"></textarea>
+                </div>
+            </div>
+
+            <!-- Product Details Section (Full Width) -->
+            <div class="info-section mt-6">
+                <h3>Product Details</h3>
+                <div class="mb-4">
+                    <label for="edit-sizes">Sizes/Variants (Comma separated for multiple)</label>
+                    <input type="text" id="edit-sizes" placeholder="e.g., Standard (45cm), Travel (35cm)">
+                </div>
+                <div class="mb-4">
+                    <label for="edit-specifications">Specifications (Plain text or key-value pairs)</label>
+                    <textarea id="edit-specifications" rows="3" placeholder="Material: Organic Cotton Cover, Memory Foam Core | Dimensions: 45x35x15cm"></textarea>
+                </div>
+            </div>
+
+            <!-- Image Upload Section (Full Width) -->
+            <div class="info-section mt-6">
+                <h3>Product Images</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="mb-4">
+                        <label for="edit-main-image">Main Product Image *</label>
+                        <input type="file" id="edit-main-image" accept="image/*">
+                        <div id="main-image-preview" class="mt-2 hidden">
+                            <img id="main-image-preview-img" class="w-32 h-32 object-cover rounded-lg border" 
+                                 alt="Main image preview">
+                            <p class="text-xs text-gray-500 mt-1">Current main image</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Required for new products</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="edit-sub-images">Additional Images (Optional)</label>
+                        <input type="file" id="edit-sub-images" accept="image/*" multiple>
+                        <div id="sub-images-preview" class="mt-2 hidden">
+                            <div class="flex flex-wrap gap-2" id="sub-images-container"></div>
+                            <p class="text-xs text-gray-500 mt-1">Current additional images</p>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Select multiple images</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+                <button type="button" id="cancelEdit" class="bg-gray-500 text-white py-2 px-6 rounded-lg hover:bg-gray-600 transition">Cancel</button>
+                <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition">Save Product</button>
+            </div>
+        </form>
+    </div>
+</div>            <!-- Verification Modal -->
+            <div id="verificationModal" class="modal">
+                <div class="modal-container verification-modal">
+                    <span class="close-btn" id="closeVerificationModal">&times;</span>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6">Verify Product</h2>
+                    <form id="verificationForm">
+                        <input type="hidden" id="verify-product-id">
+                        
+                        <div class="mb-6">
+                            <h3 class="text-lg font-medium text-gray-700 mb-2" id="verify-product-name"></h3>
+                            <div class="text-sm text-gray-600">
+                                <p>SKU: <span id="verify-product-sku"></span></p>
+                                <p>Category: <span id="verify-product-category"></span></p>
                             </div>
-                            
-                            <!-- Single Price Section -->
-                            <div id="single-price-section" class="mb-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="edit-price">Price (₹) *</label>
-                                        <input type="number" id="edit-price" min="0" step="0.01" placeholder="0.00">
-                                    </div>
-                                    <div>
-                                        <label for="edit-original-price">Original Price (₹)</label>
-                                        <input type="number" id="edit-original-price" min="0" step="0.01" placeholder="0.00">
-                                    </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Verification Action</label>
+                            <div class="space-y-3">
+                                <div class="verification-option approve">
+                                    <label class="flex items-center cursor-pointer w-full">
+                                        <input type="radio" name="verificationAction" value="APPROVE" class="mr-2" checked>
+                                        <span class="font-medium">Approve Product</span>
+                                    </label>
+                                </div>
+                                <div class="verification-option reject">
+                                    <label class="flex items-center cursor-pointer w-full">
+                                        <input type="radio" name="verificationAction" value="REJECT" class="mr-2">
+                                        <span class="font-medium">Reject Product</span>
+                                    </label>
                                 </div>
                             </div>
-                            
-                            <!-- Multiple Prices Section -->
-                            <div id="multiple-price-section" class="hidden">
-                                <div class="price-list-container">
-                                    <div class="price-header">
-                                        <span>Variant/Size</span>
-                                        <span>Current Price (₹)</span>
-                                        <span>Original Price (₹)</span>
-                                    </div>
-                                    <div id="price-list-items">
-                                        <!-- Price items will be added here -->
-                                    </div>
-                                    <button type="button" id="add-price-item" class="add-price-btn">
-                                        <i class="fas fa-plus"></i> Add Price Item
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="edit-discount">Discount (%)</label>
-                                <input type="number" id="edit-discount" min="0" max="100" placeholder="0">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-rating">Rating (0-5)</label>
-                                <input type="number" id="edit-rating" min="0" max="5" step="0.1" placeholder="0.0">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-stock-quantity">Stock Quantity *</label>
-                                <input type="number" id="edit-stock-quantity" min="0" required placeholder="0">
-                            </div>
                         </div>
-                        <div class="info-section md:col-span-2">
-                            <h3>Additional Information</h3>
-                            <div class="mb-4">
-                                <label for="edit-description">Description (One per line)</label>
-                                <textarea id="edit-description" rows="3" placeholder="Enter each description point on a new line"></textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-features">Features (One per line)</label>
-                                <textarea id="edit-features" rows="3" placeholder="Enter each feature on a new line"></textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-sizes">Sizes/Variants (Comma separated for multiple)</label>
-                                <input type="text" id="edit-sizes" placeholder="e.g., S, M, L, XL or 500ml, 1000ml">
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-specifications">Specifications (JSON format)</label>
-                                <textarea id="edit-specifications" rows="3" placeholder='{"key": "value"}'>{"": ""}</textarea>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-main-image">Main Product Image *</label>
-                                <input type="file" id="edit-main-image" accept="image/*">
-                                <p class="text-sm text-gray-500 mt-1">Required for new products</p>
-                            </div>
-                            <div class="mb-4">
-                                <label for="edit-sub-images">Additional Images (Optional)</label>
-                                <input type="file" id="edit-sub-images" accept="image/*" multiple>
-                                <p class="text-sm text-gray-500 mt-1">Select multiple images</p>
-                            </div>
-                        </div>
-                        <div class="md:col-span-2 flex justify-end gap-3 mt-6">
-                            <button type="button" id="cancelEdit" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition">Cancel</button>
-                            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">Save Product</button>
+                        
+                        <!-- <div class="mb-6" id="rejection-reason-container" style="display: none;">
+                            <label for="rejectionReason" class="block text-sm font-medium text-gray-700 mb-2">
+                                Rejection Reason *
+                            </label>
+                            <textarea 
+                                id="rejectionReason" 
+                                rows="3" 
+                                class="w-full border rounded-lg p-3"
+                                placeholder="Please provide reason for rejection..."
+                            ></textarea>
+                        </div> -->
+                        
+                        <div class="flex justify-end gap-3">
+                            <button type="button" id="cancelVerification" class="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition">
+                                Cancel
+                            </button>
+                            <button type="button" id="submitVerificationBtn" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition">
+                                Submit Verification
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -1186,9 +1465,9 @@ li:nth-child(11) { transition-delay: 200ms; }
     </div>
 
     <!-- Sticky Action Button -->
-    <button class="sticky-action-btn" id="stickyActionBtn">
+    <!-- <button class="sticky-action-btn" id="stickyActionBtn">
         <i class="fas fa-plus"></i>
-    </button>
+    </button> -->
 
     <!-- Sticky Action Menu -->
     <div class="sticky-action-menu" id="stickyActionMenu">
@@ -1213,15 +1492,87 @@ li:nth-child(11) { transition-delay: 200ms; }
             <span>Add Category</span>
         </a>
     </div>
+
+
+    <script src="/auth.js"></script>
+    <script>
+
+       function displayUserProfile() {
+        const admin = Auth.getCurrentAdmin();
+        const userInitials = document.getElementById('user-initials');
+        const userName = document.getElementById('user-name');
+        const userRole = document.getElementById('user-role');
+
+        if (!admin || !admin.firstName) {
+            userName.textContent = "Guest";
+            userRole.textContent = "Unknown";
+            userInitials.textContent = "??";
+            return;
+        }
+
+        const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
+        const role = `${admin.role}`.trim();
+        const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase() || '?';
+
+        userInitials.textContent = initials;
+        userName.textContent = fullName;
+        userRole.textContent = role;
+        }
+
+        Auth.requireAuth();
+        Auth.startSessionTimer();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const admin = Auth.getCurrentAdmin();
+            if (admin) {
+                console.log("Logged in as:", admin.firstName + " " + admin.lastName);
+            }
+            displayUserProfile();
+        });
+    </script>
     
     <!-- JavaScript Code -->
     <script>
+
+
+// REPLACE the CATEGORIES constant in your admin panel:
+const CATEGORIES = {
+    'Mother Care': [
+        'Test Kits',
+        'Skin Care',
+        'Vitamins & Supplements',
+        'Personal Care & Hygiene',
+        'Trimester Kits',
+        'Garbhsanskar Essentials & Ayurvedic Medicines',
+        'Accessories & Maternity Wear',
+        'Delivery Kits',
+        'Post delivery recovery',
+        'Breastfeeding Essentials',
+        'Postpartum Hygiene',
+        'Postpartum Nutrition',
+        'Pain & Healing Support',
+        'Uterine Health',
+        'Menstruation Essentials and Hygiene',
+        'PCOS and Preconception',
+        'MenoPausal Medicines'
+    ],
+    'Baby Care': [
+        'Bath & Body',
+        'Diapers & Hygiene', 
+        'Feeding & Nutrition',
+        'Gift Hampers'
+    ]
+};
     // ============================================
     // CONFIGURATION
     // ============================================
     const API_BASE_URL = 'http://localhost:8083/api/mb/products';
+    let currentEditingProductId = null;
+    let allProducts = [];
+    let filteredProducts = [];
+    let priceItemsCount = 0;
 
-    // ============================================
+       // ============================================
     // UTILITY FUNCTIONS
     // ============================================
 
@@ -1230,7 +1581,9 @@ li:nth-child(11) { transition-delay: 200ms; }
         const successMessage = document.getElementById('successMessage');
         successMessage.textContent = message;
         const icon = document.getElementById('popupIcon');
-        icon.className = type === 'success' ? 'fas fa-check-circle text-green-500' : 'fas fa-exclamation-circle text-red-500';
+        icon.className = type === 'success' ? 'fas fa-check-circle text-4xl text-green-500 mb-4' : 
+                       type === 'error' ? 'fas fa-exclamation-circle text-4xl text-red-500 mb-4' : 
+                       'fas fa-info-circle text-4xl text-blue-500 mb-4';
         successPopup.style.display = 'flex';
     }
 
@@ -1272,168 +1625,391 @@ li:nth-child(11) { transition-delay: 200ms; }
         }
         return stars;
     }
-
-    // ============================================
-    // SIDEBAR TOGGLE FUNCTIONALITY
-    // ============================================
-
-    // function initializeSidebarToggle() {
-    //     const sidebar = document.getElementById('sidebar');
-    //     const sidebarArrow = document.getElementById('sidebar-arrow');
-    //     const toggleButton = document.getElementById('toggle-sidebar-logo');
-    //     const mainContent = document.getElementById('mainContent');
-        
-    //     let isCollapsed = false;
-
-    //     toggleButton.addEventListener('click', () => {
-    //         isCollapsed = !isCollapsed;
-            
-    //         // Toggle collapsed class
-    //         sidebar.classList.toggle('collapsed');
-            
-    //         // Rotate arrow
-    //         sidebarArrow.style.transform = isCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
-            
-    //         // Adjust main content margin
-    //         if (mainContent) {
-    //             if (isCollapsed) {
-    //                 mainContent.style.marginLeft = '70px';
-    //             } else {
-    //                 mainContent.style.marginLeft = '256px';
-    //             }
-    //         }
-    //     });
-    // }
-
-   function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarArrow = document.getElementById('sidebar-arrow');
-    const logoDiv = document.querySelector('div > div');               // Logo container
-    const navTexts = document.querySelectorAll('.nav-text');
-    const navIcons = document.querySelectorAll('.nav-icon');
     
-    if (window.innerWidth < 768) {
-        // Mobile: Just toggle visibility with smooth transition
-        sidebar.classList.toggle('-translate-x-full');
-        sidebar.classList.toggle('translate-x-0');
+function getRowClass(product) {
+    const stockStatus = getStockStatus(product.stockQuantity);
+    const verificationStatus = product.approved === true ? 'APPROVED' : 
+                             product.approved === false ? 'REJECTED' : 'PENDING';
+    
+    if (verificationStatus === 'PENDING') return 'verification-pending-row';
+    if (verificationStatus === 'REJECTED') return 'verification-rejected-row';
+    if (stockStatus === 'Low Stock') return 'status-low-stock-row';
+    if (stockStatus === 'In Stock') return 'status-in-stock-row';
+    return '';
+};
 
-    } else {
-        // Desktop: Toggle between collapsed and expanded
-        sidebar.classList.toggle('collapsed');
+
+// ============================================
+// RESET FILTER FUNCTION
+// ============================================
+
+function resetAllFilters() {
+    console.log('Resetting all filters...');
+    
+    // Reset select dropdowns
+    document.getElementById('categoryFilter').value = '';
+    document.getElementById('subcategoryFilter').value = '';
+    document.getElementById('stockFilter').value = '';
+    document.getElementById('verificationFilter').value = '';
+    document.getElementById('searchInput').value = '';
+    
+    // Reset subcategory filter state
+    const subcategoryFilter = document.getElementById('subcategoryFilter');
+    subcategoryFilter.disabled = true;
+    subcategoryFilter.innerHTML = '<option value="">Select category first</option>';
+    
+    // Clear search input
+    document.getElementById('searchInput').value = '';
+    
+    // Show success message
+    showSuccessPopup('All filters have been reset!');
+    
+    // Apply filters (which will show all products)
+    applyFilters();
+}
+
+
+// ============================================
+// API SERVICE - FOR MB PRODUCTS (UPDATED TO MATCH BACKEND)
+// ============================================
+
+class ProductService {
+    async getAllProducts() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/get-all`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const products = await response.json();
+            
+            // Add verification status to each product
+            return products.map(product => ({
+                ...product,
+                // Use whichever field your backend actually returns
+                verificationStatus: product.approved === true ? 'APPROVED' : 
+                                   product.approved === false ? 'REJECTED' : 'PENDING'
+            }));
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            showSuccessPopup('Error loading products. Please check if server is running.', 'error');
+            return [];
+        }
+    }
+
+async getProductById(id) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/${id}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const product = await response.json();
         
-        if (sidebar.classList.contains('collapsed')) {
-            // Collapsed state
-            sidebar.style.width = '64px'; // Smaller width when collapsed
-            sidebarArrow.classList.remove('fa-chevron-left');
-            sidebarArrow.classList.add('fa-chevron-right');
+        // DEBUG: Log the product structure
+        console.log('Product fetched from API:', product);
+        console.log('Price field:', product.price);
+        console.log('OriginalPrice field:', product.originalPrice);
+        
+        // Ensure price arrays are properly handled
+        if (product.price && !Array.isArray(product.price)) {
+            // Convert single price to array if needed
+            product.price = [product.price];
+        }
+        
+        if (product.originalPrice && !Array.isArray(product.originalPrice)) {
+            // Convert single originalPrice to array if needed
+            product.originalPrice = [product.originalPrice];
+        }
+        
+        product.verificationStatus = product.approved === true ? 'APPROVED' : 
+                                   product.approved === false ? 'REJECTED' : 'PENDING';
+        return product;
+    } catch (error) {
+        console.error('Error fetching product:', error);
+        throw error;
+    }
+}
+
+async createProduct(formData) {
+    try {
+        console.log('Sending request to:', `${API_BASE_URL}/create-product`);
+        console.log('Request body (FormData):');
+        
+        // Log FormData contents for debugging
+        for (let pair of formData.entries()) {
+            if (pair[0] === 'productData') {
+                console.log(pair[0], JSON.parse(pair[1]));
+            } else {
+                console.log(pair[0], pair[1].name || 'Blob', pair[1].size);
+            }
+        }
+        
+        const response = await fetch(`${API_BASE_URL}/create-product`, {
+            method: 'POST',
+            body: formData
+            // Note: Don't set Content-Type header for FormData, browser sets it automatically
+        });
+
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
+        if (!response.ok) {
+            let errorText = 'Unknown error';
+            try {
+                errorText = await response.text();
+                console.error('Server error response:', errorText);
+            } catch (e) {
+                console.error('Could not read error response:', e);
+            }
+            throw new Error(`Failed to create product: ${response.status} ${response.statusText}. Details: ${errorText.substring(0, 200)}`);
+        }
+
+        const result = await response.json();
+        console.log('Product created successfully:', result);
+        return result;
+    } catch (error) {
+        console.error('Error creating product:', error);
+        throw error;
+    }
+}
+
+    async updateProduct(id, productData) {
+        try {
+            const formData = new FormData();
             
-            // Hide logo smoothly
-            logoDiv.style.opacity = '0';
-            logoDiv.style.width = '0';
+            const priceData = getPriceData();
+            const sizesInput = document.getElementById('edit-sizes').value;
+            const sizes = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(s => s) : [];
             
-            // Hide nav texts with delay
-            navTexts.forEach((text, index) => {
-                text.style.opacity = '0';
-                text.style.width = '0';
-                text.style.overflow = 'hidden';
-                text.style.transitionDelay = `${index * 20}ms`;
+            const productJson = {
+                sku: productData.sku,
+                title: productData.title,
+                category: productData.category,
+                subCategory: productData.subCategory,
+                price: priceData.prices,
+                originalPrice: priceData.originalPrices,
+                discount: productData.discount ? parseInt(productData.discount) : null,
+                rating: productData.rating ? parseFloat(productData.rating) : 0,
+                brand: productData.brand,
+                inStock: productData.inStock === 'true',
+                stockQuantity: parseInt(productData.stockQuantity),
+                description: productData.description ? productData.description.split('\n').filter(d => d.trim()) : [],
+                productSizes: sizes,
+                features: productData.features ? productData.features.split('\n').filter(f => f.trim()) : [],
+                specifications: productData.specifications || '{}'
+            };
+
+            console.log('Updating product with data:', JSON.stringify(productJson, null, 2));
+
+            formData.append('productData', JSON.stringify(productJson));
+            
+            // Add main image if provided
+            if (productData.mainImage) {
+                formData.append('mainImage', productData.mainImage);
+            }
+            
+            // Add sub images if provided
+            if (productData.subImages && productData.subImages.length > 0) {
+                productData.subImages.forEach((image) => {
+                    formData.append('subImages', image);
+                });
+            }
+
+            const response = await fetch(`${API_BASE_URL}/${id}`, {
+                method: 'PUT',
+                body: formData
             });
-            
-            // Center icons
-            navIcons.forEach(icon => {
-                icon.style.marginLeft = '0';
-                icon.style.marginRight = '0';
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to update product: ${errorText}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error updating product:', error);
+            throw error;
+        }
+    }
+
+    async patchMbProduct(id, formData) {
+    try {
+        console.log('Sending PATCH request to:', `${API_BASE_URL}/update-mb-product/${id}`);
+        console.log('FormData contents for PATCH:');
+        
+        for (let pair of formData.entries()) {
+            if (pair[0] === 'productData') {
+                console.log(pair[0], JSON.parse(pair[1]));
+            } else {
+                console.log(pair[0], pair[1].name || pair[1].type || 'File', 'Size:', pair[1].size || 'N/A');
+            }
+        }
+
+        const response = await fetch(`${API_BASE_URL}/update-mb-product/${id}`, {
+            method: 'PATCH',
+            body: formData
+        });
+
+        console.log('PATCH Response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Server error:', errorText);
+            throw new Error(`Failed to patch product: ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('Product patched successfully:', result);
+        return result;
+    } catch (error) {
+        console.error('Error patching product:', error);
+        throw error;
+    }
+}
+
+    async deleteProduct(id) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/delete-by-id/${id}`, {
+                method: 'DELETE'
             });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to delete product: ${errorText}`);
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            throw error;
+        }
+    }
+
+    async verifyProduct(id, action, reason = null) {
+        try {
+            // Use the PATCH endpoint for verification
+            const productData = {
+                approved: action === 'APPROVE' // Changed from is_approved
+            };
             
-        } else {
-            // Expanded state
-            sidebar.style.width = '256px'; // Original width
-            sidebarArrow.classList.remove('fa-chevron-right');
-            sidebarArrow.classList.add('fa-chevron-left');
-            
-            // Show logo smoothly
-            logoDiv.style.opacity = '1';
-            logoDiv.style.width = 'auto';
-            
-            // Show nav texts with staggered animation
-            navTexts.forEach((text, index) => {
-                text.style.opacity = '1';
-                text.style.width = 'auto';
-                text.style.overflow = 'visible';
-                text.style.transitionDelay = `${index * 20}ms`;
+            // if (action === 'REJECT' && reason) {
+            //     productData.rejectionReason = reason;
+            // }
+
+            const formData = new FormData();
+            formData.append('productData', JSON.stringify(productData));
+
+            console.log('Sending verification data:', productData);
+            console.log('Product ID:', id);
+
+            const response = await fetch(`${API_BASE_URL}/update-mb-product/${id}`, {
+                method: 'PATCH',
+                body: formData
             });
+
+            console.log('Response status:', response.status);
             
-            // Restore icon margins
-            navIcons.forEach(icon => {
-                icon.style.marginLeft = '0';
-                icon.style.marginRight = '0.75rem'; // mr-3
-            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Server error:', errorText);
+                throw new Error(`Failed to verify product: ${errorText}`);
+            }
+
+            const result = await response.json();
+            console.log('Verification response:', result);
+            return result;
+
+        } catch (error) {
+            console.error('Error verifying product:', error);
+            throw error;
+        }
+    }
+
+    async getStats() {
+        try {
+            const products = await this.getAllProducts();
+            const total = products.length;
+            const lowStock = products.filter(p => getStockStatus(p.stockQuantity) === 'Low Stock').length;
+            const inStock = products.filter(p => getStockStatus(p.stockQuantity) === 'In Stock').length;
+            const expiring = products.filter(p => {
+                try {
+                    const specs = JSON.parse(p.specifications || '{}');
+                    if (!specs.expiryDate) return false;
+                    const expiry = new Date(specs.expiryDate);
+                    const today = new Date();
+                    const diffTime = expiry - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    return diffTime > 0 && diffDays <= 30;
+                } catch {
+                    return false;
+                }
+            }).length;
+            
+            const pendingVerification = products.filter(p => p.approved === false || p.approved === null).length;
+            return { total, lowStock, inStock, expiring, pendingVerification };
+        } catch (error) {
+            console.error('Error getting stats:', error);
+            return { total: 0, lowStock: 0, inStock: 0, expiring: 0, pendingVerification: 0 };
         }
     }
 }
 
-
-// Add event listeners
-document.getElementById('toggle-sidebar-logo').addEventListener('click', toggleSidebar);
-document.getElementById('close-sidebar').addEventListener('click', () => {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.add('-translate-x-full');
-    sidebar.classList.remove('translate-x-0');
-});
-
-// Optional: Close sidebar when clicking outside on mobile
-document.addEventListener('click', (event) => {
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggle-sidebar-logo');
+// Add this function to your admin panel code
+async function testAPIStructure() {
+    console.log("=== Testing API Structure ===");
     
-    if (window.innerWidth < 768 && 
-        !sidebar.contains(event.target) && 
-        !toggleBtn.contains(event.target) &&
-        sidebar.classList.contains('translate-x-0')) {
-        sidebar.classList.add('-translate-x-full');
-        sidebar.classList.remove('translate-x-0');
-    }
-});
-    function initializeSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const sidebarArrow = document.getElementById('sidebar-arrow');
+    try {
+        // Test GET endpoint
+        const response = await fetch('http://localhost:8083/api/mb/products/get-all');
+        const products = await response.json();
         
-        // Set initial state based on screen width
-        if (window.innerWidth >= 768) {
-            // Desktop: Start expanded
-            sidebar.classList.remove('collapsed');
-            sidebarArrow.classList.remove('fa-chevron-right');
-            sidebarArrow.classList.add('fa-chevron-left');
+        if (products.length > 0) {
+            const sample = products[0];
+            console.log("Sample Product Structure:", sample);
+            console.log("Category:", sample.category);
+            console.log("SubCategory:", sample.subCategory);
+            console.log("Price Array:", sample.price);
+            console.log("Original Price Array:", sample.originalPrice);
+            console.log("Main Image URL:", sample.mainImageUrl);
         } else {
-            // Mobile: Start hidden
-            sidebar.classList.remove('translate-x-0');
+            console.log("No products found in API");
         }
+        
+        // Test if web view categories match
+        const webViewSubcategories = [
+            "Test Kits", "Skin Care", "Vitamins & Supplements", "Personal Care & Hygiene",
+            "Trimester Kits", "Garbhsanskar Essentials & Ayurvedic Medicines",
+            "Accessories & Maternity Wear", "Delivery Kits", "Post delivery recovery",
+            "Breastfeeding Essentials", "Postpartum Hygiene", "Postpartum Nutrition",
+            "Pain & Healing Support", "Uterine Health", "Menstruation Essentials and Hygiene",
+            "PCOS and Preconception", "MenoPausal Medicines"
+        ];
+        
+        console.log("\n=== Checking Subcategory Mismatch ===");
+        if (products.length > 0) {
+            products.forEach(product => {
+                if (!webViewSubcategories.includes(product.subCategory)) {
+                    console.warn(`Product ${product.id} has subcategory "${product.subCategory}" which is NOT in web view list`);
+                }
+            });
+        }
+        
+    } catch (error) {
+        console.error("API Test Error:", error);
     }
+}
 
+// Call this function in your DOMContentLoaded or after product creation
+document.addEventListener('DOMContentLoaded', async function() {
+    // ... existing code ...
+    await testAPIStructure(); // Add this line
+});
 
     // ============================================
     // DYNAMIC PRICE MANAGEMENT
     // ============================================
 
-    let priceItemsCount = 0;
-
     function setupPriceManagement() {
-        const priceTypeSelect = document.getElementById('edit-price-type');
-        const singlePriceSection = document.getElementById('single-price-section');
-        const multiplePriceSection = document.getElementById('multiple-price-section');
-        const priceListItems = document.getElementById('price-list-items');
         const addPriceBtn = document.getElementById('add-price-item');
-
-        // Handle price type change
-        priceTypeSelect.addEventListener('change', function() {
-            if (this.value === 'single') {
-                singlePriceSection.classList.remove('hidden');
-                multiplePriceSection.classList.add('hidden');
-            } else {
-                singlePriceSection.classList.add('hidden');
-                multiplePriceSection.classList.remove('hidden');
-            }
-        });
 
         // Add new price item
         addPriceBtn.addEventListener('click', function() {
@@ -1471,249 +2047,62 @@ document.addEventListener('click', (event) => {
         }
     }
 
-    function getPriceData() {
-        const priceType = document.getElementById('edit-price-type').value;
+function getPriceData() {
+    const priceItems = document.querySelectorAll('.price-item');
+    const prices = [];
+    const originalPrices = [];
+    
+    console.log('Getting price data from', priceItems.length, 'items');
+    
+    priceItems.forEach((item, index) => {
+        const variant = item.querySelector('.price-variant').value.trim();
+        const price = item.querySelector('.price-current').value.trim();
+        const originalPrice = item.querySelector('.price-original').value.trim();
         
-        if (priceType === 'single') {
-            return {
-                price: document.getElementById('edit-price').value ? parseFloat(document.getElementById('edit-price').value) : 0,
-                originalPrice: document.getElementById('edit-original-price').value ? parseFloat(document.getElementById('edit-original-price').value) : 0,
-                priceList: null
-            };
-        } else {
-            // Multiple prices
-            const priceItems = document.querySelectorAll('.price-item');
-            const priceList = [];
-            
-            priceItems.forEach(item => {
-                const variant = item.querySelector('.price-variant').value.trim();
-                const price = item.querySelector('.price-current').value.trim();
-                const originalPrice = item.querySelector('.price-original').value.trim();
-                
-                if (variant && price) {
-                    priceList.push({
-                        variant: variant,
-                        price: parseFloat(price) || 0,
-                        originalPrice: parseFloat(originalPrice) || 0
-                    });
-                }
-            });
-            
-            return {
-                price: priceList.length > 0 ? priceList[0].price : 0,
-                originalPrice: priceList.length > 0 ? priceList[0].originalPrice : 0,
-                priceList: priceList.length > 0 ? priceList : null
-            };
+        console.log(`Item ${index + 1}: variant="${variant}", price="${price}", original="${originalPrice}"`);
+        
+        if (price) {
+            const priceNum = parseFloat(price);
+            if (!isNaN(priceNum)) {
+                prices.push(priceNum);
+                originalPrices.push(originalPrice && !isNaN(parseFloat(originalPrice)) ? parseFloat(originalPrice) : null);
+            }
         }
+    });
+    
+    // Ensure we always have at least one price
+    if (prices.length === 0) {
+        prices.push(0);
+        originalPrices.push(null);
     }
+    
+    console.log('Final price arrays:', { prices, originalPrices });
+    
+    return {
+        prices: prices,
+        originalPrices: originalPrices
+    };
+}
 
-    function populatePriceData(priceList) {
+    function populatePriceData(prices, originalPrices) {
         const priceListItems = document.getElementById('price-list-items');
         priceListItems.innerHTML = '';
+        priceItemsCount = 0;
         
-        if (priceList && Array.isArray(priceList) && priceList.length > 0) {
-            // Set to multiple price type
-            document.getElementById('edit-price-type').value = 'multiple';
-            document.getElementById('edit-price-type').dispatchEvent(new Event('change'));
-            
-            // Add price items
-            priceList.forEach(item => {
-                addPriceItem(item.variant || item.size || '', item.price, item.originalPrice);
+        // Get sizes/variants for labels
+        const sizesInput = document.getElementById('edit-sizes').value;
+        const sizes = sizesInput ? sizesInput.split(',').map(s => s.trim()) : [];
+        
+        if (prices && Array.isArray(prices) && prices.length > 0) {
+            // Add price items for each price
+            prices.forEach((price, index) => {
+                const sizeLabel = sizes[index] || `Variant ${index + 1}`;
+                const originalPrice = (originalPrices && originalPrices[index]) || '';
+                addPriceItem(sizeLabel, price, originalPrice);
             });
         } else {
-            // Set to single price type
-            document.getElementById('edit-price-type').value = 'single';
-            document.getElementById('edit-price-type').dispatchEvent(new Event('change'));
-        }
-    }
-
-    // ============================================
-    // API SERVICE - FOR MB PRODUCTS (UPDATED FOR DYNAMIC PRICES)
-    // ============================================
-
-    class ProductService {
-        async getAllProducts() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/get-all`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching products:', error);
-                showSuccessPopup('Error loading products. Please check if server is running.', 'error');
-                return [];
-            }
-        }
-
-        async getProductById(id) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/${id}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching product:', error);
-                throw error;
-            }
-        }
-
-        async createProduct(productData) {
-            try {
-                const formData = new FormData();
-                
-                // Prepare product JSON with dynamic pricing
-                const priceData = getPriceData();
-                const productJson = {
-                    sku: productData.sku,
-                    title: productData.title,
-                    category: productData.category,
-                    subCategory: productData.subCategory,
-                    price: priceData.price,
-                    originalPrice: priceData.originalPrice,
-                    discount: productData.discount ? parseInt(productData.discount) : null,
-                    rating: productData.rating ? parseFloat(productData.rating) : 0,
-                    brand: productData.brand,
-                    inStock: productData.inStock === 'true',
-                    stockQuantity: parseInt(productData.stockQuantity),
-                    description: productData.description ? productData.description.split('\n').filter(d => d.trim()) : [],
-                    sizes: productData.sizes ? productData.sizes.split(',').map(s => s.trim()).filter(s => s) : [],
-                    features: productData.features ? productData.features.split('\n').filter(f => f.trim()) : [],
-                    specifications: productData.specifications || '{}',
-                    priceList: priceData.priceList
-                };
-
-                formData.append('productData', JSON.stringify(productJson));
-                
-                // Add main image
-                if (productData.mainImage) {
-                    formData.append('mainImage', productData.mainImage);
-                }
-                
-                // Add sub images
-                if (productData.subImages && productData.subImages.length > 0) {
-                    productData.subImages.forEach((image, index) => {
-                        formData.append('subImages', image);
-                    });
-                }
-
-                const response = await fetch(`${API_BASE_URL}/create-product`, {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Server error response:', errorText);
-                    throw new Error(`Failed to create product: ${response.status} ${response.statusText}`);
-                }
-
-                return await response.json();
-            } catch (error) {
-                console.error('Error creating product:', error);
-                throw error;
-            }
-        }
-
-        async updateProduct(id, productData) {
-            try {
-                const formData = new FormData();
-                
-                const priceData = getPriceData();
-                const productJson = {
-                    sku: productData.sku,
-                    title: productData.title,
-                    category: productData.category,
-                    subCategory: productData.subCategory,
-                    price: priceData.price,
-                    originalPrice: priceData.originalPrice,
-                    discount: productData.discount ? parseInt(productData.discount) : null,
-                    rating: productData.rating ? parseFloat(productData.rating) : 0,
-                    brand: productData.brand,
-                    inStock: productData.inStock === 'true',
-                    stockQuantity: parseInt(productData.stockQuantity),
-                    description: productData.description ? productData.description.split('\n').filter(d => d.trim()) : [],
-                    sizes: productData.sizes ? productData.sizes.split(',').map(s => s.trim()).filter(s => s) : [],
-                    features: productData.features ? productData.features.split('\n').filter(f => f.trim()) : [],
-                    specifications: productData.specifications || '{}',
-                    priceList: priceData.priceList
-                };
-
-                formData.append('productData', JSON.stringify(productJson));
-                
-                // Add main image if provided
-                if (productData.mainImage) {
-                    formData.append('mainImage', productData.mainImage);
-                }
-                
-                // Add sub images if provided
-                if (productData.subImages && productData.subImages.length > 0) {
-                    productData.subImages.forEach((image) => {
-                        formData.append('subImages', image);
-                    });
-                }
-
-                const response = await fetch(`${API_BASE_URL}/${id}`, {
-                    method: 'PATCH',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Failed to update product: ${errorText}`);
-                }
-
-                return await response.json();
-            } catch (error) {
-                console.error('Error updating product:', error);
-                throw error;
-            }
-        }
-
-        async deleteProduct(id) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/${id}`, {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Failed to delete product: ${errorText}`);
-                }
-
-                return true;
-            } catch (error) {
-                console.error('Error deleting product:', error);
-                throw error;
-            }
-        }
-
-        async getStats() {
-            try {
-                const products = await this.getAllProducts();
-                const total = products.length;
-                const lowStock = products.filter(p => getStockStatus(p.stockQuantity) === 'Low Stock').length;
-                const inStock = products.filter(p => getStockStatus(p.stockQuantity) === 'In Stock').length;
-                const expiring = products.filter(p => {
-                    try {
-                        const specs = JSON.parse(p.specifications || '{}');
-                        if (!specs.expiryDate) return false;
-                        const expiry = new Date(specs.expiryDate);
-                        const today = new Date();
-                        const diffTime = expiry - today;
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        return diffTime > 0 && diffDays <= 30;
-                    } catch {
-                        return false;
-                    }
-                }).length;
-                
-                return { total, lowStock, inStock, expiring };
-            } catch (error) {
-                console.error('Error getting stats:', error);
-                return { total: 0, lowStock: 0, inStock: 0, expiring: 0 };
-            }
+            // Default empty price item
+            addPriceItem();
         }
     }
 
@@ -1721,121 +2110,259 @@ document.addEventListener('click', (event) => {
     // UI MANAGEMENT
     // ============================================
 
-    let dataTableInstance = null;
-    let allProducts = [];
-    let allCategories = [];
-    let allSubcategories = [];
     const productService = new ProductService();
 
-    async function loadProducts() {
-        try {
-            allProducts = await productService.getAllProducts();
-            renderProductsTable(allProducts);
-            updateStats();
-            populateCategoryFilters();
-        } catch (error) {
-            console.error('Error loading products:', error);
-        }
+async function loadProducts() {
+    try {
+        allProducts = await productService.getAllProducts();
+        filteredProducts = [...allProducts];
+        
+        renderProductsTable(filteredProducts);
+        updateStats();
+        populateCategoryFilters();
+        
+        // Initialize category-subcategory dependency
+        setupCategorySubcategoryDependency();
+        
+    } catch (error) {
+        console.error('Error loading products:', error);
     }
+}
 
     function renderProductsTable(products) {
-        const tableBody = document.getElementById('productTableBody');
-        tableBody.innerHTML = '';
+    const tableBody = document.getElementById('productTableBody');
+    tableBody.innerHTML = '';
 
-        if (products.length === 0) {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td colspan="11" class="text-center py-8 text-gray-500">
-                    <i class="fas fa-box-open text-3xl mb-2 text-gray-300"></i>
-                    <p class="text-sm">No products found</p>
-                </td>
-            `;
-            tableBody.appendChild(row);
-            return;
+    if (products.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td colspan="12" class="text-center py-8 text-gray-500">
+                <i class="fas fa-box-open text-3xl mb-2 text-gray-300"></i>
+                <p class="text-sm">No products found</p>
+            </td>
+        `;
+        tableBody.appendChild(row);
+        return;
+    }
+
+    products.forEach(product => {
+        // DEBUG: Log each product's price data
+        console.log('Product ID:', product.id);
+        console.log('Product price field:', product.price);
+        console.log('Product originalPrice field:', product.originalPrice);
+        console.log('Product priceList field:', product.priceList);
+        console.log('All product fields:', Object.keys(product));
+        
+        const stockStatus = getStockStatus(product.stockQuantity);
+        const rowClass = getRowClass(product);
+        const imageUrl = product.mainImageUrl ? 
+            `http://localhost:8083${product.mainImageUrl}` : 
+            'https://via.placeholder.com/40?text=No+Image';
+        
+        // Handle prices - show based on priceList or single price
+        let priceDisplay = '₹0.00';
+        let originalPriceDisplay = '';
+        
+        // Check different possible price fields
+        if (product.priceList && Array.isArray(product.priceList) && product.priceList.length > 0) {
+            console.log('Using priceList:', product.priceList);
+            if (product.priceList.length === 1) {
+                const priceItem = product.priceList[0];
+                priceDisplay = `₹${Number(priceItem.price || 0).toFixed(2)}`;
+                if (priceItem.originalPrice) {
+                    originalPriceDisplay = `<div class="text-xs text-gray-500 line-through">₹${Number(priceItem.originalPrice).toFixed(2)}</div>`;
+                }
+            } else {
+                const prices = product.priceList.map(p => p.price || 0);
+                const minPrice = Math.min(...prices);
+                const maxPrice = Math.max(...prices);
+                priceDisplay = `₹${Number(minPrice).toFixed(2)} - ₹${Number(maxPrice).toFixed(2)}`;
+            }
+        } else if (product.price && Array.isArray(product.price) && product.price.length > 0) {
+            console.log('Using price array:', product.price);
+            if (product.price.length === 1) {
+                priceDisplay = `₹${Number(product.price[0] || 0).toFixed(2)}`;
+                if (product.originalPrice && product.originalPrice[0]) {
+                    originalPriceDisplay = `<div class="text-xs text-gray-500 line-through">₹${Number(product.originalPrice[0]).toFixed(2)}</div>`;
+                }
+            } else {
+                const prices = product.price.map(p => p || 0);
+                const minPrice = Math.min(...prices);
+                const maxPrice = Math.max(...prices);
+                priceDisplay = `₹${Number(minPrice).toFixed(2)} - ₹${Number(maxPrice).toFixed(2)}`;
+            }
+        } else if (typeof product.price === 'number') {
+            console.log('Using single price number:', product.price);
+            priceDisplay = `₹${Number(product.price || 0).toFixed(2)}`;
+            if (product.originalPrice) {
+                originalPriceDisplay = `<div class="text-xs text-gray-500 line-through">₹${Number(product.originalPrice).toFixed(2)}</div>`;
+            }
+        } else if (product.price) {
+            console.log('Unexpected price format:', product.price);
+            priceDisplay = '₹0.00';
+        } else {
+            console.log('No price data found for product ID:', product.id);
+            priceDisplay = '₹0.00';
         }
 
-        products.forEach(product => {
-            const stockStatus = getStockStatus(product.stockQuantity);
-            const imageUrl = product.mainImageUrl ? 
-                `http://localhost:8083${product.mainImageUrl}` : 
-                'https://via.placeholder.com/40?text=No+Image';
-            
-            // Handle prices - show based on priceList or single price
-            let priceDisplay = '₹0.00';
-            let originalPriceDisplay = '';
-            
-            if (product.priceList && Array.isArray(product.priceList) && product.priceList.length > 0) {
-                if (product.priceList.length === 1) {
-                    priceDisplay = `₹${Number(product.priceList[0].price).toFixed(2)}`;
-                    if (product.priceList[0].originalPrice) {
-                        originalPriceDisplay = `<div class="text-xs text-gray-500 line-through">₹${Number(product.priceList[0].originalPrice).toFixed(2)}</div>`;
-                    }
-                } else {
-                    const prices = product.priceList.map(p => p.price);
-                    const minPrice = Math.min(...prices);
-                    const maxPrice = Math.max(...prices);
-                    priceDisplay = `₹${Number(minPrice).toFixed(2)} - ₹${Number(maxPrice).toFixed(2)}`;
-                }
-            } else if (typeof product.price === 'number') {
-                priceDisplay = `₹${Number(product.price).toFixed(2)}`;
-                if (product.originalPrice) {
-                    originalPriceDisplay = `<div class="text-xs text-gray-500 line-through">₹${Number(product.originalPrice).toFixed(2)}</div>`;
-                }
-            }
+        const row = document.createElement('tr');
+        row.className = rowClass;
+        row.innerHTML = `
+            <td class="py-3 px-4 text-center">${product.id}</td>
+            <td class="py-3 px-4 text-center">
+                <img src="${imageUrl}" alt="${product.title}" class="product-thumbnail mx-auto" 
+                     onerror="this.src='https://via.placeholder.com/40?text=No+Image'">
+            </td>
+            <td class="py-3 px-4">${product.sku || 'N/A'}</td>
+            <td class="py-3 px-4">${product.title}</td>
+            <td class="py-3 px-4">${product.category || 'N/A'}</td>
+            <td class="py-3 px-4">${product.subCategory || 'N/A'}</td>
+            <td class="py-3 px-4">${product.brand || 'N/A'}</td>
+            <td class="py-3 px-4">
+                <span class="px-2 py-1 rounded-full text-xs font-semibold ${
+                    stockStatus === 'In Stock' ? 'bg-green-100 text-green-800' :
+                    stockStatus === 'Low Stock' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                }">
+                    ${stockStatus} (${product.stockQuantity || 0})
+                </span>
+            </td>
+            <td class="py-3 px-4">
+                <div class="font-semibold">${priceDisplay}</div>
+                ${originalPriceDisplay}
+            </td>
+            <td class="py-3 px-4">
+                <div class="flex items-center">
+                    <span class="rating-stars mr-1">${getStarRating(product.rating || 0)}</span>
+                    <span class="text-xs">${(product.rating || 0).toFixed(1)}</span>
+                </div>
+            </td>
+            <td class="py-3 px-4 text-center verification-column">
+                <span class="status-badge ${
+                    product.verificationStatus === 'APPROVED' ? 'status-approved' :
+                    product.verificationStatus === 'REJECTED' ? 'status-rejected' : 'status-pending'
+                }">
+                    ${product.verificationStatus}
+                </span>
+            </td>
+           <td class="py-3 px-4">
+    <div class="action-buttons">
+        <button class="view-btn" data-id="${product.id}" title="View">
+            <i class="fas fa-eye"></i>
+        </button>
+        <button class="edit-btn" data-id="${product.id}" title="Edit">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="delete-btn" data-id="${product.id}" title="Delete">
+            <i class="fas fa-trash"></i>
+        </button>
+        ${product.verificationStatus === 'PENDING' ? 
+            `<button class="verify-btn" data-id="${product.id}" title="Approve">
+                <i class="fas fa-check-circle text-green-500"></i>
+            </button>
+            <button class="reject-btn" data-id="${product.id}" title="Reject">
+                <i class="fas fa-times-circle text-red-500"></i>
+            </button>` : 
+        product.verificationStatus === 'APPROVED' ? 
+            `<button class="unapprove-btn" data-id="${product.id}" title="Reject (Unapprove)">
+                <i class="fas fa-times-circle text-red-500"></i>
+            </button>` : 
+        product.verificationStatus === 'REJECTED' ? 
+            `<button class="reapprove-btn" data-id="${product.id}" title="Re-approve">
+                <i class="fas fa-check-circle text-green-500"></i>
+            </button>` : ''}
+    </div>
+</td>
+        `;
+        tableBody.appendChild(row);
+    });
+    
+    // Attach event listeners to buttons
+    attachTableEventListeners();
+}
 
-            const row = document.createElement('tr');
-            row.className = 'hover:bg-gray-50';
-            row.innerHTML = `
-                <td class="py-3 px-4 text-center">${product.id}</td>
-                <td class="py-3 px-4 text-center">
-                    <img src="${imageUrl}" alt="${product.title}" class="product-thumbnail mx-auto" 
-                         onerror="this.src='https://via.placeholder.com/40?text=No+Image'">
-                </td>
-                <td class="py-3 px-4">${product.sku || 'N/A'}</td>
-                <td class="py-3 px-4">${product.title}</td>
-                <td class="py-3 px-4">${product.category || 'N/A'}</td>
-                <td class="py-3 px-4">${product.subCategory || 'N/A'}</td>
-                <td class="py-3 px-4">${product.brand || 'N/A'}</td>
-                <td class="py-3 px-4">
-                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${
-                        stockStatus === 'In Stock' ? 'bg-green-100 text-green-800' :
-                        stockStatus === 'Low Stock' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                    }">
-                        ${stockStatus} (${product.stockQuantity || 0})
-                    </span>
-                </td>
-                <td class="py-3 px-4">
-                    <div class="font-semibold">${priceDisplay}</div>
-                    ${originalPriceDisplay}
-                </td>
-                <td class="py-3 px-4">
-                    <div class="flex items-center">
-                        <span class="rating-stars mr-1">${getStarRating(product.rating || 0)}</span>
-                        <span class="text-xs">${(product.rating || 0).toFixed(1)}</span>
-                    </div>
-                </td>
-                <td class="py-3 px-4">
-                    <div class="flex justify-center space-x-2">
-                        <button onclick="showProductDetails(${product.id})" 
-                                class="text-blue-600 hover:text-blue-800 p-1 rounded hover:bg-blue-50" 
-                                title="View">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                        <button onclick="openEditModal(${product.id})" 
-                                class="text-yellow-600 hover:text-yellow-800 p-1 rounded hover:bg-yellow-50" 
-                                title="Edit">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="deleteProduct(${product.id})" 
-                                class="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50" 
-                                title="Delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-            tableBody.appendChild(row);
+    function attachTableEventListeners() {
+        // View buttons
+        document.querySelectorAll('.view-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const productId = this.getAttribute('data-id');
+                await showProductDetails(productId);
+            });
+        });
+        
+        // Edit buttons
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const productId = this.getAttribute('data-id');
+                const product = filteredProducts.find(p => p.id == productId);
+                if (product) {
+                    openEditModal(product.id);
+                }
+            });
+        });
+        
+        // Delete buttons
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const productId = this.getAttribute('data-id');
+                const product = filteredProducts.find(p => p.id == productId);
+                if (product) {
+                    await deleteProduct(product.id);
+                }
+            });
+        });
+        
+        // Verify/Approve buttons
+        document.querySelectorAll('.verify-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const productId = this.getAttribute('data-id');
+                const product = filteredProducts.find(p => p.id == productId);
+                if (product) {
+                    showVerificationModal(product, 'APPROVE');
+                }
+            });
+        });
+        
+        // Reject buttons
+        document.querySelectorAll('.reject-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const productId = this.getAttribute('data-id');
+                const product = filteredProducts.find(p => p.id == productId);
+                if (product) {
+                    showVerificationModal(product, 'REJECT');
+                }
+            });
+        });
+
+
+        // Add after the existing verify/reject button listeners
+        // Unapprove buttons
+        document.querySelectorAll('.unapprove-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const productId = this.getAttribute('data-id');
+                const product = filteredProducts.find(p => p.id == productId);
+                if (product) {
+                    showVerificationModal(product, 'REJECT');
+                }
+            });
+        });
+
+        // Re-approve buttons
+        document.querySelectorAll('.reapprove-btn').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.stopPropagation();
+                const productId = this.getAttribute('data-id');
+                const product = filteredProducts.find(p => p.id == productId);
+                if (product) {
+                    showVerificationModal(product, 'APPROVE');
+                }
+            });
         });
     }
 
@@ -1845,163 +2372,223 @@ document.addEventListener('click', (event) => {
         document.getElementById('lowStockItems').textContent = stats.lowStock;
         document.getElementById('inStockProducts').textContent = stats.inStock;
         document.getElementById('expiringSoon').textContent = stats.expiring;
+        document.getElementById('pendingVerification').textContent = stats.pendingVerification;
     }
 
-    function populateCategoryFilters() {
-        const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))];
-        const subcategories = [...new Set(allProducts.map(p => p.subCategory).filter(Boolean))];
+function populateCategoryFilters() {
+    const categoryFilter = document.getElementById('categoryFilter');
+    const subcategoryFilter = document.getElementById('subcategoryFilter');
+    const editCategory = document.getElementById('edit-category');
+    
+    // Clear existing options except first
+    while (categoryFilter.options.length > 1) categoryFilter.remove(1);
+    while (subcategoryFilter.options.length > 1) subcategoryFilter.remove(1);
+    while (editCategory.options.length > 1) editCategory.remove(1);
+    
+    // Populate categories from CATEGORIES constant
+    Object.keys(CATEGORIES).forEach(category => {
+        // Add to filter dropdown
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option.cloneNode(true));
         
-        const categoryFilter = document.getElementById('categoryFilter');
-        const subcategoryFilter = document.getElementById('subcategoryFilter');
-        const editCategory = document.getElementById('edit-category');
-        
-        // Clear existing options except first
-        while (categoryFilter.options.length > 1) categoryFilter.remove(1);
-        while (subcategoryFilter.options.length > 1) subcategoryFilter.remove(1);
-        while (editCategory.options.length > 1) editCategory.remove(1);
-        
-        // Populate category filters with pre-defined categories
-        const predefinedCategories = ['clothes', 'medicine', 'body-wash', 'serum', 'diapers', 'baby-food', 'accessories', 'other'];
-        predefinedCategories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category;
-            option.textContent = category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ');
-            categoryFilter.appendChild(option.cloneNode(true));
-            editCategory.appendChild(option);
+        // Add to edit form dropdown
+        const editOption = option.cloneNode(true);
+        editCategory.appendChild(editOption);
+    });
+    
+    // Subcategory filter will be managed by setupCategorySubcategoryDependency
+}
+
+    // ============================================
+    // FILTER FUNCTIONS
+    // ============================================
+
+function applyFilters() {
+    const category = document.getElementById('categoryFilter').value;
+    const subcategory = document.getElementById('subcategoryFilter').value;
+    const stock = document.getElementById('stockFilter').value;
+    const verification = document.getElementById('verificationFilter').value;
+    const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    
+    let filtered = [...allProducts];
+    
+    // Search filter
+    if (search) {
+        filtered = filtered.filter(p => 
+            (p.sku && p.sku.toLowerCase().includes(search)) ||
+            (p.title && p.title.toLowerCase().includes(search)) ||
+            (p.brand && p.brand.toLowerCase().includes(search)) ||
+            (p.category && p.category.toLowerCase().includes(search)) ||
+            (p.subCategory && p.subCategory.toLowerCase().includes(search))
+        );
+    }
+    
+    // Category filter - only filter if category is selected
+    if (category) {
+        filtered = filtered.filter(p => p.category === category);
+    }
+    
+    // Subcategory filter - only filter if subcategory is selected
+    if (subcategory) {
+        filtered = filtered.filter(p => p.subCategory === subcategory);
+    }
+    
+    // Stock filter
+    if (stock) {
+        filtered = filtered.filter(p => {
+            const status = getStockStatus(p.stockQuantity);
+            if (stock === 'in-stock') return status === 'In Stock';
+            if (stock === 'low-stock') return status === 'Low Stock';
+            if (stock === 'out-of-stock') return status === 'Out of Stock';
+            return true;
         });
-        
-        // Add dynamic categories from products
-        categories.forEach(category => {
-            if (!predefinedCategories.includes(category)) {
-                const option = document.createElement('option');
-                option.value = category;
-                option.textContent = category;
-                categoryFilter.appendChild(option.cloneNode(true));
-                editCategory.appendChild(option);
-            }
+    }
+    
+    // Verification filter
+    if (verification) {
+        filtered = filtered.filter(p => {
+            const status = p.approved === true ? 'APPROVED' : 
+                          p.approved === false ? 'REJECTED' : 'PENDING';
+            return status === verification;
         });
-        
-        // Populate subcategory filter
-        subcategories.forEach(subcategory => {
-            const option = document.createElement('option');
-            option.value = subcategory;
-            option.textContent = subcategory;
-            subcategoryFilter.appendChild(option);
-        });
-        
-        // Enable subcategory filter if categories exist
-        if (categories.length > 0) {
-            subcategoryFilter.disabled = false;
+    }
+    
+    filteredProducts = filtered;
+    renderProductsTable(filteredProducts);
+}
+
+// ============================================
+// CATEGORY-SUBCATEGORY DEPENDENCY MANAGEMENT
+// ============================================
+
+function setupCategorySubcategoryDependency() {
+    const categoryFilter = document.getElementById('categoryFilter');
+    const subcategoryFilter = document.getElementById('subcategoryFilter');
+    const editCategory = document.getElementById('edit-category');
+    const editSubcategory = document.getElementById('edit-subcategory');
+    
+    // Function to populate subcategories based on selected category
+    function populateSubcategories(category, targetElement) {
+        // Clear existing subcategories except first option
+        while (targetElement.options.length > 1) {
+            targetElement.remove(1);
         }
         
-        // Store for later use
-        allCategories = categories;
-        allSubcategories = subcategories;
+        if (category && CATEGORIES[category]) {
+            // Populate with category-specific subcategories
+            CATEGORIES[category].forEach(subcategory => {
+                const option = document.createElement('option');
+                option.value = subcategory;
+                option.textContent = subcategory;
+                targetElement.appendChild(option);
+            });
+            
+            // Enable the target element
+            targetElement.disabled = false;
+        } else {
+            // Disable and clear if no category selected
+            targetElement.disabled = true;
+            targetElement.value = '';
+            
+            // Add placeholder option
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'Select category first';
+            placeholderOption.disabled = true;
+            placeholderOption.selected = true;
+            targetElement.appendChild(placeholderOption);
+        }
     }
-
-    // ============================================
-    // STICKY ACTION BUTTON FUNCTIONS
-    // ============================================
-
-    function setupStickyActionButton() {
-        const actionBtn = document.getElementById('stickyActionBtn');
-        const actionMenu = document.getElementById('stickyActionMenu');
+    
+    // Initialize both filters with placeholders
+    function initializeFilters() {
+        // Clear and reset subcategory filter
+        while (subcategoryFilter.options.length > 0) {
+            subcategoryFilter.remove(0);
+        }
         
-        // Toggle action menu
-        actionBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            actionMenu.classList.toggle('show');
-        });
+        // Add placeholder to subcategory filter
+        const placeholderOption = document.createElement('option');
+        placeholderOption.value = '';
+        placeholderOption.textContent = 'Select category first';
+        placeholderOption.disabled = true;
+        placeholderOption.selected = true;
+        subcategoryFilter.appendChild(placeholderOption);
+        subcategoryFilter.disabled = true;
         
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!actionMenu.contains(e.target) && !actionBtn.contains(e.target)) {
-                actionMenu.classList.remove('show');
-            }
-        });
-        
-        // Quick actions
-        document.getElementById('quickAddProduct').addEventListener('click', (e) => {
-            e.preventDefault();
-            actionMenu.classList.remove('show');
-            openEditModal();
-        });
-        
-        document.getElementById('quickExport').addEventListener('click', (e) => {
-            e.preventDefault();
-            actionMenu.classList.remove('show');
-            exportToExcel();
-        });
-        
-        document.getElementById('quickImport').addEventListener('click', (e) => {
-            e.preventDefault();
-            actionMenu.classList.remove('show');
-            showSuccessPopup('Import functionality coming soon!', 'info');
-        });
-        
-        document.getElementById('quickRefresh').addEventListener('click', (e) => {
-            e.preventDefault();
-            actionMenu.classList.remove('show');
-            loadProducts();
-            showSuccessPopup('Data refreshed successfully!');
-        });
-        
-        document.getElementById('quickAddCategory').addEventListener('click', (e) => {
-            e.preventDefault();
-            actionMenu.classList.remove('show');
-            showSuccessPopup('Category management feature coming soon!', 'info');
-        });
+        // Reset edit subcategory
+        editSubcategory.disabled = true;
+        editSubcategory.innerHTML = '<option value="">Select category first</option>';
     }
-
-    // ============================================
-    // SIDEBAR FUNCTIONS (FIXED)
-    // ============================================
-
-    function initializeSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
-        const mobileToggle = document.getElementById('toggle-sidebar-mobile');
-        const closeSidebar = document.getElementById('close-sidebar');
+    
+    // Category filter change handler
+    categoryFilter.addEventListener('change', function() {
+        const selectedCategory = this.value;
         
-        // Mobile toggle
-        mobileToggle.addEventListener('click', () => {
-            sidebar.classList.add('open');
-            backdrop.classList.add('active');
-        });
-        
-        // Close sidebar buttons
-        closeSidebar.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            backdrop.classList.remove('active');
-        });
-        
-        // Close sidebar when clicking backdrop
-        backdrop.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-            backdrop.classList.remove('active');
-        });
-        
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth < 768) {
-                if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
-                    sidebar.classList.remove('open');
-                    backdrop.classList.remove('active');
-                }
+        if (selectedCategory) {
+            populateSubcategories(selectedCategory, subcategoryFilter);
+            applyFilters();
+        } else {
+            // Reset subcategory filter
+            while (subcategoryFilter.options.length > 0) {
+                subcategoryFilter.remove(0);
             }
-        });
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'Select category first';
+            placeholderOption.disabled = true;
+            placeholderOption.selected = true;
+            subcategoryFilter.appendChild(placeholderOption);
+            subcategoryFilter.disabled = true;
+            applyFilters();
+        }
+    });
+    
+    // Edit form category change handler
+    editCategory.addEventListener('change', function() {
+        const selectedCategory = this.value;
         
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('open');
-                backdrop.classList.remove('active');
-            }
-        });
-        
-        // Initialize sidebar toggle functionality
-        initializeSidebarToggle();
-    }
+        if (selectedCategory) {
+            // Clear existing subcategories in edit form
+            editSubcategory.innerHTML = '';
+            
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select Subcategory';
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            editSubcategory.appendChild(defaultOption);
+            
+            // Populate subcategories
+            CATEGORIES[selectedCategory].forEach(subcategory => {
+                const option = document.createElement('option');
+                option.value = subcategory;
+                option.textContent = subcategory;
+                editSubcategory.appendChild(option);
+            });
+            
+            // Enable subcategory field
+            editSubcategory.disabled = false;
+        } else {
+            editSubcategory.disabled = true;
+            editSubcategory.value = '';
+            editSubcategory.innerHTML = '';
+            
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = '';
+            placeholderOption.textContent = 'Select category first';
+            placeholderOption.disabled = true;
+            placeholderOption.selected = true;
+            editSubcategory.appendChild(placeholderOption);
+        }
+    });
+    
+    // Initialize filters
+    initializeFilters();
+}
 
     // ============================================
     // MODAL FUNCTIONS
@@ -2111,6 +2698,31 @@ document.addEventListener('click', (event) => {
                 document.getElementById('detail-specifications').textContent = product.specifications || 'N/A';
             }
             
+            // Verification details
+            const verificationStatus = product.verificationStatus;
+            document.getElementById('detail-verification-status').innerHTML = `
+                <span class="status-badge ${
+                    verificationStatus === 'APPROVED' ? 'status-approved' :
+                    verificationStatus === 'REJECTED' ? 'status-rejected' : 'status-pending'
+                }">
+                    ${verificationStatus}
+                </span>
+            `;
+            
+            // Show verification details if available
+            if (product.verifiedBy) {
+                document.getElementById('detail-verified-by-container').style.display = 'grid';
+                document.getElementById('detail-verified-by').textContent = product.verifiedBy;
+            }
+            if (product.verifiedAt) {
+                document.getElementById('detail-verified-at-container').style.display = 'grid';
+                document.getElementById('detail-verified-at').textContent = formatDate(product.verifiedAt);
+            }
+            // if (product.rejectionReason) {
+            //     document.getElementById('detail-rejection-reason-container').style.display = 'grid';
+            //     document.getElementById('detail-rejection-reason').textContent = product.rejectionReason;
+            // }
+            
             document.getElementById('detail-created').textContent = formatDate(product.createdAt);
             
             const mainImageContainer = document.getElementById('detail-main-image');
@@ -2129,7 +2741,7 @@ document.addEventListener('click', (event) => {
             }
             
             // Set edit button
-            document.getElementById('editProductBtn').onclick = () => openEditModal(productId);
+            document.getElementById('editProductBtn').onclick = () => openEditModal(product.id);
             
             // Show modal
             document.getElementById('productDetailModal').style.display = 'flex';
@@ -2139,146 +2751,268 @@ document.addEventListener('click', (event) => {
         }
     }
 
-    let currentEditingProductId = null;
-
-    async function openEditModal(productId = null) {
-        const modal = document.getElementById('editProductModal');
-        const title = document.getElementById('editModalTitle');
-        
-        // Reset price items
-        document.getElementById('price-list-items').innerHTML = '';
-        priceItemsCount = 0;
-        
-        if (productId) {
-            // Edit mode
-            currentEditingProductId = productId;
-            title.textContent = 'Edit Product';
-            
-            try {
-                const product = await productService.getProductById(productId);
-                
-                // Fill form
-                document.getElementById('edit-sku').value = product.sku || '';
-                document.getElementById('edit-title').value = product.title || '';
-                document.getElementById('edit-category').value = product.category || '';
-                document.getElementById('edit-subcategory').value = product.subCategory || '';
-                document.getElementById('edit-brand').value = product.brand || '';
-                document.getElementById('edit-instock').value = product.inStock ? 'true' : 'false';
-                document.getElementById('edit-discount').value = product.discount || '';
-                document.getElementById('edit-rating').value = product.rating || 0;
-                document.getElementById('edit-stock-quantity').value = product.stockQuantity || 0;
-                document.getElementById('edit-description').value = product.description?.join('\n') || '';
-                document.getElementById('edit-features').value = product.features?.join('\n') || '';
-                document.getElementById('edit-sizes').value = product.sizes?.join(', ') || '';
-                document.getElementById('edit-specifications').value = product.specifications || '{"": ""}';
-                
-                // Handle prices
-                if (product.priceList && Array.isArray(product.priceList) && product.priceList.length > 0) {
-                    populatePriceData(product.priceList);
-                    document.getElementById('edit-price').value = '';
-                    document.getElementById('edit-original-price').value = '';
-                } else {
-                    document.getElementById('edit-price-type').value = 'single';
-                    document.getElementById('edit-price-type').dispatchEvent(new Event('change'));
-                    document.getElementById('edit-price').value = product.price || '';
-                    document.getElementById('edit-original-price').value = product.originalPrice || '';
-                }
-                
-            } catch (error) {
-                console.error('Error loading product for edit:', error);
-                showSuccessPopup('Error loading product data', 'error');
-                return;
-            }
-        } else {
-            // Add mode
-            currentEditingProductId = null;
-            title.textContent = 'Add New Product';
-            document.getElementById('editProductForm').reset();
-            document.getElementById('edit-specifications').value = '{"": ""}';
-            document.getElementById('edit-price-type').value = 'single';
-            document.getElementById('edit-price-type').dispatchEvent(new Event('change'));
-            addPriceItem(); // Add one default price item
-        }
-        
-        modal.style.display = 'flex';
-    }
-
-    async function handleFormSubmit(e) {
-        e.preventDefault();
+async function openEditModal(productId = null) {
+    const modal = document.getElementById('editProductModal');
+    const title = document.getElementById('editModalTitle');
+    
+    // Reset form and previews
+    document.getElementById('editProductForm').reset();
+    document.getElementById('price-list-items').innerHTML = '';
+    document.getElementById('main-image-preview').classList.add('hidden');
+    document.getElementById('sub-images-preview').classList.add('hidden');
+    priceItemsCount = 0;
+    
+    // Reset category and subcategory
+    document.getElementById('edit-category').value = '';
+    document.getElementById('edit-subcategory').innerHTML = '<option value="">Select category first</option>';
+    document.getElementById('edit-subcategory').disabled = true;
+    
+    if (productId) {
+        // Edit mode
+        currentEditingProductId = productId;
+        title.textContent = 'Edit Product';
         
         try {
-            // Collect form data
-            const formData = {
-                sku: document.getElementById('edit-sku').value.trim(),
-                title: document.getElementById('edit-title').value.trim(),
-                category: document.getElementById('edit-category').value,
-                subCategory: document.getElementById('edit-subcategory').value.trim(),
-                brand: document.getElementById('edit-brand').value.trim(),
-                inStock: document.getElementById('edit-instock').value,
-                discount: document.getElementById('edit-discount').value ? parseInt(document.getElementById('edit-discount').value) : null,
-                rating: document.getElementById('edit-rating').value ? parseFloat(document.getElementById('edit-rating').value) : 0,
-                stockQuantity: parseInt(document.getElementById('edit-stock-quantity').value),
-                description: document.getElementById('edit-description').value,
-                features: document.getElementById('edit-features').value,
-                sizes: document.getElementById('edit-sizes').value,
-                specifications: document.getElementById('edit-specifications').value
-            };
-
-            // Validation
-            if (!formData.sku || !formData.title || !formData.category || !formData.brand) {
-                showSuccessPopup('SKU, Title, Category, and Brand are required', 'error');
-                return;
-            }
-
-            if (isNaN(formData.stockQuantity) || formData.stockQuantity < 0) {
-                showSuccessPopup('Stock quantity must be a valid number', 'error');
-                return;
-            }
-
-            // Get image files
-            const mainImageInput = document.getElementById('edit-main-image');
-            const mainImage = mainImageInput.files[0];
+            const product = await productService.getProductById(productId);
             
-            const subImagesInput = document.getElementById('edit-sub-images');
-            const subImages = subImagesInput.files ? Array.from(subImagesInput.files) : [];
-
-            // For new product, require main image
-            if (!currentEditingProductId && !mainImage) {
-                showSuccessPopup('Main image is required for new products', 'error');
-                return;
-            }
-
-            // Validate price data
-            const priceData = getPriceData();
-            if (priceData.price <= 0) {
-                showSuccessPopup('Price must be greater than 0', 'error');
-                return;
-            }
-
-            // Add images to form data
-            if (mainImage) formData.mainImage = mainImage;
-            if (subImages.length > 0) formData.subImages = subImages;
-
-            // Call API
-            if (currentEditingProductId) {
-                await productService.updateProduct(currentEditingProductId, formData);
-                showSuccessPopup('Product updated successfully!');
+            // Fill form with product data
+            document.getElementById('edit-sku').value = product.sku || '';
+            document.getElementById('edit-title').value = product.title || '';
+            document.getElementById('edit-brand').value = product.brand || '';
+            document.getElementById('edit-instock').value = product.inStock ? 'true' : 'false';
+            document.getElementById('edit-discount').value = product.discount || '';
+            document.getElementById('edit-rating').value = product.rating || 0;
+            document.getElementById('edit-review-count').value = product.reviewCount || '';
+            document.getElementById('edit-stock-quantity').value = product.stockQuantity || 0;
+            document.getElementById('edit-description').value = product.description?.join('\n') || '';
+            document.getElementById('edit-features').value = product.features?.join('\n') || '';
+            document.getElementById('edit-sizes').value = product.productSizes?.join(', ') || '';
+            document.getElementById('edit-specifications').value = product.specifications || '';
+            
+            // Handle category and subcategory
+            const category = product.category || '';
+            const subcategory = product.subCategory || '';
+            
+// In your openEditModal function, make sure this part exists:
+if (category) {
+    document.getElementById('edit-category').value = category;
+    
+    // Trigger category change to populate subcategories
+    const categoryEvent = new Event('change');
+    document.getElementById('edit-category').dispatchEvent(categoryEvent);
+    
+    // Set subcategory after a small delay to ensure options are populated
+    setTimeout(() => {
+        document.getElementById('edit-subcategory').value = subcategory;
+    }, 100);
+}
+            
+            // Handle prices
+            if (product.price && Array.isArray(product.price) && product.price.length > 0) {
+                console.log('Processing price array:', product.price);
+                
+                // Get sizes/variants for labels
+                const sizes = product.productSizes || [];
+                const originalPrices = product.originalPrice || [];
+                
+                // Create price items for each price
+                product.price.forEach((price, index) => {
+                    const sizeLabel = sizes[index] || `Variant ${index + 1}`;
+                    const originalPrice = (originalPrices && originalPrices[index]) || '';
+                    console.log(`Adding price item ${index + 1}: size=${sizeLabel}, price=${price}, original=${originalPrice}`);
+                    addPriceItem(sizeLabel, price, originalPrice);
+                });
+            } else if (typeof product.price === 'number') {
+                console.log('Processing single price:', product.price);
+                const originalPrice = product.originalPrice || '';
+                addPriceItem('Default', product.price, originalPrice);
             } else {
-                await productService.createProduct(formData);
-                showSuccessPopup('Product created successfully!');
+                console.log('No price data found, adding default');
+                addPriceItem();
             }
-
-            // Close modal and reload
-            document.getElementById('editProductModal').style.display = 'none';
-            document.getElementById('editProductForm').reset();
-            await loadProducts();
+            
+            // Handle image previews if available
+            if (product.mainImageUrl) {
+                const mainImagePreview = document.getElementById('main-image-preview');
+                const mainImageImg = document.getElementById('main-image-preview-img');
+                mainImageImg.src = `http://localhost:8083${product.mainImageUrl}`;
+                mainImageImg.onerror = function() {
+                    this.src = 'https://via.placeholder.com/150?text=No+Image';
+                };
+                mainImagePreview.classList.remove('hidden');
+            }
+            
+            // Handle sub images if available
+            if (product.subImageUrls && product.subImageUrls.length > 0) {
+                const subImagesContainer = document.getElementById('sub-images-container');
+                subImagesContainer.innerHTML = '';
+                product.subImageUrls.forEach((url, index) => {
+                    const imgDiv = document.createElement('div');
+                    imgDiv.className = 'relative';
+                    imgDiv.innerHTML = `
+                        <img src="http://localhost:8083${url}" 
+                             class="w-20 h-20 object-cover rounded-lg border"
+                             alt="Sub image ${index + 1}"
+                             onerror="this.src='https://via.placeholder.com/80?text=Image'">
+                        <span class="absolute -top-1 -right-1 bg-gray-700 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">${index + 1}</span>
+                    `;
+                    subImagesContainer.appendChild(imgDiv);
+                });
+                document.getElementById('sub-images-preview').classList.remove('hidden');
+            }
             
         } catch (error) {
-            console.error('Error saving product:', error);
-            showSuccessPopup(error.message || 'Error saving product', 'error');
+            console.error('Error loading product for edit:', error);
+            showSuccessPopup('Error loading product data', 'error');
+            return;
         }
+    } else {
+        // Add mode
+        currentEditingProductId = null;
+        title.textContent = 'Add New Product';
+        addPriceItem(); // Add one default price item
     }
+    
+    modal.style.display = 'flex';
+}
 
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    try {
+        // Collect form data matching your JSON payload
+        const priceData = getPriceData();
+        const sizesInput = document.getElementById('edit-sizes').value;
+        const sizes = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(s => s) : [];
+        
+        const formDataJson = {
+            sku: document.getElementById('edit-sku').value.trim(),
+            title: document.getElementById('edit-title').value.trim(),
+            category: document.getElementById('edit-category').value,
+            subCategory: document.getElementById('edit-subcategory').value.trim(),
+            price: priceData.prices,
+            originalPrice: priceData.originalPrices,
+            discount: document.getElementById('edit-discount').value ? parseInt(document.getElementById('edit-discount').value) : null,
+            rating: document.getElementById('edit-rating').value ? parseFloat(document.getElementById('edit-rating').value) : 0,
+            reviewCount: document.getElementById('edit-review-count').value ? parseInt(document.getElementById('edit-review-count').value) : null,
+            brand: document.getElementById('edit-brand').value.trim(),
+            inStock: document.getElementById('edit-instock').value === 'true',
+            stockQuantity: parseInt(document.getElementById('edit-stock-quantity').value),
+            description: document.getElementById('edit-description').value ? 
+                        document.getElementById('edit-description').value.split('\n').filter(d => d.trim()) : [],
+            productSizes: sizes,
+            features: document.getElementById('edit-features').value ? 
+                     document.getElementById('edit-features').value.split('\n').filter(f => f.trim()) : [],
+            specifications: document.getElementById('edit-specifications').value.trim(),
+            // approved: false
+            
+        };
+           // ✅ Only add approved: false for NEW products
+        if (!currentEditingProductId) {
+            formDataJson.approved = false; // New products start unapproved
+        }
+
+        console.log('Form data to send:', JSON.stringify(formDataJson, null, 2));
+
+        // Validation
+        if (!formDataJson.sku || !formDataJson.title || !formDataJson.category || !formDataJson.brand) {
+            showSuccessPopup('SKU, Title, Category, and Brand are required', 'error');
+            return;
+        }
+
+        if (isNaN(formDataJson.stockQuantity) || formDataJson.stockQuantity < 0) {
+            showSuccessPopup('Stock quantity must be a valid number', 'error');
+            return;
+        }
+
+        // Validate at least one price
+        if (!priceData.prices || priceData.prices.length === 0 || priceData.prices[0] <= 0) {
+            showSuccessPopup('At least one valid price is required', 'error');
+            return;
+        }
+
+        // Get image files
+        const mainImageInput = document.getElementById('edit-main-image');
+        const mainImage = mainImageInput.files[0];
+        
+        const subImagesInput = document.getElementById('edit-sub-images');
+        const subImages = subImagesInput.files ? Array.from(subImagesInput.files) : [];
+
+        // Create FormData object for the API call
+        const apiFormData = new FormData();
+        apiFormData.append('productData', JSON.stringify(formDataJson));
+        
+        // Handle main image differently for create vs update
+        if (mainImage) {
+            // User selected a new image
+            apiFormData.append('mainImage', mainImage);
+            console.log('Main image added to FormData:', mainImage.name, mainImage.size);
+        } else if (!currentEditingProductId) {
+            // For NEW product, main image is required
+            console.error('Main image is required for new products!');
+            showSuccessPopup('Main image is required for new products', 'error');
+            return;
+        } else {
+            // For UPDATE, if no new image is selected, we'll update without changing the image
+            console.log('No new main image selected, keeping existing image');
+            // Don't append mainImage - backend will keep the existing one
+        }
+        
+        // Handle sub images
+        if (subImages.length > 0) {
+            // Backend expects array for subImages
+            subImages.forEach((image, index) => {
+                apiFormData.append('subImages', image);
+                console.log(`Sub image ${index + 1} added:`, image.name, image.size);
+            });
+        } else if (!currentEditingProductId) {
+            // For new products with no sub images, add empty file
+            apiFormData.append('subImages', new File([], 'empty', { type: 'application/octet-stream' }));
+        } else {
+            // For updates with no new sub images, backend will keep existing ones
+            console.log('No new sub images selected, keeping existing sub images');
+        }
+
+        // Log FormData contents for debugging
+        console.log('FormData entries:');
+        for (let pair of apiFormData.entries()) {
+            if (pair[0] === 'productData') {
+                console.log(pair[0], JSON.parse(pair[1]));
+            } else {
+                console.log(pair[0], pair[1].name || pair[1].type || 'Blob', 'Size:', pair[1].size);
+            }
+        }
+
+        // Call API
+        let result;
+        if (currentEditingProductId) {
+            // For update, use the PATCH endpoint which allows partial updates
+            console.log('Updating product ID:', currentEditingProductId);
+            
+            // For updates without new images, use PATCH instead of PUT
+            if (!mainImage && subImages.length === 0) {
+                // Use patch endpoint for updates without new images
+                result = await productService.patchMbProduct(currentEditingProductId, apiFormData);
+            } else {
+                // Use put endpoint for updates with new images
+                result = await productService.updateProduct(currentEditingProductId, apiFormData);
+            }
+            showSuccessPopup('Product updated successfully!');
+        } else {
+            // For create
+            result = await productService.createProduct(apiFormData);
+            showSuccessPopup('Product created successfully! It is now pending verification.');
+        }
+
+        // Close modal and reload
+        document.getElementById('editProductModal').style.display = 'none';
+        await loadProducts();
+        
+    } catch (error) {
+        console.error('Error saving product:', error);
+        showSuccessPopup(error.message || 'Error saving product', 'error');
+    }
+}
     async function deleteProduct(productId) {
         if (!confirm('Are you sure you want to delete this product?')) return;
         
@@ -2293,50 +3027,115 @@ document.addEventListener('click', (event) => {
     }
 
     // ============================================
-    // FILTER FUNCTIONS
+    // VERIFICATION MODAL FUNCTIONS
     // ============================================
 
-    function applyFilters() {
-        const category = document.getElementById('categoryFilter').value;
-        const subcategory = document.getElementById('subcategoryFilter').value;
-        const stock = document.getElementById('stockFilter').value;
-        const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    function showVerificationModal(product, action) {
+        document.getElementById('verify-product-id').value = product.id;
+        document.getElementById('verify-product-name').textContent = product.title;
+        document.getElementById('verify-product-sku').textContent = product.sku || 'N/A';
+        document.getElementById('verify-product-category').textContent = product.category || 'N/A';
         
-        let filtered = allProducts;
-        
-        // Search filter
-        if (search) {
-            filtered = filtered.filter(p => 
-                (p.sku && p.sku.toLowerCase().includes(search)) ||
-                (p.title && p.title.toLowerCase().includes(search)) ||
-                (p.brand && p.brand.toLowerCase().includes(search)) ||
-                (p.category && p.category.toLowerCase().includes(search))
-            );
+        // Set radio button
+        if (action === 'REJECT') {
+            document.querySelector('input[name="verificationAction"][value="REJECT"]').checked = true;
+        } else {
+            document.querySelector('input[name="verificationAction"][value="APPROVE"]').checked = true;
         }
         
-        // Category filter
-        if (category) {
-            filtered = filtered.filter(p => p.category === category);
-        }
+        // Don't show rejection reason container at all
+        // document.getElementById('rejection-reason-container').style.display = 'none';
         
-        // Subcategory filter
-        if (subcategory) {
-            filtered = filtered.filter(p => p.subCategory === subcategory);
-        }
-        
-        // Stock filter
-        if (stock) {
-            filtered = filtered.filter(p => {
-                const status = getStockStatus(p.stockQuantity);
-                if (stock === 'in-stock') return status === 'In Stock';
-                if (stock === 'low-stock') return status === 'Low Stock';
-                if (stock === 'out-of-stock') return status === 'Out of Stock';
-                return true;
-            });
-        }
-        
-        renderProductsTable(filtered);
+        document.getElementById('verificationModal').style.display = 'flex';
     }
+
+    async function handleVerificationSubmit() {
+        const productId = document.getElementById('verify-product-id').value;
+        const action = document.querySelector('input[name="verificationAction"]:checked').value;
+        const reason = action === 'REJECT' ? document.getElementById('rejectionReason').value.trim() : null;
+        
+        // if (action === 'REJECT' && !reason) {
+        //     showSuccessPopup('Please provide a rejection reason', 'error');
+        //     return;
+        // }
+        
+        try {
+            showSuccessPopup(`Processing ${action.toLowerCase()}...`, 'info');
+            
+            const result = await productService.verifyProduct(productId, action, reason);
+            
+            console.log('Verification API Response:', result);
+            console.log('Approved field value:', result.approved);
+            console.log('is_approved field value:', result.is_approved);
+            
+            const actionText = action === 'APPROVE' ? 'approved' : 'rejected';
+            showSuccessPopup(`Product ${actionText} successfully!`);
+            
+            document.getElementById('verificationModal').style.display = 'none';
+            document.getElementById('verificationForm').reset();
+            
+            // Force reload products from server
+            await loadProducts();
+            
+        } catch (error) {
+            console.error('Error verifying product:', error);
+            showSuccessPopup(error.message || 'Error verifying product', 'error');
+        }
+    }
+
+    // ============================================
+    // STICKY ACTION BUTTON FUNCTIONS
+    // ============================================
+
+    // function setupStickyActionButton() {
+    //     const actionBtn = document.getElementById('stickyActionBtn');
+    //     const actionMenu = document.getElementById('stickyActionMenu');
+        
+    //     // Toggle action menu
+    //     actionBtn.addEventListener('click', (e) => {
+    //         e.stopPropagation();
+    //         actionMenu.classList.toggle('show');
+    //     });
+        
+    //     // Close menu when clicking outside
+    //     document.addEventListener('click', (e) => {
+    //         if (!actionMenu.contains(e.target) && !actionBtn.contains(e.target)) {
+    //             actionMenu.classList.remove('show');
+    //         }
+    //     });
+        
+    //     // Quick actions
+    //     document.getElementById('quickAddProduct').addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         actionMenu.classList.remove('show');
+    //         openEditModal();
+    //     });
+        
+    //     document.getElementById('quickExport').addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         actionMenu.classList.remove('show');
+    //         exportToExcel();
+    //     });
+        
+    //     document.getElementById('quickImport').addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         actionMenu.classList.remove('show');
+    //         showSuccessPopup('Import functionality coming soon!', 'info');
+    //     });
+        
+    //     document.getElementById('quickRefresh').addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         actionMenu.classList.remove('show');
+    //         loadProducts();
+    //         showSuccessPopup('Data refreshed successfully!');
+    //     });
+        
+    //     document.getElementById('quickAddCategory').addEventListener('click', (e) => {
+    //         e.preventDefault();
+    //         actionMenu.classList.remove('show');
+    //         showSuccessPopup('Category management feature coming soon!', 'info');
+    //     });
+    // }
 
     // ============================================
     // EXPORT FUNCTION
@@ -2356,7 +3155,7 @@ document.addEventListener('click', (event) => {
             
             // Prepare data for export
             const exportData = [
-                ['ID', 'SKU', 'Title', 'Category', 'Subcategory', 'Brand', 'Prices', 'Original Prices', 'Discount', 'Rating', 'Stock', 'Status', 'Created']
+                ['ID', 'SKU', 'Title', 'Category', 'Subcategory', 'Brand', 'Prices', 'Original Prices', 'Discount', 'Rating', 'Stock', 'Status', 'Verification', 'Created']
             ];
             
             products.forEach(product => {
@@ -2381,6 +3180,10 @@ document.addEventListener('click', (event) => {
                     }
                 }
                 
+                // Get verification status
+                const verificationStatus = product.approved === true ? 'APPROVED' : 
+                                         product.approved === false ? 'REJECTED' : 'PENDING';
+                
                 exportData.push([
                     product.id,
                     product.sku || '',
@@ -2394,6 +3197,7 @@ document.addEventListener('click', (event) => {
                     product.rating || 0,
                     product.stockQuantity || 0,
                     getStockStatus(product.stockQuantity),
+                    verificationStatus,
                     formatDate(product.createdAt)
                 ]);
             });
@@ -2416,15 +3220,97 @@ document.addEventListener('click', (event) => {
     }
 
     // ============================================
-    // EVENT LISTENERS
+    // SIDEBAR FUNCTIONS
+    // ============================================
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarArrow = document.getElementById('sidebar-arrow');
+        const logoDiv = document.querySelector('div > div');               // Logo container
+        const navTexts = document.querySelectorAll('.nav-text');
+        const navIcons = document.querySelectorAll('.nav-icon');
+        
+        if (window.innerWidth < 768) {
+            // Mobile: Just toggle visibility with smooth transition
+            sidebar.classList.toggle('-translate-x-full');
+            sidebar.classList.toggle('translate-x-0');
+        } else {
+            // Desktop: Toggle between collapsed and expanded
+            sidebar.classList.toggle('collapsed');
+            
+            if (sidebar.classList.contains('collapsed')) {
+                // Collapsed state
+                sidebar.style.width = '64px'; // Smaller width when collapsed
+                sidebarArrow.classList.remove('fa-chevron-left');
+                sidebarArrow.classList.add('fa-chevron-right');
+                
+                // Hide logo smoothly
+                logoDiv.style.opacity = '0';
+                logoDiv.style.width = '0';
+                
+                // Hide nav texts with delay
+                navTexts.forEach((text, index) => {
+                    text.style.opacity = '0';
+                    text.style.width = '0';
+                    text.style.overflow = 'hidden';
+                    text.style.transitionDelay = `${index * 20}ms`;
+                });
+                
+                // Center icons
+                navIcons.forEach(icon => {
+                    icon.style.marginLeft = '0';
+                    icon.style.marginRight = '0';
+                });
+                
+            } else {
+                // Expanded state
+                sidebar.style.width = '256px'; // Original width
+                sidebarArrow.classList.remove('fa-chevron-right');
+                sidebarArrow.classList.add('fa-chevron-left');
+                
+                // Show logo smoothly
+                logoDiv.style.opacity = '1';
+                logoDiv.style.width = 'auto';
+                
+                // Show nav texts with staggered animation
+                navTexts.forEach((text, index) => {
+                    text.style.opacity = '1';
+                    text.style.width = 'auto';
+                    text.style.overflow = 'visible';
+                    text.style.transitionDelay = `${index * 20}ms`;
+                });
+                
+                // Restore icon margins
+                navIcons.forEach(icon => {
+                    icon.style.marginLeft = '0';
+                    icon.style.marginRight = '0.75rem'; // mr-3
+                });
+            }
+        }
+    }
+
+    // ============================================
+    // EVENT LISTENERS SETUP
     // ============================================
 
     function setupEventListeners() {
-        // Initialize sidebar
-        // initializeSidebar();
-        
         // Setup price management
         setupPriceManagement();
+        
+        // Sidebar toggle
+        document.getElementById('toggle-sidebar-logo').addEventListener('click', toggleSidebar);
+        document.getElementById('close-sidebar').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.add('-translate-x-full');
+            sidebar.classList.remove('translate-x-0');
+        });
+        
+        // Mobile sidebar toggle
+        document.getElementById('toggle-sidebar-mobile').addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+            sidebar.classList.toggle('translate-x-0');
+        });
         
         // Modal close buttons
         document.getElementById('closeDetailModal').addEventListener('click', () => {
@@ -2435,8 +3321,16 @@ document.addEventListener('click', (event) => {
             document.getElementById('editProductModal').style.display = 'none';
         });
         
+        document.getElementById('closeVerificationModal').addEventListener('click', () => {
+            document.getElementById('verificationModal').style.display = 'none';
+        });
+        
         document.getElementById('cancelEdit').addEventListener('click', () => {
             document.getElementById('editProductModal').style.display = 'none';
+        });
+        
+        document.getElementById('cancelVerification').addEventListener('click', () => {
+            document.getElementById('verificationModal').style.display = 'none';
         });
         
         document.getElementById('closeSuccessPopup').addEventListener('click', () => {
@@ -2446,19 +3340,23 @@ document.addEventListener('click', (event) => {
         // Add product button
         document.getElementById('addProductBtn').addEventListener('click', () => openEditModal());
 
-        // Form submission
+        // Reset filter button
+document.getElementById('resetFilterBtn').addEventListener('click', resetAllFilters);
+
+        // Form submissions
         document.getElementById('editProductForm').addEventListener('submit', handleFormSubmit);
+        
+        // Use button click instead of form submit for verification to avoid validation errors
+        document.getElementById('submitVerificationBtn').addEventListener('click', handleVerificationSubmit);
 
         // Export button
         document.getElementById('exportBtn').addEventListener('click', exportToExcel);
 
         // Filters
-        document.getElementById('categoryFilter').addEventListener('change', function() {
-            applyFilters();
-        });
-        
+        document.getElementById('categoryFilter').addEventListener('change', applyFilters);
         document.getElementById('subcategoryFilter').addEventListener('change', applyFilters);
         document.getElementById('stockFilter').addEventListener('change', applyFilters);
+        document.getElementById('verificationFilter').addEventListener('change', applyFilters);
         
         // Search with debounce
         let searchTimeout;
@@ -2469,7 +3367,7 @@ document.addEventListener('click', (event) => {
 
         // Close modals when clicking outside
         window.addEventListener('click', (e) => {
-            const modals = ['productDetailModal', 'editProductModal', 'successPopup'];
+            const modals = ['productDetailModal', 'editProductModal', 'verificationModal', 'successPopup'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (e.target === modal) {
@@ -2477,6 +3375,18 @@ document.addEventListener('click', (event) => {
                 }
             });
         });
+
+        // Handle rejection reason field visibility
+        // document.querySelectorAll('input[name="verificationAction"]').forEach(radio => {
+        //     radio.addEventListener('change', function() {
+        //         if (this.value === 'REJECT') {
+        //             document.getElementById('rejection-reason-container').style.display = 'block';
+        //         } else {
+        //             document.getElementById('rejection-reason-container').style.display = 'none';
+        //             document.getElementById('rejectionReason').value = '';
+        //         }
+        //     });
+        // });
 
         // Logout Modal
         const logoutBtn = document.getElementById('logoutBtn');
@@ -2505,7 +3415,7 @@ document.addEventListener('click', (event) => {
         });
 
         // Setup sticky action button
-        setupStickyActionButton();
+        // setupStickyActionButton();
     }
 
     // ============================================
@@ -2533,62 +3443,5 @@ document.addEventListener('click', (event) => {
     window.exportToExcel = exportToExcel;
     window.removePriceItem = removePriceItem;
     </script>
-
-
-<script src="/auth.js"></script>
-    <script>
-        // This will redirect to login if session is missing or expired
-        Auth.requireAuth();
-
-        // Optional: start background timer to warn on expiration
-        Auth.startSessionTimer();
-
-        // Example: display admin name
-        document.addEventListener("DOMContentLoaded", () => {
-            const admin = Auth.getCurrentAdmin();
-            if (admin) {
-                console.log("Logged in as:", admin.firstName + " " + admin.lastName);
-                // e.g., document.getElementById('adminName').textContent = admin.firstName;
-            }
-        });
-
-
-          function displayUserProfile() {
-  const admin = Auth.getCurrentAdmin(); // This returns the admin object like { id: 4, firstName: "Sumer", lastName: "Khan", ... }
-
-  const userInitials = document.getElementById('user-initials');
-  const userName = document.getElementById('user-name');
-  const userRole = document.getElementById('user-role');
-
-  if (!admin || !admin.firstName) {
-    // Fallback if no admin is logged in (shouldn't happen due to Auth.requireAuth())
-    userName.textContent = "Guest";
-    userRole.textContent = "Unknown";
-    userInitials.textContent = "??";
-    return;
-  }
-
-  // Full name
-  const fullName = `${admin.firstName} ${admin.lastName || ''}`.trim();
-
-  // Generate initials (e.g., "SK" for Sumer Khan)
-  const nameParts = fullName.trim().split(' ');
-  const initials = nameParts.length > 1
-    ? `${nameParts[0][0]}${nameParts[nameParts.length - 1][0]}`
-    : (nameParts[0]?.[0] || '?');
-
-  // Update DOM
-  userInitials.textContent = initials.toUpperCase();
-  userName.textContent = fullName;
-  userRole.textContent = "Admin"; // You can make this dynamic later if needed
-}
-
-// Call it when page loads
-document.addEventListener("DOMContentLoaded", displayUserProfile);
-
-    </script>
 </body>
 </html>
-
-
-

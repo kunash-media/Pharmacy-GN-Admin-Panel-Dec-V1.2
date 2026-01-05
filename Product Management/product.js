@@ -7,94 +7,89 @@ const API_BASE_URL = 'http://localhost:8083/api/products';
 
 // Comprehensive Category Structure with Subcategories
 const categoryStructure = {
-    "Medicines & Healthcare": [
-        "Prescription Medicines (Upload Prescription)",
-        "Over-the-Counter (OTC) Medicines",
-        "Chronic Care",
-        "First Aid & Emergency",
-        "Pain Relief & Fever",
-        "Allergy & Cold Care",
-        "Digestive Health",
-        "Eye Care",
-        "Skin Care",
-        "Cough & Cold",
-        "Anti-infectives",
-        "Cardiac Care",
-        "Diabetes Care",
-        "Neurological",
+    "Prescription Medicines (Upload Prescription)": [
+        "Allergy and Fever",
+        "Antibiotics",
+        "Liver & Kidney Care",
+        "Stomach Care & Digestion",
+        "Skin Medicines",
         "Other"
-    ],
-    "Mother Care & Maternity": [
-        "Maternity Wear",
-        "Pregnancy Nutrition",
-        "Skincare for Moms",
-        "Postpartum Recovery",
-        "Breastfeeding Essentials",
-        "Pregnancy Tests & Kits",
-        "Maternity Supplements",
-        "Other"
-    ],
-    "Baby Care": [
-        "Diapers & Wipes",
-        "Baby Skin & Hair Care",
-        "Feeding & Nursing",
-        "Baby Health & Safety",
-        "Baby Food & Formula",
-        "Baby Bath & Hygiene",
-        "Baby Medicines",
-        "Baby Accessories",
-        "Other"
-    ],
-    "Wellness & Personal Care": [
+        ],
+        
+    "Wellness": [
         "Vitamins & Supplements",
         "Skin & Hair Care",
-        "Oral Care",
-        "Menstrual & Intimate Care",
-        "Personal Hygiene",
-        "Sexual Wellness",
-        "Diet & Nutrition",
-        "Fitness & Sports",
-        "Other"
-    ],
-    "Medical Devices & Equipment": [
-        "Monitoring Devices",
-        "Mobility Aids",
-        "Respiratory Care",
-        "Therapeutic Devices",
-        "Diagnostic Equipment",
-        "Surgical Supplies",
-        "Home Care Equipment",
-        "Other"
-    ],
-    "Speciality Care": [
-        "Women's Health",
-        "Men's Health",
-        "Senior Care",
-        "Ayurveda & Herbal Products",
-        "Homeopathy",
-        "Orthopedic",
-        "Diabetic Care",
-        "Other"
-    ],
-    "COVID-19 Essentials": [
-        "Masks & PPE",
-        "Sanitizers & Disinfectants",
+        "Fitness & Weight",
         "Immunity Boosters",
-        "Testing Kits",
-        "Thermometers",
-        "Oxygen Equipment",
-        "Other"
+        "Senior Care",
+        "Oral Care",
+        "Menstrual Care",
     ],
-    "Health Foods & Drinks": [
-        "Protein Supplements",
-        "Health Drinks",
-        "Diet Foods",
-        "Organic Products",
-        "Weight Management",
-        "Energy & Sports Drinks",
-        "Herbal Teas",
-        "Other"
+    
+    "Over-the-Counter (OTC) Medicines": [
+        "Ayurvedic Medicines",
+        "Allergy",
+        "Fever & Flu",
+        "Pain Relief",
+        "Ointments",
+        "Health Supplements",
+
+    ],
+    
+    "LifeStyle Disorder": [
+        "Diabetes Care",
+        "Heart & Blood Pressure",
+        "Thyroid Support",
+        "Vitamins & Supplements",
+        "Nutritional Support",
+        "General Wellness",
+        
+    ],
+    
+    "Fertility Essentials" : [
+        "Male Infertility",
+        "Female Infertility",
+        "Ayurvedic Supplements",
+        "Vitamins & Minerals",
+        "Herbal Teas & Powders",
+      
+    ],
+    
+    "Monitoring Devices (BP Monitors, Glucometers)" : [
+        "Blood Pressure Monitors",
+        "Glucometers & Test Strips",
+        "Thermometers",
+        "Pulse Oximeters"
+    ],
+    
+    "Mobility Aids (Walkers, Wheelchairs)" : [
+        "Wheelchair",
+        "Walkers & Walking Sticks",
+        "Crutches",
+        "Support Belts & Braces"
+    ],
+    
+    "Respiratory Care (Nebulizers, Oxygen)" : [
+        "Nebulizers & Accessories",
+        "Vaporizers & Steam Inhalers",
+        "Oxygen Cylinders & Concentrators",
+        "CPAP/BIPAP Machines"
+    ],
+    
+    "Surgical Items" : [
+            
+        "Dressings & Bandages",
+        "Surgical Consumables",
+        "IV & Infusion Items",
+        "Catheters & Tubes",
+        "Wound Care",
+        "Orthopedic Support",
+        "IV Fluids",
+        "Surgical Kits",
+     
     ]
+        
+    
 };
 
 // Global Variables
@@ -110,6 +105,464 @@ let totalProducts = 0;
 let filteredProducts = [];
 let allProducts = []; // Store ALL products from API
 let searchTerm = ''; // Store current search term
+
+// Price Management variable
+let priceItemsCount = 0;
+
+// ============================================
+// PRICE MANAGEMENT FUNCTIONS
+// ============================================
+
+function setupPriceManagement() {
+    console.log('Setting up price management...');
+    
+    // Only run if edit modal is visible
+    const modal = document.getElementById('editProductModal');
+    if (!modal || modal.style.display !== 'flex') {
+        console.warn('Edit modal not visible, skipping price management setup');
+        return;
+    }
+    
+    // Find elements
+    const addButton = document.querySelector('.add-price-btn');
+    const priceTypeSelect = document.getElementById('edit-price-type');
+    const singlePriceSection = document.getElementById('single-price-section');
+    const multiplePriceSection = document.getElementById('multiple-price-section');
+    const singlePriceInputs = document.querySelectorAll('#single-price-section input[type="number"]');
+    
+    if (!addButton || !priceTypeSelect || !singlePriceSection || !multiplePriceSection) {
+        console.warn('Price management elements not found in modal');
+        return;
+    }
+    
+    console.log('Setting up price management for visible modal');
+    
+    // Function to toggle required attributes for single price inputs
+    function toggleSinglePriceRequired(isRequired) {
+        singlePriceInputs.forEach(input => {
+            if (isRequired) {
+                input.setAttribute('required', 'required');
+            } else {
+                input.removeAttribute('required');
+            }
+        });
+    }
+    
+    // Function to setup remove button event listener
+    function setupRemoveButton(removeButton) {
+        if (!removeButton) return;
+        
+        removeButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const row = this.closest('.price-item-row');
+            if (row) {
+                // Add fade out animation
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                row.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    row.remove();
+                    console.log('Price item removed');
+                }, 300);
+            }
+        });
+    }
+    
+    // Function to setup all remove buttons
+    function setupPriceItemEventListeners() {
+        const removeButtons = document.querySelectorAll('.remove-price-btn');
+        console.log('Setting up remove buttons:', removeButtons.length);
+        
+        removeButtons.forEach(button => {
+            setupRemoveButton(button);
+        });
+    }
+    
+    // Set initial state - single price is visible by default
+    toggleSinglePriceRequired(true);
+    
+    // Price type toggle
+    priceTypeSelect.addEventListener('change', function() {
+        console.log('Price type changed to:', this.value);
+        
+        if (this.value === 'multiple') {
+            // Show multiple price section, hide single price
+            singlePriceSection.style.display = 'none';
+            multiplePriceSection.classList.remove('hidden');
+            
+            // Remove required from single price inputs (they're hidden)
+            toggleSinglePriceRequired(false);
+            
+            // Setup event listeners for price items
+            setTimeout(() => {
+                setupPriceItemEventListeners();
+            }, 50);
+            
+        } else {
+            // Show single price section, hide multiple price
+            singlePriceSection.style.display = 'block';
+            multiplePriceSection.classList.add('hidden');
+            
+            // Add required to single price inputs (they're visible)
+            toggleSinglePriceRequired(true);
+        }
+    });
+    
+    // Setup add button - clone to remove existing listeners
+    const newAddButton = addButton.cloneNode(true);
+    addButton.parentNode.replaceChild(newAddButton, addButton);
+    
+    // Add price item functionality
+    newAddButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('Add price button clicked');
+        
+        const container = document.querySelector('.price-items-container');
+        if (!container) {
+            console.error('Price items container not found');
+            return;
+        }
+        
+        // Create new price item row
+        const newRow = document.createElement('div');
+        newRow.className = 'price-item-row grid grid-cols-4 gap-4 items-center p-3 border border-gray-200 rounded-lg bg-white hover:border-blue-300 transition-colors';
+        newRow.innerHTML = `
+            <input type="text" placeholder="e.g., 500ml, 100 tablets" 
+                   class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <input type="number" placeholder="0.00" step="0.01" min="0"
+                   class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <input type="number" placeholder="0.00" step="0.01" min="0"
+                   class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+            <button type="button" class="remove-price-btn flex justify-center">
+                <i class="fas fa-times-circle text-red-500 text-lg hover:text-red-700 transition-colors"></i>
+            </button>
+        `;
+        
+        // Add fade-in animation
+        newRow.style.opacity = '0';
+        newRow.style.transform = 'translateY(-10px)';
+        
+        container.appendChild(newRow);
+        
+        // Trigger animation after DOM insertion
+        setTimeout(() => {
+            newRow.style.opacity = '1';
+            newRow.style.transform = 'translateY(0)';
+            newRow.style.transition = 'all 0.3s ease';
+        }, 10);
+        
+        // Add event listener to the new remove button
+        const removeBtn = newRow.querySelector('.remove-price-btn');
+        setupRemoveButton(removeBtn);
+        
+        console.log('New price item added');
+    });
+    
+    // Setup initial remove buttons
+    setupPriceItemEventListeners();
+    
+    console.log('Price management setup complete');
+}
+
+// Function to setup add button
+function setupAddPriceButton(addButton) {
+    // Clone button to remove existing listeners
+    const newAddButton = addButton.cloneNode(true);
+    addButton.parentNode.replaceChild(newAddButton, addButton);
+    
+    // Add price item functionality
+    newAddButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('Add price button clicked');
+        
+        const container = document.querySelector('.price-items-container');
+        if (!container) {
+            console.error('Price items container not found');
+            return;
+        }
+        
+        const newRow = document.createElement('div');
+        newRow.className = 'price-item-row';
+        newRow.innerHTML = `
+            <input type="text" placeholder="e.g., 500ml, 100 tablets" />
+            <input type="number" placeholder="0.00" step="0.01" />
+            <input type="number" placeholder="0.00" step="0.01" />
+            <button type="button" class="remove-price-btn">
+                <i class="fas fa-times-circle text-red-500"></i>
+            </button>
+        `;
+        container.appendChild(newRow);
+        
+        // Add event listener to the new remove button
+        setupRemoveButton(newRow.querySelector('.remove-price-btn'));
+    });
+}
+
+// Function to setup remove button event listener
+function setupRemoveButton(removeButton) {
+    if (!removeButton) return;
+    
+    removeButton.addEventListener('click', function() {
+        const row = this.closest('.price-item-row');
+        if (row) {
+            // Add fade out animation
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-20px)';
+            row.style.transition = 'all 0.3s';
+            
+            setTimeout(() => {
+                row.remove();
+                console.log('Price item removed');
+            }, 300);
+        }
+    });
+}
+
+// Function to setup all remove buttons
+function setupPriceItemEventListeners() {
+    const removeButtons = document.querySelectorAll('.remove-price-btn');
+    console.log('Found remove buttons:', removeButtons.length);
+    
+    removeButtons.forEach(button => {
+        setupRemoveButton(button);
+    });
+}
+function addPriceItem(variant = '', price = '', originalPrice = '') {
+    const priceListItems = document.getElementById('price-list-items');
+    const priceItemId = `price-item-${priceItemsCount++}`;
+    
+    const priceItem = document.createElement('div');
+    priceItem.className = 'price-item';
+    priceItem.id = priceItemId;
+    
+    priceItem.innerHTML = `
+        <input type="text" class="price-variant" placeholder="e.g., S, 500ml" value="${variant}">
+        <input type="number" class="price-current" min="0" step="0.01" placeholder="0.00" value="${price}">
+        <input type="number" class="price-original" min="0" step="0.01" placeholder="0.00" value="${originalPrice}">
+        <button type="button" class="remove-price-btn" onclick="removePriceItem('${priceItemId}')">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    priceListItems.appendChild(priceItem);
+}
+
+function removePriceItem(itemId) {
+    const item = document.getElementById(itemId);
+    if (item && document.querySelectorAll('.price-item').length > 1) {
+        item.remove();
+    }
+}
+
+function getPriceData() {
+    const priceType = document.getElementById('edit-price-type').value;
+    
+    if (priceType === 'single') {
+        console.log('Using single price type');
+        
+        const price = document.getElementById('edit-price').value;
+        const oldPrice = document.getElementById('edit-old-price').value;
+        
+        const priceValue = price ? parseFloat(price) : 0;
+        const oldPriceValue = oldPrice ? parseFloat(oldPrice) : null;
+        
+        return {
+            prices: [priceValue],
+            oldPrices: oldPriceValue !== null ? [oldPriceValue] : [],
+            variants: []
+        };
+    } else {
+        console.log('Using multiple price type');
+        
+        const priceItems = document.querySelectorAll('.price-item-row');
+        console.log('Found price items:', priceItems.length);
+        
+        const prices = [];
+        const oldPrices = [];
+        const variants = [];
+        
+        priceItems.forEach((row, index) => {
+            const inputs = row.querySelectorAll('input');
+            
+            if (inputs.length >= 3) {
+                const variantInput = inputs[0];
+                const priceInput = inputs[1];
+                const oldPriceInput = inputs[2];
+                
+                const variant = variantInput.value.trim();
+                const price = priceInput.value.trim();
+                const oldPrice = oldPriceInput.value.trim();
+                
+                if (price && !isNaN(parseFloat(price))) {
+                    const priceNum = parseFloat(price);
+                    if (priceNum >= 0) {
+                        prices.push(priceNum);
+                        variants.push(variant || `Variant ${index + 1}`);
+                        
+                        if (oldPrice && !isNaN(parseFloat(oldPrice))) {
+                            oldPrices.push(parseFloat(oldPrice));
+                        } else {
+                            oldPrices.push(null);
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('Collected data:', { prices, oldPrices, variants });
+        
+        // Fallback if no prices collected
+        if (prices.length === 0) {
+            console.log('No prices collected, falling back to single price');
+            const fallbackPrice = document.getElementById('edit-price').value;
+            const fallbackOldPrice = document.getElementById('edit-old-price').value;
+            
+            const priceValue = fallbackPrice ? parseFloat(fallbackPrice) : 0;
+            const oldPriceValue = fallbackOldPrice ? parseFloat(fallbackOldPrice) : null;
+            
+            return {
+                prices: [priceValue],
+                oldPrices: oldPriceValue !== null ? [oldPriceValue] : [],
+                variants: []
+            };
+        }
+        
+        return {
+            prices: prices,
+            oldPrices: oldPrices,
+            variants: variants
+        };
+    }
+}
+
+
+
+// Update your populatePriceData function (around line 258)
+function populatePriceData(priceList, mrp, oldPrice) {
+    console.log('populatePriceData called with:', { priceList, mrp, oldPrice });
+    
+    // Initialize price management first
+    setupPriceManagement();
+    
+    // Wait a moment for DOM to be ready
+    setTimeout(() => {
+        const priceListItems = document.querySelector('.price-items-container');
+        console.log('Price items container found:', priceListItems);
+        
+        if (!priceListItems) {
+            console.error('Price items container not found!');
+            return;
+        }
+        
+        // Clear existing items
+        priceListItems.innerHTML = '';
+        priceItemsCount = 0;
+        
+        if (priceList && Array.isArray(priceList) && priceList.length > 0) {
+            console.log('Setting up multiple price type with', priceList.length, 'items');
+            
+            // Set to multiple price type
+            const priceTypeSelect = document.getElementById('edit-price-type');
+            if (priceTypeSelect) {
+                priceTypeSelect.value = 'multiple';
+                priceTypeSelect.dispatchEvent(new Event('change'));
+            }
+            
+            // Add price items after the DOM has been updated
+            setTimeout(() => {
+                priceList.forEach(item => {
+                    addPriceItemToContainer(item.variant || item.size || '', item.price, item.originalPrice);
+                });
+            }, 100);
+            
+            // Clear single price fields
+            const priceInput = document.getElementById('edit-price');
+            const oldPriceInput = document.getElementById('edit-old-price');
+            
+            if (priceInput) priceInput.value = '';
+            if (oldPriceInput) oldPriceInput.value = '';
+        } else {
+            console.log('Setting up single price type');
+            
+            // Set to single price type
+            const priceTypeSelect = document.getElementById('edit-price-type');
+            if (priceTypeSelect) {
+                priceTypeSelect.value = 'single';
+                priceTypeSelect.dispatchEvent(new Event('change'));
+            }
+            
+            // Set single price fields
+            const priceInput = document.getElementById('edit-price');
+            const oldPriceInput = document.getElementById('edit-old-price');
+            
+            if (priceInput) priceInput.value = mrp || '';
+            if (oldPriceInput) oldPriceInput.value = oldPrice || '';
+        }
+    }, 100);
+}
+
+// New helper function to add price items to the container
+function addPriceItemToContainer(variant = '', price = '', originalPrice = '') {
+    const container = document.querySelector('.price-items-container');
+    if (!container) {
+        console.error('Cannot find price items container');
+        return;
+    }
+    
+    console.log('Adding price item:', { variant, price, originalPrice });
+    
+    // Create new row
+    const newRow = document.createElement('div');
+    newRow.className = 'price-item-row grid grid-cols-4 gap-4 items-center p-3 border border-gray-200 rounded-lg bg-white hover:border-blue-300 transition-colors';
+    newRow.innerHTML = `
+        <input type="text" placeholder="e.g., 500ml, 100 tablets" 
+               value="${variant || ''}"
+               class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+        <input type="number" placeholder="0.00" step="0.01" min="0"
+               value="${price || ''}"
+               class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+        <input type="number" placeholder="0.00" step="0.01" min="0"
+               value="${originalPrice || ''}"
+               class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
+        <button type="button" class="remove-price-btn flex justify-center">
+            <i class="fas fa-times-circle text-red-500 text-lg hover:text-red-700 transition-colors"></i>
+        </button>
+    `;
+    
+    // Add fade-in animation
+    newRow.style.opacity = '0';
+    newRow.style.transform = 'translateY(-10px)';
+    container.appendChild(newRow);
+    
+    // Trigger animation
+    setTimeout(() => {
+        newRow.style.opacity = '1';
+        newRow.style.transform = 'translateY(0)';
+        newRow.style.transition = 'all 0.3s ease';
+    }, 10);
+    
+    // Add event listener to remove button
+    const removeBtn = newRow.querySelector('.remove-price-btn');
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const row = this.closest('.price-item-row');
+            if (row) {
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                row.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    row.remove();
+                    console.log('Price item removed');
+                }, 300);
+            }
+        });
+    }
+    
+    priceItemsCount++;
+}
 
 // ============================================
 // SIDEBAR FUNCTIONS
@@ -263,217 +716,193 @@ class ProductService {
         }
     }
 
+
+    
     async createProduct(productData, mainImage, subImages = []) {
-        try {
-            const formData = new FormData();
-            
-            // Process sizes and prices for dynamic fields
-            const sizes = productData.sizes || [];
-            const prices = productData.prices || [];
-            const oldPrices = productData.oldPrices || [];
-            
-            // Extract individual size prices
-            const sizePriceMap = {};
-            sizes.forEach((size, index) => {
-                if (prices[index] !== undefined) {
-                    sizePriceMap[size] = {
-                        price: prices[index],
-                        oldPrice: oldPrices[index] || null
-                    };
-                }
-            });
-            
-            // Use exact field names expected by your backend
-            const productJson = {
-                sku: productData.sku,
-                productName: productData.name,
-                productCategory: productData.category,
-                productSubCategory: productData.type,
-                productPrice: prices, // Keep as array
-                productOldPrice: oldPrices, // Keep as array
-                productStock: getStockStatus(productData.quantity),
-                productStatus: productData.status,
-                productDescription: productData.description,
-                productQuantity: productData.quantity,
-                prescriptionRequired: productData.prescription === 'Yes',
-                brandName: productData.brand,
-                mfgDate: productData.mfgDate,
-                expDate: productData.expiry,
-                batchNo: productData.batch,
-                rating: productData.rating,
-                benefitsList: productData.benefits || [],
-                ingredientsList: productData.ingredients || [],
-                directionsList: productData.directions || [],
-                productSizes: sizes,
-                productDynamicFields: {
-                    strength: productData.strength || '',
-                    form: productData.form || '',
-                    dosage: productData.dosage || '',
-                    sizePriceMap: JSON.stringify(sizePriceMap),
-                    ...productData.additionalFields || {}
-                }
-            };
+    try {
+        const formData = new FormData();
 
-            // Use 'productData' as key (backend expects this)
-            formData.append('productData', JSON.stringify(productJson));
-            
-            if (mainImage) {
-                formData.append('productMainImage', mainImage);
-            }
-            
-            if (subImages && subImages.length > 0) {
-                subImages.forEach((image, index) => {
-                    if (image) {
-                        formData.append('productSubImages', image);
-                    }
-                });
-            }
+        // Basic fields (send as individual fields for better binding)
+        formData.append('sku', productData.sku || '');
+        formData.append('productName', productData.name || '');
+        formData.append('productCategory', productData.category || '');
+        formData.append('productSubCategory', productData.type || '');
+        formData.append('productStock', getStockStatus(productData.quantity));
+        formData.append('productStatus', productData.status || 'Available');
+        formData.append('productDescription', productData.description || '');
+        formData.append('productQuantity', productData.quantity || 0);
+        formData.append('prescriptionRequired', productData.prescription === 'Yes');
+        formData.append('brandName', productData.brand || '');
+        formData.append('mfgDate', productData.mfgDate || '');
+        formData.append('expDate', productData.expiry || '');
+        formData.append('batchNo', productData.batch || '');
+        formData.append('rating', productData.rating || 0);
 
-            console.log('=== CREATE PRODUCT REQUEST ===');
-            console.log('FormData content:');
-            for (let pair of formData.entries()) {
-                console.log(`${pair[0]}:`, pair[1]);
-            }
+        // === SEND ARRAYS INDIVIDUALLY ===
+        const sizes = productData.sizes || [];
+        const prices = productData.prices || [];
+        const oldPrices = productData.oldPrices || [];
+        const benefits = productData.benefits || [];
+        const ingredients = productData.ingredients || [];
+        const directions = productData.directions || [];
 
-            const response = await fetch(`${API_BASE_URL}/create-product`, {
-                method: 'POST',
-                body: formData
-            });
+        // Append sizes
+        sizes.forEach(size => formData.append('productSizes', size.trim()));
 
-            console.log('Response status:', response.status);
+        // Append prices and old prices (must match array length)
+        prices.forEach(price => formData.append('productPrice', price));
+        oldPrices.forEach(price => formData.append('productOldPrice', price || ''));
 
-            if (!response.ok) {
-                let errorText = 'Unknown error';
-                try {
-                    errorText = await response.text();
-                    console.log('Error response:', errorText);
-                } catch (e) {
-                    console.log('Could not read error response:', e);
-                    errorText = `Status: ${response.status} ${response.statusText}`;
-                }
-                throw new Error(`Failed to create product: ${errorText}`);
-            }
+        // Append lists
+        benefits.forEach(b => formData.append('benefitsList', b.trim()));
+        ingredients.forEach(i => formData.append('ingredientsList', i.trim()));
+        directions.forEach(d => formData.append('directionsList', d.trim()));
 
-            try {
-                const responseText = await response.text();
-                console.log('Success response:', responseText);
-                return responseText ? JSON.parse(responseText) : {};
-            } catch (e) {
-                console.error('Error parsing response:', e);
-                return {};
-            }
-        } catch (error) {
-            console.error('Error creating product:', error);
-            throw error;
+        // Dynamic fields (send as JSON string or individual — here as JSON)
+        const dynamicFields = {
+            strength: productData.strength || '',
+            form: productData.form || '',
+            dosage: productData.dosage || '',
+            ...productData.additionalFields || {}
+        };
+        formData.append('productDynamicFields', JSON.stringify(dynamicFields));
+
+        // Images
+        if (mainImage) {
+            formData.append('productMainImage', mainImage);
         }
-    }
 
-    async updateProduct(productId, productData, mainImage = null, subImages = []) {
-        try {
-            const formData = new FormData();
-            
-            // Process sizes and prices for dynamic fields
-            const sizes = productData.sizes || [];
-            const prices = productData.prices || [];
-            const oldPrices = productData.oldPrices || [];
-            
-            // Extract individual size prices
-            const sizePriceMap = {};
-            sizes.forEach((size, index) => {
-                if (prices[index] !== undefined) {
-                    sizePriceMap[size] = {
-                        price: prices[index],
-                        oldPrice: oldPrices[index] || null
-                    };
-                }
+        if (subImages && subImages.length > 0) {
+            subImages.forEach((image) => {
+                if (image) formData.append('productSubImages', image);
             });
-            
-            // Use exact field names expected by your backend
-            const productJson = {
-                sku: productData.sku,
-                productName: productData.name,
-                productCategory: productData.category,
-                productSubCategory: productData.type,
-                productPrice: prices, // Keep as array
-                productOldPrice: oldPrices, // Keep as array
-                productStock: getStockStatus(productData.quantity),
-                productStatus: productData.status,
-                productDescription: productData.description,
-                productQuantity: productData.quantity,
-                prescriptionRequired: productData.prescription === 'Yes',
-                brandName: productData.brand,
-                mfgDate: productData.mfgDate,
-                expDate: productData.expiry,
-                batchNo: productData.batch,
-                rating: productData.rating,
-                benefitsList: productData.benefits || [],
-                ingredientsList: productData.ingredients || [],
-                directionsList: productData.directions || [],
-                productSizes: sizes,
-                productDynamicFields: {
-                    strength: productData.strength || '',
-                    form: productData.form || '',
-                    dosage: productData.dosage || '',
-                    sizePriceMap: JSON.stringify(sizePriceMap),
-                    ...productData.additionalFields || {}
-                }
-            };
-
-            // Use 'productData' as key (backend expects this)
-            formData.append('productData', JSON.stringify(productJson));
-            
-            if (mainImage) {
-                formData.append('productMainImage', mainImage);
-            }
-            
-            if (subImages && subImages.length > 0) {
-                subImages.forEach((image, index) => {
-                    if (image) {
-                        formData.append('productSubImages', image);
-                    }
-                });
-            }
-
-            console.log('=== UPDATE PRODUCT REQUEST ===');
-            console.log('Product ID:', productId);
-            console.log('Using PATCH method for update');
-            console.log('FormData content:');
-            for (let pair of formData.entries()) {
-                console.log(`${pair[0]}:`, pair[0] === 'productData' ? JSON.parse(pair[1]) : pair[1]);
-            }
-
-            const response = await fetch(`${API_BASE_URL}/patch-product/${productId}`, {
-                method: 'PATCH',
-                body: formData
-            });
-
-            console.log('Response status:', response.status);
-
-            if (!response.ok) {
-                let errorText = 'Unknown error';
-                try {
-                    errorText = await response.text();
-                    console.log('Error response:', errorText);
-                } catch (e) {
-                    console.log('Could not read error response:', e);
-                    errorText = `Status: ${response.status} ${response.statusText}`;
-                }
-                throw new Error(`Failed to update product: ${errorText}`);
-            }
-
-            try {
-                const responseText = await response.text();
-                console.log('Success response:', responseText);
-                return responseText ? JSON.parse(responseText) : {};
-            } catch (e) {
-                console.error('Error parsing response:', e);
-                return {};
-            }
-        } catch (error) {
-            console.error('Error updating product:', error);
-            throw error;
         }
+
+        console.log('=== FINAL FORM DATA ===');
+        for (let pair of formData.entries()) {
+            console.log(pair[0], pair[1]);
+        }
+
+        const response = await fetch(`${API_BASE_URL}/create-product`, {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('Product created successfully:', result);
+        return result;
+
+    } catch (error) {
+        console.error('Error creating product:', error);
+        throw error;
     }
+}
+
+
+
+  async updateProduct(productId, productData, mainImage = null, subImages = []) {
+    try {
+        const formData = new FormData();
+
+        // === Build the exact same JSON structure as create ===
+        const sizes = productData.sizes || [];
+        const prices = productData.prices || [];
+        const oldPrices = productData.oldPrices || [];
+
+        const sizePriceMap = {};
+        sizes.forEach((size, index) => {
+            if (prices[index] !== undefined) {
+                sizePriceMap[size] = {
+                    price: prices[index],
+                    oldPrice: oldPrices[index] || null
+                };
+            }
+        });
+
+        const productJson = {
+            sku: productData.sku || null,
+            productName: productData.name || null,
+            productCategory: productData.category || null,
+            productSubCategory: productData.type || null,
+            productPrice: prices.length > 0 ? prices : null,
+            productOldPrice: oldPrices.length > 0 ? oldPrices : null,
+            productStock: getStockStatus(productData.quantity),
+            productStatus: productData.status || null,
+            productDescription: productData.description || null,
+            productQuantity: productData.quantity || 0,
+            prescriptionRequired: productData.prescription === 'Yes',
+            brandName: productData.brand || null,
+            mfgDate: productData.mfgDate || null,
+            expDate: productData.expiry || null,
+            batchNo: productData.batch || null,
+            rating: productData.rating || 0,
+            benefitsList: productData.benefits || [],
+            ingredientsList: productData.ingredients || [],
+            directionsList: productData.directions || [],
+            productSizes: sizes.length > 0 ? sizes : null,
+            productDynamicFields: {
+                strength: productData.strength || '',
+                form: productData.form || '',
+                dosage: productData.dosage || '',
+                sizePriceMap: JSON.stringify(sizePriceMap),
+                ...productData.additionalFields || {}
+            }
+        };
+
+        // === CRITICAL: Send as 'productData' JSON string ===
+        formData.append('productData', JSON.stringify(productJson));
+
+        // === Images (optional) ===
+        if (mainImage) {
+            formData.append('productMainImage', mainImage);
+        }
+
+        if (subImages && subImages.length > 0) {
+            subImages.forEach((image) => {
+                if (image) {
+                    formData.append('productSubImages', image);
+                }
+            });
+        }
+
+        // === Debug: Check what is actually sent ===
+        console.log('=== PATCH REQUEST TO /patch-product/' + productId + ' ===');
+        for (let pair of formData.entries()) {
+            if (pair[0] === 'productData') {
+                console.log('productData (JSON):', JSON.parse(pair[1]));
+            } else {
+                console.log(pair[0] + ':', pair[1]);
+            }
+        }
+
+        const response = await fetch(`${API_BASE_URL}/patch-product/${productId}`, {
+            method: 'PATCH',
+            body: formData
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Patch failed:', errorText);
+            throw new Error(`Update failed: ${response.status} - ${errorText}`);
+        }
+
+        const result = await response.json();
+        console.log('Product updated successfully:', result);
+        return result;
+
+    } catch (error) {
+        console.error('Error in updateProduct:', error);
+        throw error;
+    }
+  }
+  
 }
 
 class VerificationService {
@@ -750,128 +1179,357 @@ function populateSubcategoryDropdown(category = null) {
 // FORM HANDLING FUNCTIONS
 // ============================================
 
-function openEditModal(product) {
+function openEditModal(product = null) {
+    console.log('Opening edit modal...');
+    
     const editProductModal = document.getElementById('editProductModal');
-    document.getElementById('editModalTitle').textContent = product.productId ? 'Edit Product' : 'Add New Product';
-    currentProductId = product.productId;
+    const modalTitle = document.getElementById('editModalTitle');
     
-    // Fill basic form fields
-    document.getElementById('edit-sku').value = product.sku || '';
-    document.getElementById('edit-name').value = product.productName || '';
-    document.getElementById('edit-brand').value = product.brandName || '';
-    document.getElementById('edit-prescription').value = product.prescriptionRequired ? 'Yes' : 'No';
-    document.getElementById('edit-status').value = product.productStatus || 'Available';
-    document.getElementById('edit-quantity').value = product.productQuantity || 0;
-    document.getElementById('edit-unit').value = 'Tablet Strip';
-    document.getElementById('edit-rating').value = product.rating || 0;
-    document.getElementById('edit-batch').value = product.batchNo || '';
-    document.getElementById('edit-mfg-date').value = product.mfgDate ? product.mfgDate.split('T')[0] : '';
-    document.getElementById('edit-expiry').value = product.expDate ? product.expDate.split('T')[0] : '';
-    document.getElementById('edit-description').value = product.productDescription || '';
-    document.getElementById('edit-benefits').value = (product.benefitsList || []).join('\n');
-    document.getElementById('edit-directions').value = (product.directionsList || []).join('\n');
-    document.getElementById('edit-ingredients').value = (product.ingredientsList || []).join(', ');
-    
-    // Handle dynamic fields
-    if (product.productDynamicFields) {
-        document.getElementById('edit-strength').value = product.productDynamicFields.strength || '';
-        document.getElementById('edit-form').value = product.productDynamicFields.form || '';
-        document.getElementById('edit-dosage').value = product.productDynamicFields.dosage || '';
+    // Check if modal exists
+    if (!editProductModal) {
+        console.error('Edit modal not found in DOM!');
+        showSuccessPopup('Error: Edit form not available', 'error');
+        return;
     }
     
-    // Handle MRP and Price - take first price if array exists
-    if (product.productPrice && Array.isArray(product.productPrice) && product.productPrice.length > 0) {
-        document.getElementById('edit-mrp').value = product.productPrice[0] || '';
-        document.getElementById('edit-price').value = product.productPrice[0] || '';
-    } else if (product.productPrice) {
-        document.getElementById('edit-mrp').value = product.productPrice || '';
-        document.getElementById('edit-price').value = product.productPrice || '';
+    if (product && product.productId) {
+        // EDIT MODE
+        modalTitle.textContent = 'Edit Product';
+        currentProductId = product.productId;
+        
+        console.log('Loading product data for editing:', product.productName);
+        console.log('Product ID:', product.productId);
+        
+        // RESET FORM FIRST
+        resetEditForm();
+        
+        // Wait a moment for reset to complete, then populate data
+        setTimeout(() => {
+            // Fill form with product data using safe element checking
+            const fields = [
+                { id: 'edit-sku', value: product.sku || '' },
+                { id: 'edit-name', value: product.productName || '' },
+                { id: 'edit-brand', value: product.brandName || '' },
+                { id: 'edit-prescription', value: product.prescriptionRequired ? 'Yes' : 'No' },
+                { id: 'edit-status', value: product.productStatus || 'Available' },
+                { id: 'edit-quantity', value: product.productQuantity || 0 },
+                { id: 'edit-rating', value: product.rating || 0 },
+                { id: 'edit-batch', value: product.batchNo || '' },
+                { id: 'edit-mfg-date', value: product.mfgDate ? product.mfgDate.split('T')[0] : '' },
+                { id: 'edit-expiry', value: product.expDate ? product.expDate.split('T')[0] : '' },
+                { id: 'edit-description', value: product.productDescription || '' },
+                { id: 'edit-benefits', value: (product.benefitsList || []).join('\n') },
+                { id: 'edit-ingredients', value: (product.ingredientsList || []).join(', ') }
+            ];
+            
+            // Safely set values only if elements exist
+            fields.forEach(field => {
+                const element = document.getElementById(field.id);
+                if (element) {
+                    element.value = field.value;
+                    console.log(`Set ${field.id}: ${field.value}`);
+                } else {
+                    console.warn(`Element not found: ${field.id}`);
+                }
+            });
+            
+            // Check and set directions field if it exists
+            const directionsElement = document.getElementById('edit-directions');
+            if (directionsElement) {
+                directionsElement.value = (product.directionsList || []).join('\n');
+                console.log(`Set edit-directions`);
+            }
+            
+            // Handle dynamic fields safely
+            if (product.productDynamicFields) {
+                const dynamicFields = [
+                    { id: 'edit-strength', value: product.productDynamicFields.strength || '' },
+                    { id: 'edit-form', value: product.productDynamicFields.form || '' },
+                    { id: 'edit-dosage', value: product.productDynamicFields.dosage || '' }
+                ];
+                
+                dynamicFields.forEach(field => {
+                    const element = document.getElementById(field.id);
+                    if (element) {
+                        element.value = field.value;
+                        console.log(`Set ${field.id}: ${field.value}`);
+                    }
+                });
+            }
+            
+            // Handle pricing data
+            const sizes = product.productSizes || [];
+            const prices = product.productPrice || [];
+            const oldPrices = product.productOldPrice || [];
+            
+            console.log('Pricing data:', { sizes, prices, oldPrices });
+            
+            // IMPORTANT: Check if we have multiple prices vs single price
+            if (prices && Array.isArray(prices) && prices.length > 1) {
+                console.log('Setting up multiple price type with', prices.length, 'variants');
+                
+                const priceList = sizes.map((size, index) => ({
+                    variant: size,
+                    price: prices[index] || 0,
+                    originalPrice: oldPrices[index] || 0
+                }));
+                
+                const mrp = prices.length > 0 ? prices[0] : '';
+                const oldPrice = oldPrices.length > 0 ? oldPrices[0] : '';
+                
+                // Use setTimeout to ensure modal is fully rendered
+                setTimeout(() => {
+                    populatePriceData(priceList, mrp, oldPrice);
+                }, 200);
+                
+            } else {
+                console.log('Setting up single price type');
+                // Set single price fields safely
+                const priceElement = document.getElementById('edit-price');
+                const mrpElement = document.getElementById('edit-mrp');
+                const oldPriceElement = document.getElementById('edit-old-price');
+                
+                if (priceElement) {
+                    priceElement.value = prices && prices.length > 0 ? prices[0] : '';
+                    console.log(`Set edit-price: ${priceElement.value}`);
+                }
+                if (mrpElement) {
+                    mrpElement.value = prices && prices.length > 0 ? prices[0] : '';
+                    console.log(`Set edit-mrp: ${mrpElement.value}`);
+                }
+                if (oldPriceElement) {
+                    oldPriceElement.value = oldPrices && oldPrices.length > 0 ? oldPrices[0] : '';
+                    console.log(`Set edit-old-price: ${oldPriceElement.value}`);
+                }
+                
+                // Ensure price type is set to single
+                const priceTypeSelect = document.getElementById('edit-price-type');
+                if (priceTypeSelect) {
+                    priceTypeSelect.value = 'single';
+                    // Trigger change event to show single price section
+                    setTimeout(() => {
+                        priceTypeSelect.dispatchEvent(new Event('change'));
+                    }, 100);
+                }
+            }
+            
+            // Handle sizes safely
+            const sizesElement = document.getElementById('edit-sizes');
+            if (sizesElement) {
+                sizesElement.value = sizes.join(', ');
+                console.log(`Set edit-sizes: ${sizesElement.value}`);
+            }
+            
+            // Handle category selection safely
+            const categorySelect = document.getElementById('edit-category');
+            const categoryOtherContainer = document.getElementById('category-other-container');
+            const categoryOtherInput = document.getElementById('edit-category-other');
+            
+            if (categorySelect && categoryOtherContainer && categoryOtherInput) {
+                if (product.productCategory && allCategories.includes(product.productCategory)) {
+                    categorySelect.value = product.productCategory;
+                    categoryOtherContainer.classList.add('hidden');
+                    categoryOtherInput.value = '';
+                    categoryOtherInput.required = false;
+                    console.log(`Set edit-category: ${product.productCategory}`);
+                } else if (product.productCategory) {
+                    categorySelect.value = 'Other';
+                    categoryOtherContainer.classList.remove('hidden');
+                    categoryOtherInput.value = product.productCategory;
+                    categoryOtherInput.required = true;
+                    console.log(`Set edit-category to Other: ${product.productCategory}`);
+                }
+                
+                // Enable subcategory dropdown and populate
+                populateSubcategoryDropdown(categorySelect.value);
+            } else {
+                console.warn('Category elements not found');
+            }
+            
+            // Handle subcategory selection safely
+            const typeSelect = document.getElementById('edit-type');
+            const typeOtherContainer = document.getElementById('type-other-container');
+            const typeOtherInput = document.getElementById('edit-type-other');
+            
+            if (typeSelect && typeOtherContainer && typeOtherInput) {
+                if (product.productSubCategory && allSubcategories.includes(product.productSubCategory)) {
+                    typeSelect.value = product.productSubCategory;
+                    typeOtherContainer.classList.add('hidden');
+                    typeOtherInput.value = '';
+                    typeOtherInput.required = false;
+                    console.log(`Set edit-type: ${product.productSubCategory}`);
+                } else if (product.productSubCategory) {
+                    typeSelect.value = 'Other';
+                    typeOtherContainer.classList.remove('hidden');
+                    typeOtherInput.value = product.productSubCategory;
+                    typeOtherInput.required = true;
+                    console.log(`Set edit-type to Other: ${product.productSubCategory}`);
+                }
+            } else {
+                console.warn('Type elements not found');
+            }
+            
+            // Show verification status for existing products safely
+            const verificationStatusContainer = document.getElementById('verification-status-container');
+            const verificationStatusSelect = document.getElementById('edit-verification-status');
+            
+            if (verificationStatusContainer && verificationStatusSelect) {
+                verificationStatusContainer.classList.remove('hidden');
+                verificationStatusSelect.value = product.verificationStatus || 'PENDING';
+                console.log(`Set verification status: ${verificationStatusSelect.value}`);
+            }
+            
+            // Update the file input placeholder if main image exists
+            const mainImageInput = document.getElementById('edit-main-image');
+            if (mainImageInput && product.productMainImage) {
+                mainImageInput.placeholder = 'Current image exists. Upload new to replace.';
+            }
+            
+        }, 100); // Wait for reset to complete
+        
     } else {
-        document.getElementById('edit-mrp').value = '';
-        document.getElementById('edit-price').value = '';
+        // ADD NEW PRODUCT MODE
+        modalTitle.textContent = 'Add New Product';
+        currentProductId = null;
+        
+        // Reset form for new product
+        resetEditForm();
+        
+        // Hide verification status for new products
+        const verificationContainer = document.getElementById('verification-status-container');
+        if (verificationContainer) {
+            verificationContainer.classList.add('hidden');
+        }
     }
     
-    // Handle old price
-    if (product.productOldPrice && Array.isArray(product.productOldPrice) && product.productOldPrice.length > 0) {
-        document.getElementById('edit-old-price').value = product.productOldPrice[0] || '';
-    } else if (product.productOldPrice) {
-        document.getElementById('edit-old-price').value = product.productOldPrice || '';
-    } else {
-        document.getElementById('edit-old-price').value = '';
-    }
-    
-    // Handle sizes
-    const sizes = product.productSizes || [];
-    document.getElementById('edit-sizes').value = sizes.join(', ');
-    
-    // Handle category
-    const categorySelect = document.getElementById('edit-category');
-    const categoryOtherContainer = document.getElementById('category-other-container');
-    const categoryOtherInput = document.getElementById('edit-category-other');
-    
-    if (product.productCategory && allCategories.includes(product.productCategory)) {
-        categorySelect.value = product.productCategory;
-        categoryOtherContainer.classList.add('hidden');
-        categoryOtherInput.value = '';
-        categoryOtherInput.required = false;
-    } else if (product.productCategory) {
-        categorySelect.value = 'Other';
-        categoryOtherContainer.classList.remove('hidden');
-        categoryOtherInput.value = product.productCategory;
-        categoryOtherInput.required = true;
-    } else {
-        categorySelect.value = '';
-        categoryOtherContainer.classList.add('hidden');
-        categoryOtherInput.value = '';
-        categoryOtherInput.required = false;
-    }
-    
-    // Enable subcategory dropdown and populate
-    populateSubcategoryDropdown(categorySelect.value);
-    
-    // Handle subcategory
-    const typeSelect = document.getElementById('edit-type');
-    const typeOtherContainer = document.getElementById('type-other-container');
-    const typeOtherInput = document.getElementById('edit-type-other');
-    
-    if (product.productSubCategory && allSubcategories.includes(product.productSubCategory)) {
-        typeSelect.value = product.productSubCategory;
-        typeOtherContainer.classList.add('hidden');
-        typeOtherInput.value = '';
-        typeOtherInput.required = false;
-    } else if (product.productSubCategory) {
-        typeSelect.value = 'Other';
-        typeOtherContainer.classList.remove('hidden');
-        typeOtherInput.value = product.productSubCategory;
-        typeOtherInput.required = true;
-    } else {
-        typeSelect.value = '';
-        typeOtherContainer.classList.add('hidden');
-        typeOtherInput.value = '';
-        typeOtherInput.required = false;
-    }
-    
-    // Show verification status for existing products
-    const verificationStatusContainer = document.getElementById('verification-status-container');
-    const verificationStatusSelect = document.getElementById('edit-verification-status');
-    
-    if (product.productId) {
-        verificationStatusContainer.classList.remove('hidden');
-        verificationStatusSelect.value = product.verificationStatus || 'PENDING';
-    } else {
-        verificationStatusContainer.classList.add('hidden');
-    }
-    
-    // Clear image inputs
-    document.getElementById('edit-main-image').value = '';
-    document.getElementById('edit-image1').value = '';
-    document.getElementById('edit-image2').value = '';
-    document.getElementById('edit-image3').value = '';
-    document.getElementById('edit-image4').value = '';
-    
+    // Show the modal
     editProductModal.style.display = 'flex';
+    
+    // Setup price management AFTER modal is visible
+    setTimeout(() => {
+        setupPriceManagement();
+    }, 300);
 }
 
+// Helper function to safely reset the form
+function resetEditForm() {
+    console.log('Resetting edit form...');
+    
+    const editForm = document.getElementById('editProductForm');
+    if (editForm) {
+        editForm.reset();
+        console.log('Form reset complete');
+    }
+    
+    // Reset category dropdowns
+    const editCategory = document.getElementById('edit-category');
+    const editType = document.getElementById('edit-type');
+    
+    if (editCategory) editCategory.value = '';
+    if (editType) {
+        editType.value = '';
+        editType.disabled = true;
+    }
+    
+    // Reset other containers
+    const categoryOtherContainer = document.getElementById('category-other-container');
+    const typeOtherContainer = document.getElementById('type-other-container');
+    
+    if (categoryOtherContainer) {
+        categoryOtherContainer.classList.add('hidden');
+        const categoryOtherInput = document.getElementById('edit-category-other');
+        if (categoryOtherInput) {
+            categoryOtherInput.value = '';
+            categoryOtherInput.required = false;
+        }
+    }
+    
+    if (typeOtherContainer) {
+        typeOtherContainer.classList.add('hidden');
+        const typeOtherInput = document.getElementById('edit-type-other');
+        if (typeOtherInput) {
+            typeOtherInput.value = '';
+            typeOtherInput.required = false;
+        }
+    }
+    
+    // Reset price type to single
+    const priceTypeSelect = document.getElementById('edit-price-type');
+    if (priceTypeSelect) {
+        priceTypeSelect.value = 'single';
+        // Trigger the change event to update UI
+        setTimeout(() => {
+            priceTypeSelect.dispatchEvent(new Event('change'));
+        }, 50);
+    }
+    
+    // Clear single price fields
+    const priceFields = ['edit-price', 'edit-mrp', 'edit-old-price'];
+    priceFields.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.value = '';
+    });
+    
+    // Clear dynamic fields
+    const dynamicFields = ['edit-strength', 'edit-form', 'edit-dosage', 'edit-directions', 'edit-sizes'];
+    dynamicFields.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.value = '';
+    });
+    
+    // Clear image inputs
+    const imageInputs = ['edit-main-image', 'edit-image1', 'edit-image2', 'edit-image3', 'edit-image4'];
+    imageInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.value = '';
+            input.placeholder = '';
+        }
+    });
+    
+    // Clear price items container
+    const priceItemsContainer = document.querySelector('.price-items-container');
+    if (priceItemsContainer) {
+        // Keep only the first row (template row)
+        const rows = priceItemsContainer.querySelectorAll('.price-item-row');
+        rows.forEach((row, index) => {
+            if (index > 0) {
+                row.remove();
+            }
+        });
+        
+        // Clear inputs in the first row
+        const firstRow = priceItemsContainer.querySelector('.price-item-row');
+        if (firstRow) {
+            const inputs = firstRow.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+        }
+    }
+    
+    // Reset verification status if it exists
+    const verificationStatusSelect = document.getElementById('edit-verification-status');
+    if (verificationStatusSelect) {
+        verificationStatusSelect.value = 'PENDING';
+    }
+    
+    // Hide verification container
+    const verificationContainer = document.getElementById('verification-status-container');
+    if (verificationContainer) {
+        verificationContainer.classList.add('hidden');
+    }
+    
+    console.log('Form reset completed successfully');
+}
+
+// Helper function to safely set value only if element exists
+function setValueIfElementExists(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.value = value;
+    }
+}
 // ============================================
 // PAGINATION FUNCTIONS
 // ============================================
@@ -964,7 +1622,7 @@ function setupPaginationControls() {
             border: 1px solid #d1d5db;
             border-radius: 6px;
             background-color: white;
-            color: #374151;
+            // color: #374151;
             font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
@@ -1105,71 +1763,77 @@ function renderTable() {
         const row = document.createElement('tr');
         row.className = getRowClass(product);
         
-        row.innerHTML = `
-            <td class="text-center">${product.productId || `N/A-${startIndex + index}`}</td>
-            <td class="text-center">
-                <img src="${mainImageUrl}" alt="${product.productName}" class="product-thumbnail" onerror="this.src='https://via.placeholder.com/40?text=No+Image'">
-            </td>
-            <td>${product.sku || `SKU-${product.productId}`}</td>
-            <td>${product.productName || `Product ${startIndex + index}`}</td>
-            <td>${product.productCategory || 'N/A'}</td>
-            <td>${product.productSubCategory || 'N/A'}</td>
-            <td>${product.brandName || 'N/A'}</td>
-            <td>
-                <span class="${getStockStatus(product.productQuantity) === 'Low Stock' ? 'low-stock' : getStockStatus(product.productQuantity) === 'Out of Stock' ? 'status-out-of-stock' : ''}">
-                    ${product.productQuantity || 0} ${product.unit || 'unit'}
-                </span>
-            </td>
-            <td>
-                <div class="font-semibold">${pricingDisplay}</div>
-                ${product.productOldPrice && product.productOldPrice.length > 0 ? 
-                    `<div class="old-price">${sizesCount} variant${sizesCount > 1 ? 's' : ''}</div>` : ''}
-                ${pricingDetails ? `<div class="text-xs text-gray-500">${pricingDetails}</div>` : ''}
-            </td>
-            <td class="text-center">
-                <div class="flex items-center justify-center">
-                    <span class="rating-stars mr-1">${getStarRating(product.rating || 0)}</span>
-                    <span>${(product.rating || 0).toFixed(1)}</span>
-                </div>
-            </td>
-            <td class="text-center">
-                <span class="${isExpiringSoon(product.expDate) ? 'expiring-soon' : ''}">${formatDate(product.expDate)}</span>
-            </td>
-            <td class="text-center">
-                <span class="status-badge ${product.productStatus === 'Available' ? 'status-available' : product.productStatus === 'Unavailable' ? 'status-unavailable' : 'status-discontinued'}">
-                    ${product.productStatus || 'N/A'}
-                </span>
-            </td>
-            <td class="text-center">
-                <span class="verification-badge status-badge ${verificationStatus === 'APPROVED' ? 'status-approved' : verificationStatus === 'REJECTED' ? 'status-rejected' : 'status-pending'}">
-                    ${verificationStatus}
-                </span>
-            </td>
-            <td class="text-center">
-                <div class="action-buttons">
-                    <button class="view-btn" data-id="${product.productId}" title="View">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="edit-btn" data-id="${product.productId}" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="delete-btn" data-id="${product.productId}" title="Delete">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    ${(product.approved === null || product.approved === false) ? 
-                        `${product.approved === null ? 
-                            `<button class="verify-btn" data-id="${product.productId}" title="Approve">
-                                <i class="fas fa-check-circle"></i>
-                            </button>
-                            <button class="reject-btn" data-id="${product.productId}" title="Reject">
-                                <i class="fas fa-times-circle"></i>
-                            </button>` : 
-                            `<button class="verify-btn" data-id="${product.productId}" title="Approve">
-                                <i class="fas fa-check-circle"></i>
-                            </button>`}` : ''}
-                </div>
-            </td>
-        `;
+        // Update the action buttons section in the renderTable() function (around line 1400-1440)
+row.innerHTML = `
+    <td class="text-center">${product.productId || `N/A-${startIndex + index}`}</td>
+    <td class="text-center">
+        <img src="${mainImageUrl}" alt="${product.productName}" class="product-thumbnail" onerror="this.src='https://via.placeholder.com/40?text=No+Image'">
+    </td>
+    <td>${product.sku || `SKU-${product.productId}`}</td>
+    <td>${product.productName || `Product ${startIndex + index}`}</td>
+    <td>${product.productCategory || 'N/A'}</td>
+    <td>${product.productSubCategory || 'N/A'}</td>
+    <td>${product.brandName || 'N/A'}</td>
+    <td>
+        <span class="${getStockStatus(product.productQuantity) === 'Low Stock' ? 'low-stock' : getStockStatus(product.productQuantity) === 'Out of Stock' ? 'status-out-of-stock' : ''}">
+            ${product.productQuantity || 0} ${product.unit || 'unit'}
+        </span>
+    </td>
+    <td>
+        <div class="font-semibold">${pricingDisplay}</div>
+        ${product.productOldPrice && product.productOldPrice.length > 0 ? 
+            `<div class="old-price">${sizesCount} variant${sizesCount > 1 ? 's' : ''}</div>` : ''}
+        ${pricingDetails ? `<div class="text-xs text-gray-500">${pricingDetails}</div>` : ''}
+    </td>
+    <td class="text-center">
+        <div class="flex items-center justify-center">
+            <span class="rating-stars mr-1">${getStarRating(product.rating || 0)}</span>
+            <span>${(product.rating || 0).toFixed(1)}</span>
+        </div>
+    </td>
+    <td class="text-center">
+        <span class="${isExpiringSoon(product.expDate) ? 'expiring-soon' : ''}">${formatDate(product.expDate)}</span>
+    </td>
+    <td class="text-center">
+        <span class="status-badge ${product.productStatus === 'Available' ? 'status-available' : product.productStatus === 'Unavailable' ? 'status-unavailable' : 'status-discontinued'}">
+            ${product.productStatus || 'N/A'}
+        </span>
+    </td>
+    <td class="text-center">
+        <span class="verification-badge status-badge ${verificationStatus === 'APPROVED' ? 'status-approved' : verificationStatus === 'REJECTED' ? 'status-rejected' : 'status-pending'}">
+            ${verificationStatus}
+        </span>
+    </td>
+<td class="text-center">
+    <div class="action-buttons">
+        <button class="view-btn" data-id="${product.productId}" title="View">
+            <i class="fas fa-eye"></i>
+        </button>
+        <button class="edit-btn" data-id="${product.productId}" title="Edit">
+            <i class="fas fa-edit"></i>
+        </button>
+        <button class="delete-btn" data-id="${product.productId}" title="Delete">
+            <i class="fas fa-trash"></i>
+        </button>
+        <!-- APPROVAL STATUS BASED ACTION BUTTONS -->
+        ${verificationStatus === 'PENDING' ? 
+            `<button class="verify-btn" data-id="${product.productId}" title="Approve">
+                <i class="fas fa-check-circle text-green-500"></i>
+            </button>
+            <button class="reject-btn" data-id="${product.productId}" title="Reject">
+                <i class="fas fa-times-circle text-red-500"></i>
+            </button>` : 
+        verificationStatus === 'APPROVED' ? 
+            `<button class="unapprove-btn" data-id="${product.productId}" title="Reject (Unapprove)">
+                <i class="fas fa-times-circle text-red-500"></i>
+            </button>` : 
+        verificationStatus === 'REJECTED' ? 
+            `<button class="reapprove-btn" data-id="${product.productId}" title="Re-approve">
+                <i class="fas fa-check-circle text-green-500"></i>
+            </button>` : ''}
+    </div>
+</td>
+`;
         
         tableBody.appendChild(row);
     });
@@ -1366,7 +2030,442 @@ function applyAllFilters() {
     updateStatsWithFilteredData(filtered);
 }
 
-// Function to attach event listeners to table buttons
+// Update the attachTableEventListeners() function (around line 1875-1935)
+function setupEventListeners() {
+    console.log('Setting up event listeners...');
+    
+    // Sidebar toggle buttons
+    const toggleSidebarLogo = document.getElementById('toggle-sidebar-logo');
+    const closeSidebar = document.getElementById('close-sidebar');
+    const toggleSidebarMobile = document.getElementById('toggle-sidebar-mobile');
+    const toggleSidebarDesktop = document.getElementById('toggle-sidebar-desktop');
+    
+    if (toggleSidebarLogo) toggleSidebarLogo.addEventListener('click', toggleSidebar);
+    if (closeSidebar) closeSidebar.addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.remove('translate-x-0');
+    });
+    if (toggleSidebarMobile) toggleSidebarMobile.addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) sidebar.classList.toggle('translate-x-0');
+    });
+    if (toggleSidebarDesktop) toggleSidebarDesktop.addEventListener('click', toggleSidebar);
+    
+    // Modal close buttons
+    const closeDetailModal = document.getElementById('closeDetailModal');
+    const closeEditModal = document.getElementById('closeEditModal');
+    const cancelEdit = document.getElementById('cancelEdit');
+    const closeSuccessPopup = document.getElementById('closeSuccessPopup');
+    
+    if (closeDetailModal) closeDetailModal.addEventListener('click', () => {
+        const modal = document.getElementById('productDetailModal');
+        if (modal) modal.style.display = 'none';
+    });
+    
+    if (closeEditModal) closeEditModal.addEventListener('click', () => {
+        const modal = document.getElementById('editProductModal');
+        if (modal) {
+            modal.style.display = 'none';
+            resetEditForm();
+        }
+    });
+    
+    if (cancelEdit) cancelEdit.addEventListener('click', () => {
+        const modal = document.getElementById('editProductModal');
+        if (modal) {
+            modal.style.display = 'none';
+            resetEditForm();
+        }
+    });
+    
+    if (closeSuccessPopup) closeSuccessPopup.addEventListener('click', () => {
+        const popup = document.getElementById('successPopup');
+        if (popup) popup.style.display = 'none';
+    });
+    
+    // Add product button
+    const addProductBtn = document.getElementById('addProductBtn');
+    if (addProductBtn) {
+        addProductBtn.addEventListener('click', () => {
+            openEditModal();  // No parameter for new product
+        });
+    }
+    
+    // Form submissions
+    const editProductForm = document.getElementById('editProductForm');
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // Category change handlers
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', function() {
+            populateSubcategoryDropdown(this.value);
+            applyFilters();
+        });
+    }
+    
+    const editCategory = document.getElementById('edit-category');
+    if (editCategory) {
+        editCategory.addEventListener('change', function() {
+            const otherContainer = document.getElementById('category-other-container');
+            const otherInput = document.getElementById('edit-category-other');
+            
+            if (this.value === 'Other') {
+                if (otherContainer) otherContainer.classList.remove('hidden');
+                if (otherInput) otherInput.required = true;
+            } else {
+                if (otherContainer) otherContainer.classList.add('hidden');
+                if (otherInput) {
+                    otherInput.required = false;
+                    otherInput.value = '';
+                }
+            }
+            
+            populateSubcategoryDropdown(this.value);
+        });
+    }
+    
+    const editType = document.getElementById('edit-type');
+    if (editType) {
+        editType.addEventListener('change', function() {
+            const otherContainer = document.getElementById('type-other-container');
+            const otherInput = document.getElementById('edit-type-other');
+            
+            if (this.value === 'Other') {
+                if (otherContainer) otherContainer.classList.remove('hidden');
+                if (otherInput) otherInput.required = true;
+            } else {
+                if (otherContainer) otherContainer.classList.add('hidden');
+                if (otherInput) {
+                    otherInput.required = false;
+                    otherInput.value = '';
+                }
+            }
+        });
+    }
+    
+    // Filters
+    const subcategoryFilter = document.getElementById('subcategoryFilter');
+    const prescriptionFilter = document.getElementById('prescriptionFilter');
+    const stockFilter = document.getElementById('stockFilter');
+    const verificationFilter = document.getElementById('verificationFilter');
+    
+    if (subcategoryFilter) subcategoryFilter.addEventListener('change', applyFilters);
+    if (prescriptionFilter) prescriptionFilter.addEventListener('change', applyFilters);
+    if (stockFilter) stockFilter.addEventListener('change', applyFilters);
+    if (verificationFilter) verificationFilter.addEventListener('change', applyFilters);
+    
+    // Search functionality
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchTerm = this.value;
+                console.log('Search term updated:', searchTerm);
+                applyAllFilters();
+            }, 500);
+        });
+        
+        // Add clear search button
+        const searchClearBtn = document.createElement('button');
+        searchClearBtn.innerHTML = '<i class="fas fa-times"></i>';
+        searchClearBtn.className = 'absolute right-10 top-3 text-gray-400 hover:text-gray-600 cursor-pointer';
+        searchClearBtn.title = 'Clear search';
+        searchClearBtn.onclick = function() {
+            document.getElementById('searchInput').value = '';
+            searchTerm = '';
+            applyAllFilters();
+        };
+        searchInput.parentNode.appendChild(searchClearBtn);
+    }
+    
+    // ============================================
+    // VERIFICATION MODAL EVENT LISTENERS
+    // ============================================
+    
+    const verificationModal = document.getElementById('verificationModal');
+    const cancelVerificationBtn = document.getElementById('cancelVerification');
+    const submitVerificationBtn = document.getElementById('submitVerification');
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    
+    // Close verification modal when clicking outside
+    if (verificationModal) {
+        verificationModal.addEventListener('click', function(e) {
+            if (e.target === verificationModal) {
+                closeVerificationModal();
+            }
+        });
+    }
+    
+    // Cancel verification button
+    if (cancelVerificationBtn) {
+        cancelVerificationBtn.addEventListener('click', closeVerificationModal);
+    }
+    
+    // Submit verification button
+    if (submitVerificationBtn) {
+        submitVerificationBtn.addEventListener('click', submitVerification);
+    }
+    
+    // Radio button changes - enable/disable submit button
+    if (actionRadios.length > 0) {
+        actionRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateVerificationSubmitButton();
+            });
+        });
+    }
+    
+    // Close modals when clicking outside (updated with verification modal)
+    window.addEventListener('click', (e) => {
+        const modals = ['productDetailModal', 'editProductModal', 'successPopup', 'verificationModal'];
+        modals.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal && e.target === modal) {
+                if (modalId === 'verificationModal') {
+                    closeVerificationModal();
+                } else if (modalId === 'editProductModal') {
+                    modal.style.display = 'none';
+                    resetEditForm();
+                } else {
+                    modal.style.display = 'none';
+                }
+            }
+        });
+    });
+    
+    // Keyboard shortcuts for verification modal
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('verificationModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            if (e.key === 'Enter') {
+                const submitBtn = document.getElementById('submitVerification');
+                if (submitBtn && !submitBtn.disabled) {
+                    submitVerification();
+                }
+            } else if (e.key === 'Escape') {
+                closeVerificationModal();
+            }
+        }
+    });
+    
+    // ============================================
+    // LOGOUT MODAL EVENT LISTENERS
+    // ============================================
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    const logoutModal = document.getElementById('logoutModal');
+    const confirmLogout = document.getElementById('confirmLogout');
+    const cancelLogout = document.getElementById('cancelLogout');
+    const closeLogoutModal = document.getElementById('closeLogoutModal');
+    
+    if (logoutBtn && logoutModal) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.classList.remove('hidden');
+        });
+    }
+    
+    function closeLogout() {
+        if (logoutModal) logoutModal.classList.add('hidden');
+    }
+    
+    if (cancelLogout) cancelLogout.addEventListener('click', closeLogout);
+    if (closeLogoutModal) closeLogoutModal.addEventListener('click', closeLogout);
+    if (logoutModal) {
+        logoutModal.addEventListener('click', (e) => {
+            if (e.target === logoutModal) closeLogout();
+        });
+    }
+    
+    if (confirmLogout) {
+        confirmLogout.addEventListener('click', () => {
+            window.location.href = '../Login/login.html';
+        });
+    }
+    
+    console.log('Event listeners setup complete including verification modal');
+}
+
+// ============================================
+// VERIFICATION MODAL FUNCTIONS (Add these to your file)
+// ============================================
+
+let currentVerificationProduct = null;
+
+function showVerificationModal(product, action = null) {
+    console.log('Showing verification modal for:', product.productName);
+    
+    currentVerificationProduct = product;
+    
+    const modal = document.getElementById('verificationModal');
+    const productName = document.getElementById('verificationProductName');
+    const sku = document.getElementById('verificationSku');
+    const category = document.getElementById('verificationCategory');
+    const brand = document.getElementById('verificationBrand');
+    const status = document.getElementById('verificationStatus');
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const submitBtn = document.getElementById('submitVerification');
+        // const notes = document.getElementById('verificationNotes');
+    const modalTitle = document.getElementById('verificationModalTitle');
+    
+    if (!modal) {
+        console.error('Verification modal not found!');
+        return;
+    }
+    
+    // Update product info
+    productName.textContent = product.productName || 'N/A';
+    sku.textContent = product.sku || 'N/A';
+    category.textContent = product.productCategory || 'N/A';
+    brand.textContent = product.brandName || 'N/A';
+    
+    // Update status badge
+    const verificationStatus = product.approved === true ? 'APPROVED' : 
+                               product.approved === false ? 'REJECTED' : 'PENDING';
+    status.innerHTML = `<span class="px-2 py-1 rounded-full text-xs font-medium ${
+        verificationStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
+        verificationStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
+        'bg-yellow-100 text-yellow-800'
+    }">${verificationStatus}</span>`;
+    
+    // Reset form
+    actionRadios.forEach(radio => {
+        radio.checked = false;
+    });
+    
+    // notes.value = '';
+    submitBtn.disabled = true;
+    
+    // Set modal title
+    if (action === 'APPROVE') {
+        modalTitle.textContent = 'Approve Product';
+    } else if (action === 'REJECT') {
+        modalTitle.textContent = 'Reject Product';
+    } else {
+        modalTitle.textContent = 'Verify Product';
+    }
+    
+    // If a specific action is passed (from clicking approve/reject buttons), pre-select it
+    if (action === 'APPROVE') {
+        const approveRadio = document.querySelector('input[value="APPROVE"]');
+        if (approveRadio) {
+            approveRadio.checked = true;
+            updateVerificationSubmitButton();
+        }
+    } else if (action === 'REJECT') {
+        const rejectRadio = document.querySelector('input[value="REJECT"]');
+        if (rejectRadio) {
+            rejectRadio.checked = true;
+            updateVerificationSubmitButton();
+        }
+    }
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    
+    // Focus on first radio button
+    setTimeout(() => {
+        if (actionRadios.length > 0) {
+            actionRadios[0].focus();
+        }
+    }, 100);
+}
+
+function updateVerificationSubmitButton() {
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const submitBtn = document.getElementById('submitVerification');
+    
+    if (!submitBtn) return;
+    
+    const hasSelection = Array.from(actionRadios).some(radio => radio.checked);
+    submitBtn.disabled = !hasSelection;
+    
+    // Update button text and color based on selected action
+    const selectedAction = Array.from(actionRadios).find(radio => radio.checked);
+    if (selectedAction) {
+        if (selectedAction.value === 'APPROVE') {
+            submitBtn.textContent = 'Approve Product';
+            submitBtn.className = 'flex-1 px-4 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+        } else {
+            submitBtn.textContent = 'Reject Product';
+            submitBtn.className = 'flex-1 px-4 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+        }
+    }
+}
+
+function closeVerificationModal() {
+    const modal = document.getElementById('verificationModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentVerificationProduct = null;
+}
+
+async function submitVerification() {
+    if (!currentVerificationProduct) {
+        showSuccessPopup('No product selected for verification', 'error');
+        return;
+    }
+    
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const selectedAction = Array.from(actionRadios).find(radio => radio.checked);
+    
+    if (!selectedAction) {
+        showSuccessPopup('Please select an action', 'error');
+        return;
+    }
+    
+    const action = selectedAction.value;
+    // const notes = document.getElementById('verificationNotes')?.value.trim() || '';
+    const productId = currentVerificationProduct.productId;
+    const productName = currentVerificationProduct.productName;
+    
+    console.log(`Submitting verification for product ${productId} (${productName}): ${action}`);
+    // console.log('Notes:', notes);
+    
+    try {
+        // Show loading state
+        const submitBtn = document.getElementById('submitVerification');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        submitBtn.disabled = true;
+        
+        // Call verification API
+        await verificationService.verifyProduct(productId, action);
+        
+        // Show success message
+        const actionText = action === 'APPROVE' ? 'approved' : 'rejected';
+        showSuccessPopup(`"${productName}" ${actionText} successfully!`);
+        
+        // Close modal
+        closeVerificationModal();
+        
+        // Reload products to reflect changes
+        await loadProducts();
+        
+    } catch (error) {
+        console.error(`Error ${action.toLowerCase()}ing product:`, error);
+        showSuccessPopup(`Error: ${error.message}`, 'error');
+        
+        // Reset button
+        const submitBtn = document.getElementById('submitVerification');
+        if (submitBtn) {
+            submitBtn.textContent = action === 'APPROVE' ? 'Approve Product' : 'Reject Product';
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+// ============================================
+// UPDATE TABLE ROW EVENT LISTENERS
+// ============================================
+
+// Update the attachTableEventListeners() function to use the new modal
 function attachTableEventListeners() {
     // View buttons
     document.querySelectorAll('.view-btn').forEach(button => {
@@ -1407,28 +2506,63 @@ function attachTableEventListeners() {
         });
     });
     
-    // Verify/Approve buttons
+   // Verify/Approve buttons (for pending products)
     document.querySelectorAll('.verify-btn').forEach(button => {
-        button.addEventListener('click', async function(e) {
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        newButton.addEventListener('click', function(e) {
             e.stopPropagation();
             const productId = this.getAttribute('data-id');
+            console.log('Verify/Approve button clicked for product ID:', productId);
             const product = filteredProducts.find(p => p.productId == productId);
             if (product) {
-                console.log('Approve button clicked for product:', product.productName);
                 showVerificationModal(product, 'APPROVE');
             }
         });
     });
     
-    // Reject buttons
+    // Reject buttons (for pending products)
     document.querySelectorAll('.reject-btn').forEach(button => {
-        button.addEventListener('click', async function(e) {
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        newButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const productId = this.getAttribute('data-id');
+            console.log('Reject button clicked for product ID:', productId);
+            const product = filteredProducts.find(p => p.productId == productId);
+            if (product) {
+                showVerificationModal(product, 'REJECT');
+            }
+        });
+    });
+    
+    // Unapprove buttons (for approved products)
+    document.querySelectorAll('.unapprove-btn').forEach(button => {
+        const newButton = button.cloneNode(true);
+        button.parentNode.replaceChild(newButton, button);
+        
+        newButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const productId = this.getAttribute('data-id');
+            console.log('Unapprove button clicked for product ID:', productId);
+            const product = filteredProducts.find(p => p.productId == productId);
+            if (product) {
+                showVerificationModal(product, 'REJECT');
+            }
+        });
+    });
+    
+    // Re-approve buttons (for rejected products) - UPDATED to use modal
+    document.querySelectorAll('.reapprove-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
             e.stopPropagation();
             const productId = this.getAttribute('data-id');
             const product = filteredProducts.find(p => p.productId == productId);
             if (product) {
-                console.log('Reject button clicked for product:', product.productName);
-                showVerificationModal(product, 'REJECT');
+                console.log('Re-approve button clicked for product:', product.productName);
+                showVerificationModal(product, 'APPROVE');
             }
         });
     });
@@ -1438,19 +2572,241 @@ function attachTableEventListeners() {
 // VERIFICATION FUNCTIONS
 // ============================================
 
-function showVerificationModal(product, action) {
-    const productName = product.productName || 'Product';
+
+function showVerificationModal(product, action = null) {
+    console.log('Showing verification modal for:', product.productName);
     
-    // Simple confirmation
-    const message = action === 'APPROVE' 
-        ? `Are you sure you want to APPROVE "${productName}"?`
-        : `Are you sure you want to REJECT "${productName}"?`;
+    currentVerificationProduct = product;
     
-    if (confirm(message)) {
-        // Directly call verification API
-        handleVerification(product.productId, action);
+    const modal = document.getElementById('verificationModal');
+    const productName = document.getElementById('verificationProductName');
+    const sku = document.getElementById('verificationSku');
+    const category = document.getElementById('verificationCategory');
+    const brand = document.getElementById('verificationBrand');
+    const status = document.getElementById('verificationStatus');
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const submitBtn = document.getElementById('submitVerification');
+    // const notes = document.getElementById('verificationNotes');
+    const modalTitle = document.getElementById('verificationModalTitle');
+    
+    if (!modal) {
+        console.error('Verification modal not found!');
+        return;
+    }
+    
+    // Update product info
+    productName.textContent = product.productName || 'N/A';
+    sku.textContent = product.sku || 'N/A';
+    category.textContent = product.productCategory || 'N/A';
+    brand.textContent = product.brandName || 'N/A';
+    
+    // Update status badge
+    const verificationStatus = product.approved === true ? 'APPROVED' : 
+                               product.approved === false ? 'REJECTED' : 'PENDING';
+    status.innerHTML = `<span class="px-2 py-1 rounded-full text-xs font-medium ${
+        verificationStatus === 'APPROVED' ? 'bg-green-100 text-green-800' :
+        verificationStatus === 'REJECTED' ? 'bg-red-100 text-red-800' :
+        'bg-yellow-100 text-yellow-800'
+    }">${verificationStatus}</span>`;
+    
+    // Reset form
+    actionRadios.forEach(radio => {
+        radio.checked = false;
+    });
+    
+    // notes.value = '';
+    submitBtn.disabled = true;
+    
+    // Set modal title
+    if (action === 'APPROVE') {
+        modalTitle.textContent = 'Approve Product';
+    } else if (action === 'REJECT') {
+        modalTitle.textContent = 'Reject Product';
+    } else {
+        modalTitle.textContent = 'Verify Product';
+    }
+    
+    // If a specific action is passed (from clicking approve/reject buttons), pre-select it
+    if (action === 'APPROVE') {
+        const approveRadio = document.querySelector('input[value="APPROVE"]');
+        if (approveRadio) {
+            approveRadio.checked = true;
+            updateVerificationSubmitButton();
+        }
+    } else if (action === 'REJECT') {
+        const rejectRadio = document.querySelector('input[value="REJECT"]');
+        if (rejectRadio) {
+            rejectRadio.checked = true;
+            updateVerificationSubmitButton();
+        }
+    }
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    
+    // Focus on first radio button
+    setTimeout(() => {
+        if (actionRadios.length > 0) {
+            actionRadios[0].focus();
+        }
+    }, 100);
+}
+
+function updateSubmitButton() {
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const submitBtn = document.getElementById('submitVerification');
+    const hasSelection = Array.from(actionRadios).some(radio => radio.checked);
+    
+    submitBtn.disabled = !hasSelection;
+    
+    // Update button text based on selected action
+    const selectedAction = Array.from(actionRadios).find(radio => radio.checked);
+    if (selectedAction) {
+        submitBtn.textContent = selectedAction.value === 'APPROVE' ? 'Approve Product' : 'Reject Product';
+        submitBtn.className = submitBtn.className.replace(/bg-(blue|red|green)-\d+/, 
+            selectedAction.value === 'APPROVE' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700');
     }
 }
+
+function updateVerificationSubmitButton() {
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const submitBtn = document.getElementById('submitVerification');
+    
+    if (!submitBtn) return;
+    
+    const hasSelection = Array.from(actionRadios).some(radio => radio.checked);
+    submitBtn.disabled = !hasSelection;
+    
+    // Update button text and color based on selected action
+    const selectedAction = Array.from(actionRadios).find(radio => radio.checked);
+    if (selectedAction) {
+        if (selectedAction.value === 'APPROVE') {
+            submitBtn.textContent = 'Approve Product';
+            submitBtn.className = 'flex-1 px-4 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+        } else {
+            submitBtn.textContent = 'Reject Product';
+            submitBtn.className = 'flex-1 px-4 py-3 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+        }
+    }
+}
+
+function closeVerificationModal() {
+    const modal = document.getElementById('verificationModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    currentVerificationProduct = null;
+}
+
+async function submitVerification() {
+    if (!currentVerificationProduct) {
+        showSuccessPopup('No product selected for verification', 'error');
+        return;
+    }
+    
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const selectedAction = Array.from(actionRadios).find(radio => radio.checked);
+    
+    if (!selectedAction) {
+        showSuccessPopup('Please select an action', 'error');
+        return;
+    }
+    
+    const action = selectedAction.value;
+    // const notes = document.getElementById('verificationNotes')?.value.trim() || '';
+    const productId = currentVerificationProduct.productId;
+    const productName = currentVerificationProduct.productName;
+    
+    console.log(`Submitting verification for product ${productId} (${productName}): ${action}`);
+    console.log('Notes:');
+    
+    try {
+        // Show loading state
+        const submitBtn = document.getElementById('submitVerification');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        submitBtn.disabled = true;
+        
+        // Call verification API
+        await verificationService.verifyProduct(productId, action);
+        
+        // Show success message
+        const actionText = action === 'APPROVE' ? 'approved' : 'rejected';
+        showSuccessPopup(`"${productName}" ${actionText} successfully!`);
+        
+        // Close modal
+        closeVerificationModal();
+        
+        // Reload products to reflect changes
+        await loadProducts();
+        
+    } catch (error) {
+        console.error(`Error ${action.toLowerCase()}ing product:`, error);
+        showSuccessPopup(`Error: ${error.message}`, 'error');
+        
+        // Reset button
+        const submitBtn = document.getElementById('submitVerification');
+        if (submitBtn) {
+            submitBtn.textContent = action === 'APPROVE' ? 'Approve Product' : 'Reject Product';
+            submitBtn.disabled = false;
+        }
+    }
+}
+
+
+
+async function submitVerification() {
+    if (!currentVerificationProduct) {
+        showSuccessPopup('No product selected for verification', 'error');
+        return;
+    }
+    
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    const selectedAction = Array.from(actionRadios).find(radio => radio.checked);
+    
+    if (!selectedAction) {
+        showSuccessPopup('Please select an action', 'error');
+        return;
+    }
+    
+    const action = selectedAction.value;
+    // const notes = document.getElementById('verificationNotes').value.trim();
+    const productId = currentVerificationProduct.productId;
+    
+    console.log(`Submitting verification for product ${productId}: ${action}`);
+    console.log('Notes:');
+    
+    try {
+        // Show loading state
+        const submitBtn = document.getElementById('submitVerification');
+        const originalText = submitBtn.textContent;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+        submitBtn.disabled = true;
+        
+        // Call verification API
+        await verificationService.verifyProduct(productId, action);
+        
+        // Show success message
+        const actionText = action === 'APPROVE' ? 'approved' : 'rejected';
+        showSuccessPopup(`Product ${actionText} successfully!`);
+        
+        // Close modal
+        closeVerificationModal();
+        
+        // Reload products to reflect changes
+        await loadProducts();
+        
+    } catch (error) {
+        console.error(`Error ${action.toLowerCase()}ing product:`, error);
+        showSuccessPopup(`Error: ${error.message}`, 'error');
+        
+        // Reset button
+        const submitBtn = document.getElementById('submitVerification');
+        submitBtn.textContent = action === 'APPROVE' ? 'Approve Product' : 'Reject Product';
+        submitBtn.disabled = false;
+    }
+}
+
 
 async function handleVerification(productId, action) {
     try {
@@ -1536,14 +2892,14 @@ async function showProductDetails(product) {
         if (productDetails.productMainImage && !productDetails.productMainImage.startsWith('http')) {
             productDetails.productMainImage = productDetails.productMainImage.startsWith('/') 
                 ? `http://localhost:8083${productDetails.productMainImage}`
-                : `http://localhost:8083/${productDetails.productMainImage}`;
+                : `http://localhost:8083${productDetails.productMainImage}`;
         }
         
         if (productDetails.productSubImages && Array.isArray(productDetails.productSubImages)) {
             productDetails.productSubImages = productDetails.productSubImages.map(img => {
                 if (!img) return null;
                 return img.startsWith('http') ? img : 
-                       (img.startsWith('/') ? `http://localhost:8083${img}` : `http://localhost:8083/${img}`);
+                       (img.startsWith('/') ? `http://localhost:8083${img}` : `http://localhost:8083${img}`);
             }).filter(img => img !== null);
         }
         
@@ -1747,7 +3103,8 @@ async function showProductDetails(product) {
         }
 
         // Update edit button to use the productDetails with fixed image URLs
-        document.getElementById('editProductBtn').onclick = () => openEditModal(productDetails);
+// In showProductDetails() function (around line 2192)
+document.getElementById('editProductBtn').onclick = () => openEditModal(productDetails);
         productDetailModal.style.display = 'flex';
         
         console.log('Product details modal displayed');
@@ -1769,94 +3126,219 @@ async function handleFormSubmit(e) {
     e.preventDefault();
 
     try {
-        // Get form data
-        const formData = {
+        console.log('=== FORM SUBMISSION STARTED ===');
+        
+        // Get price data
+        const priceData = getPriceData();
+        
+        // Get sizes
+        const sizesInput = document.getElementById('edit-sizes').value.trim();
+        const sizes = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(s => s) : [];
+        
+        // Get benefits, directions, ingredients
+        const benefits = document.getElementById('edit-benefits').value
+            .split('\n')
+            .filter(b => b.trim())
+            .map(b => b.trim());
+            
+        // Directions is optional
+        const directionsInput = document.getElementById('edit-directions');
+        const directions = directionsInput ? directionsInput.value
+            .split('\n')
+            .filter(d => d.trim())
+            .map(d => d.trim()) : [];
+            
+        const ingredients = document.getElementById('edit-ingredients').value
+            .split(',')
+            .filter(i => i.trim())
+            .map(i => i.trim());
+
+        // Prepare product data - EXACTLY matching backend ProductRequestDto
+        const productData = {
+            // Basic information
             sku: document.getElementById('edit-sku').value.trim(),
-            name: document.getElementById('edit-name').value.trim(),
-            category: document.getElementById('edit-category').value === 'Other' 
+            productName: document.getElementById('edit-name').value.trim(),
+            productCategory: document.getElementById('edit-category').value === 'Other' 
                 ? document.getElementById('edit-category-other').value.trim()
                 : document.getElementById('edit-category').value,
-            type: document.getElementById('edit-type').value === 'Other'
+            productSubCategory: document.getElementById('edit-type').value === 'Other'
                 ? document.getElementById('edit-type-other').value.trim()
                 : document.getElementById('edit-type').value,
-            brand: document.getElementById('edit-brand').value.trim(),
-            prescription: document.getElementById('edit-prescription').value,
-            status: document.getElementById('edit-status').value,
-            quantity: parseInt(document.getElementById('edit-quantity').value) || 0,
-            unit: document.getElementById('edit-unit').value,
-            mrp: document.getElementById('edit-mrp').value ? parseFloat(document.getElementById('edit-mrp').value) : null,
-            price: document.getElementById('edit-price').value ? parseFloat(document.getElementById('edit-price').value) : null,
-            oldPrice: document.getElementById('edit-old-price').value ? parseFloat(document.getElementById('edit-old-price').value) : null,
-            rating: parseFloat(document.getElementById('edit-rating').value) || 0,
-            batch: document.getElementById('edit-batch').value.trim(),
+            brandName: document.getElementById('edit-brand').value.trim(),
+            productDescription: document.getElementById('edit-description').value.trim(),
+            
+            // Stock & pricing
+            productPrice: priceData.prices.map(price => price.toString()), // Convert to string for BigDecimal
+            productOldPrice: priceData.oldPrices ? 
+                priceData.oldPrices.map(price => price ? price.toString() : null) : [],
+            productQuantity: parseInt(document.getElementById('edit-quantity').value) || 0,
+            
+            // Status & requirements
+            productStatus: document.getElementById('edit-status').value,
+            prescriptionRequired: document.getElementById('edit-prescription').value === 'Yes',
+            
+            // Dates & batch
             mfgDate: document.getElementById('edit-mfg-date').value,
-            expiry: document.getElementById('edit-expiry').value,
-            description: document.getElementById('edit-description').value.trim(),
-            benefits: document.getElementById('edit-benefits').value.split('\n').filter(b => b.trim()),
-            directions: document.getElementById('edit-directions').value.split('\n').filter(d => d.trim()),
-            ingredients: document.getElementById('edit-ingredients').value.split(',').map(i => i.trim()).filter(i => i),
-            sizes: document.getElementById('edit-sizes').value.split(',').map(s => s.trim()).filter(s => s),
-            strength: document.getElementById('edit-strength').value.trim(),
-            form: document.getElementById('edit-form').value.trim(),
-            dosage: document.getElementById('edit-dosage').value.trim()
+            expDate: document.getElementById('edit-expiry').value,
+            batchNo: document.getElementById('edit-batch').value.trim(),
+            
+            // Rating
+            rating: parseFloat(document.getElementById('edit-rating').value) || 0,
+            
+            // Lists
+            benefitsList: benefits,
+            ingredientsList: ingredients,
+            directionsList: directions,
+            productSizes: sizes,
+            
+            // Dynamic fields
+            productDynamicFields: {
+                strength: document.getElementById('edit-strength').value.trim() || '',
+                form: document.getElementById('edit-form').value.trim() || '',
+                dosage: document.getElementById('edit-dosage').value.trim() || '',
+                unit: 'Tablet Strip' // Default value
+            }
         };
 
-        // If no sizes but we have single price, use that
-        if (formData.sizes.length === 0 && formData.price) {
-            formData.prices = [formData.price];
-            if (formData.oldPrice) {
-                formData.oldPrices = [formData.oldPrice];
-            }
-        } else if (formData.sizes.length > 0) {
-            // If we have sizes, create price arrays matching the sizes
-            formData.prices = formData.sizes.map(() => formData.price || 0);
-            formData.oldPrices = formData.sizes.map(() => formData.oldPrice || null);
-        } else {
-            // Default case
-            formData.prices = [];
-            formData.oldPrices = [];
+        console.log('Product data to be sent:', JSON.stringify(productData, null, 2));
+        
+        // Validation (matches backend validation)
+        if (!productData.sku || !productData.productName) {
+            showSuccessPopup('SKU and Product Name are required', 'error');
+            return;
         }
         
-        // Validation
-        if (!validateProductForm(formData)) return;
-
-        // Get image files
-        const mainImageInput = document.getElementById('edit-main-image');
-        const mainImage = mainImageInput.files[0];
+        if (!productData.productCategory || !productData.productSubCategory) {
+            showSuccessPopup('Category and Subcategory are required', 'error');
+            return;
+        }
         
-        const subImages = [];
+        if (productData.productPrice.length === 0) {
+            showSuccessPopup('At least one price is required', 'error');
+            return;
+        }
+        
+        // Check for negative prices
+        if (productData.productPrice.some(price => parseFloat(price) <= 0)) {
+            showSuccessPopup('All prices must be greater than zero', 'error');
+            return;
+        }
+        
+        // Check quantity
+        if (productData.productQuantity < 0) {
+            showSuccessPopup('Quantity must be non-negative', 'error');
+            return;
+        }
+
+        // Create FormData
+        const formData = new FormData();
+        
+        // IMPORTANT: Convert productData to JSON string with the key 'productData'
+        formData.append('productData', JSON.stringify(productData));
+        
+        // Get and validate main image (REQUIRED for new products)
+        const mainImageInput = document.getElementById('edit-main-image');
+        if (mainImageInput && mainImageInput.files && mainImageInput.files[0]) {
+            formData.append('productMainImage', mainImageInput.files[0]);
+            console.log('Main image attached:', mainImageInput.files[0].name);
+        } else if (!currentProductId) {
+            // Only require image for new products (backend requires it for create)
+            showSuccessPopup('Main product image is required for new products', 'error');
+            return;
+        } else {
+            // For updates, you might want to handle this differently
+            console.log('No new main image provided for update');
+        }
+        
+        // Get sub images (optional)
         for (let i = 1; i <= 4; i++) {
             const subImageInput = document.getElementById(`edit-image${i}`);
-            if (subImageInput && subImageInput.files[0]) {
-                subImages.push(subImageInput.files[0]);
+            if (subImageInput && subImageInput.files && subImageInput.files[0]) {
+                formData.append('productSubImages', subImageInput.files[0]);
+                console.log(`Sub image ${i} attached:`, subImageInput.files[0].name);
             }
         }
 
-        if (currentProductId) {
-            // Update existing product
-            await productService.updateProduct(currentProductId, formData, mainImage, subImages);
-            showSuccessPopup('Product updated successfully!');
-        } else {
-            // Create new product
-            await productService.createProduct(formData, mainImage, subImages);
-            showSuccessPopup('Product added successfully! It is now pending verification.');
+        // Log form data for debugging
+        console.log('FormData contents:');
+        for (let [key, value] of formData.entries()) {
+            if (key === 'productData') {
+                console.log('productData (JSON):', JSON.parse(value));
+            } else {
+                console.log(`${key}:`, value.name || value);
+            }
         }
 
-        const editProductModal = document.getElementById('editProductModal');
-        editProductModal.style.display = 'none';
-        document.getElementById('editProductForm').reset();
+        // Make API call
+        let response;
+        const url = currentProductId 
+            ? `${API_BASE_URL}/patch-product/${currentProductId}`
+            : `${API_BASE_URL}/create-product`;
         
-        // Reset category/subcategory
-        document.getElementById('edit-category').value = '';
-        document.getElementById('edit-type').value = '';
-        document.getElementById('edit-type').disabled = true;
+        const method = currentProductId ? 'PATCH' : 'POST';
+        
+        console.log(`${method} request to: ${url}`);
+        
+        response = await fetch(url, {
+            method: method,
+            body: formData
+        });
+
+        console.log('Response status:', response.status);
+        console.log('Response status text:', response.statusText);
+
+        if (!response.ok) {
+            let errorText = 'Unknown error';
+            try {
+                errorText = await response.text();
+                console.error('Error response body:', errorText);
+                
+                // Try to parse as JSON for structured error
+                try {
+                    const errorJson = JSON.parse(errorText);
+                    errorText = errorJson.message || JSON.stringify(errorJson);
+                } catch (e) {
+                    // Not JSON, keep as text
+                }
+            } catch (e) {
+                console.log('Could not read error response:', e);
+                errorText = `Status: ${response.status} ${response.statusText}`;
+            }
+            throw new Error(`Failed to ${currentProductId ? 'update' : 'create'} product: ${errorText}`);
+        }
+
+        // Handle success
+        const responseText = await response.text();
+        console.log('Success response:', responseText);
+        
+        let result = {};
+        if (responseText) {
+            try {
+                result = JSON.parse(responseText);
+            } catch (e) {
+                console.log('Response is not JSON:', responseText);
+                // Even if not JSON, it might be success
+                result = { success: true, message: responseText };
+            }
+        }
+
+        showSuccessPopup(currentProductId ? 
+            'Product updated successfully!' : 
+            'Product added successfully! It is now pending verification.');
+
+        // Close modal and reset
+        const editProductModal = document.getElementById('editProductModal');
+        if (editProductModal) editProductModal.style.display = 'none';
+        
+        resetEditForm();
         
         // Reload products
         await loadProducts();
         
     } catch (error) {
-        console.error('Error saving product:', error);
-        showSuccessPopup(error.message || 'Error saving product', 'error');
+        console.error('Error in handleFormSubmit:', error);
+        console.error('Error stack:', error.stack);
+        showSuccessPopup(error.message || 'Error saving product. Check console for details.', 'error');
     }
 }
 
@@ -1879,9 +3361,16 @@ function validateProductForm(formData) {
     }
     
     // Validate prices
-    if (formData.price !== null && (isNaN(formData.price) || formData.price < 0)) {
-        showSuccessPopup('Price must be a valid non-negative number.', 'error');
+    if (formData.prices.length === 0) {
+        showSuccessPopup('At least one price must be specified.', 'error');
         return false;
+    }
+    
+    for (let i = 0; i < formData.prices.length; i++) {
+        if (isNaN(formData.prices[i]) || formData.prices[i] < 0) {
+            showSuccessPopup('All prices must be valid non-negative numbers.', 'error');
+            return false;
+        }
     }
     
     return true;
@@ -1892,189 +3381,677 @@ function validateProductForm(formData) {
 // ============================================
 
 function setupEventListeners() {
-    // Sidebar toggle buttons
-    document.getElementById('toggle-sidebar-logo').addEventListener('click', toggleSidebar);
+    console.log('Setting up event listeners...');
     
-    // Close sidebar on mobile when clicking close button
-    document.getElementById('close-sidebar').addEventListener('click', function() {
+    // Sidebar toggle buttons
+    const toggleSidebarLogo = document.getElementById('toggle-sidebar-logo');
+    const closeSidebar = document.getElementById('close-sidebar');
+    const toggleSidebarMobile = document.getElementById('toggle-sidebar-mobile');
+    const toggleSidebarDesktop = document.getElementById('toggle-sidebar-desktop');
+    
+    if (toggleSidebarLogo) toggleSidebarLogo.addEventListener('click', toggleSidebar);
+    if (closeSidebar) closeSidebar.addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
-        sidebar.classList.remove('translate-x-0');
+        if (sidebar) sidebar.classList.remove('translate-x-0');
     });
-
-    // Toggle sidebar for mobile menu button
-    document.getElementById('toggle-sidebar-mobile').addEventListener('click', function() {
+    if (toggleSidebarMobile) toggleSidebarMobile.addEventListener('click', function() {
         const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('translate-x-0');
+        if (sidebar) sidebar.classList.toggle('translate-x-0');
     });
-
-    // Toggle sidebar for desktop
-    document.getElementById('toggle-sidebar-desktop').addEventListener('click', toggleSidebar);
+    if (toggleSidebarDesktop) toggleSidebarDesktop.addEventListener('click', toggleSidebar);
     
     // Modal close buttons
-    document.getElementById('closeDetailModal').addEventListener('click', () => {
-        document.getElementById('productDetailModal').style.display = 'none';
+    const closeDetailModal = document.getElementById('closeDetailModal');
+    const closeEditModal = document.getElementById('closeEditModal');
+    const cancelEdit = document.getElementById('cancelEdit');
+    const closeSuccessPopup = document.getElementById('closeSuccessPopup');
+    
+    if (closeDetailModal) closeDetailModal.addEventListener('click', () => {
+        const modal = document.getElementById('productDetailModal');
+        if (modal) modal.style.display = 'none';
     });
     
-    document.getElementById('closeEditModal').addEventListener('click', () => {
-        document.getElementById('editProductModal').style.display = 'none';
-        document.getElementById('editProductForm').reset();
-        document.getElementById('edit-category').value = '';
-        document.getElementById('edit-type').value = '';
-        document.getElementById('edit-type').disabled = true;
+    if (closeEditModal) closeEditModal.addEventListener('click', () => {
+        const modal = document.getElementById('editProductModal');
+        if (modal) {
+            modal.style.display = 'none';
+            resetEditForm();
+        }
     });
     
-    document.getElementById('cancelEdit').addEventListener('click', () => {
-        document.getElementById('editProductModal').style.display = 'none';
-        document.getElementById('editProductForm').reset();
-        document.getElementById('edit-category').value = '';
-        document.getElementById('edit-type').value = '';
-        document.getElementById('edit-type').disabled = true;
+    if (cancelEdit) cancelEdit.addEventListener('click', () => {
+        const modal = document.getElementById('editProductModal');
+        if (modal) {
+            modal.style.display = 'none';
+            resetEditForm();
+        }
     });
     
-    document.getElementById('closeSuccessPopup').addEventListener('click', () => {
-        document.getElementById('successPopup').style.display = 'none';
+    if (closeSuccessPopup) closeSuccessPopup.addEventListener('click', () => {
+        const popup = document.getElementById('successPopup');
+        if (popup) popup.style.display = 'none';
     });
     
     // Add product button
-    document.getElementById('addProductBtn').addEventListener('click', () => {
-        document.getElementById('editModalTitle').textContent = 'Add New Product';
-        document.getElementById('editProductForm').reset();
-        currentProductId = null;
-        
-        // Reset category/subcategory
-        document.getElementById('edit-category').value = '';
-        document.getElementById('edit-type').value = '';
-        document.getElementById('category-other-container').classList.add('hidden');
-        document.getElementById('type-other-container').classList.add('hidden');
-        document.getElementById('edit-type').disabled = true;
-        
-        // Set default unit
-        document.getElementById('edit-unit').value = 'Tablet Strip';
-        
-        // Hide verification status for new products
-        document.getElementById('verification-status-container').classList.add('hidden');
-        
-        document.getElementById('editProductModal').style.display = 'flex';
-    });
-
-    // Form submissions
-    document.getElementById('editProductForm').addEventListener('submit', handleFormSubmit);
-
-    // Category change handlers
-    document.getElementById('categoryFilter').addEventListener('change', function() {
-        populateSubcategoryDropdown(this.value);
-        applyFilters();
-    });
-
-    document.getElementById('edit-category').addEventListener('change', function() {
-        const otherContainer = document.getElementById('category-other-container');
-        const otherInput = document.getElementById('edit-category-other');
-        
-        if (this.value === 'Other') {
-            otherContainer.classList.remove('hidden');
-            otherInput.required = true;
-        } else {
-            otherContainer.classList.add('hidden');
-            otherInput.required = false;
-            otherInput.value = '';
-        }
-        
-        populateSubcategoryDropdown(this.value);
-    });
-
-    document.getElementById('edit-type').addEventListener('change', function() {
-        const otherContainer = document.getElementById('type-other-container');
-        const otherInput = document.getElementById('edit-type-other');
-        
-        if (this.value === 'Other') {
-            otherContainer.classList.remove('hidden');
-            otherInput.required = true;
-        } else {
-            otherContainer.classList.add('hidden');
-            otherInput.required = false;
-            otherInput.value = '';
-        }
-    });
-
-    // Filters - FIXED: All filters use the same function
-    document.getElementById('subcategoryFilter').addEventListener('change', applyFilters);
-    document.getElementById('prescriptionFilter').addEventListener('change', applyFilters);
-    // document.getElementById('stockFilter').addEventListener('change', applyFilters);
-
-    // Add debugging for stock filter
-document.getElementById('stockFilter').addEventListener('change', function() {
-    console.log('Stock filter changed to:', this.value);
-    console.log('Options:', Array.from(this.options).map(opt => ({value: opt.value, text: opt.text})));
-    applyFilters();
-});
-    document.getElementById('verificationFilter').addEventListener('change', applyFilters);
+    const addProductBtn = document.getElementById('addProductBtn');
+    if (addProductBtn) {
+        addProductBtn.addEventListener('click', () => {
+            openEditModal();  // No parameter for new product
+        });
+    }
     
-    // Search functionality - FIXED
+    // Form submissions
+    const editProductForm = document.getElementById('editProductForm');
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', handleFormSubmit);
+    }
+    
+    // Category change handlers
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', function() {
+            populateSubcategoryDropdown(this.value);
+            applyFilters();
+        });
+    }
+    
+    const editCategory = document.getElementById('edit-category');
+    if (editCategory) {
+        editCategory.addEventListener('change', function() {
+            const otherContainer = document.getElementById('category-other-container');
+            const otherInput = document.getElementById('edit-category-other');
+            
+            if (this.value === 'Other') {
+                if (otherContainer) otherContainer.classList.remove('hidden');
+                if (otherInput) otherInput.required = true;
+            } else {
+                if (otherContainer) otherContainer.classList.add('hidden');
+                if (otherInput) {
+                    otherInput.required = false;
+                    otherInput.value = '';
+                }
+            }
+            
+            populateSubcategoryDropdown(this.value);
+        });
+    }
+    
+    const editType = document.getElementById('edit-type');
+    if (editType) {
+        editType.addEventListener('change', function() {
+            const otherContainer = document.getElementById('type-other-container');
+            const otherInput = document.getElementById('edit-type-other');
+            
+            if (this.value === 'Other') {
+                if (otherContainer) otherContainer.classList.remove('hidden');
+                if (otherInput) otherInput.required = true;
+            } else {
+                if (otherContainer) otherContainer.classList.add('hidden');
+                if (otherInput) {
+                    otherInput.required = false;
+                    otherInput.value = '';
+                }
+            }
+        });
+    }
+    
+    // Filters
+    const subcategoryFilter = document.getElementById('subcategoryFilter');
+    const prescriptionFilter = document.getElementById('prescriptionFilter');
+    const stockFilter = document.getElementById('stockFilter');
+    const verificationFilter = document.getElementById('verificationFilter');
+    
+    if (subcategoryFilter) subcategoryFilter.addEventListener('change', applyFilters);
+    if (prescriptionFilter) prescriptionFilter.addEventListener('change', applyFilters);
+    if (stockFilter) stockFilter.addEventListener('change', applyFilters);
+    if (verificationFilter) verificationFilter.addEventListener('change', applyFilters);
+    
+    // Search functionality
     let searchTimeout;
-    document.getElementById('searchInput').addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            searchTerm = this.value;
-            console.log('Search term updated:', searchTerm);
-            applyAllFilters(); // This will apply all filters including search
-        }, 500);
-    });
-
-    // Clear search button (optional - add if you want)
-    const searchClearBtn = document.createElement('button');
-    searchClearBtn.innerHTML = '<i class="fas fa-times"></i>';
-    searchClearBtn.className = 'absolute right-10 top-3 text-gray-400 hover:text-gray-600 cursor-pointer';
-    searchClearBtn.title = 'Clear search';
-    searchClearBtn.onclick = function() {
-        document.getElementById('searchInput').value = '';
-        searchTerm = '';
-        applyAllFilters();
-    };
-    document.querySelector('#searchInput').parentNode.appendChild(searchClearBtn);
-
-    // Close modals when clicking outside
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                searchTerm = this.value;
+                console.log('Search term updated:', searchTerm);
+                applyAllFilters();
+            }, 500);
+        });
+        
+        // Add clear search button
+        const searchClearBtn = document.createElement('button');
+        searchClearBtn.innerHTML = '<i class="fas fa-times"></i>';
+        searchClearBtn.className = 'absolute right-10 top-3 text-gray-400 hover:text-gray-600 cursor-pointer';
+        searchClearBtn.title = 'Clear search';
+        searchClearBtn.onclick = function() {
+            document.getElementById('searchInput').value = '';
+            searchTerm = '';
+            applyAllFilters();
+        };
+        searchInput.parentNode.appendChild(searchClearBtn);
+    }
+    
+    // ============================================
+    // VERIFICATION MODAL EVENT LISTENERS
+    // ============================================
+    
+    const verificationModal = document.getElementById('verificationModal');
+    const cancelVerificationBtn = document.getElementById('cancelVerification');
+    const submitVerificationBtn = document.getElementById('submitVerification');
+    const actionRadios = document.querySelectorAll('input[name="verificationAction"]');
+    
+    // Close verification modal when clicking outside
+    if (verificationModal) {
+        verificationModal.addEventListener('click', function(e) {
+            if (e.target === verificationModal) {
+                closeVerificationModal();
+            }
+        });
+    }
+    
+    // Cancel verification button
+    if (cancelVerificationBtn) {
+        cancelVerificationBtn.addEventListener('click', closeVerificationModal);
+    }
+    
+    // Submit verification button
+    if (submitVerificationBtn) {
+        submitVerificationBtn.addEventListener('click', submitVerification);
+    }
+    
+    // Radio button changes - enable/disable submit button
+    if (actionRadios.length > 0) {
+        actionRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                updateVerificationSubmitButton();
+            });
+        });
+    }
+    
+    // Close modals when clicking outside (updated with verification modal)
     window.addEventListener('click', (e) => {
-        const modals = ['productDetailModal', 'editProductModal', 'successPopup'];
+        const modals = ['productDetailModal', 'editProductModal', 'successPopup', 'verificationModal'];
         modals.forEach(modalId => {
             const modal = document.getElementById(modalId);
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                if (modalId === 'editProductModal') {
-                    document.getElementById('editProductForm').reset();
-                    document.getElementById('edit-category').value = '';
-                    document.getElementById('edit-type').value = '';
-                    document.getElementById('edit-type').disabled = true;
+            if (modal && e.target === modal) {
+                if (modalId === 'verificationModal') {
+                    closeVerificationModal();
+                } else if (modalId === 'editProductModal') {
+                    modal.style.display = 'none';
+                    resetEditForm();
+                } else {
+                    modal.style.display = 'none';
                 }
             }
         });
     });
-
-    // Logout Modal
+    
+    // Keyboard shortcuts for verification modal
+    document.addEventListener('keydown', function(e) {
+        const modal = document.getElementById('verificationModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            if (e.key === 'Enter') {
+                const submitBtn = document.getElementById('submitVerification');
+                if (submitBtn && !submitBtn.disabled) {
+                    submitVerification();
+                }
+            } else if (e.key === 'Escape') {
+                closeVerificationModal();
+            }
+        }
+    });
+    
+    // ============================================
+    // LOGOUT MODAL EVENT LISTENERS
+    // ============================================
+    
     const logoutBtn = document.getElementById('logoutBtn');
     const logoutModal = document.getElementById('logoutModal');
     const confirmLogout = document.getElementById('confirmLogout');
     const cancelLogout = document.getElementById('cancelLogout');
     const closeLogoutModal = document.getElementById('closeLogoutModal');
-
-    logoutBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        logoutModal.classList.remove('hidden');
-    });
-
-    function closeLogout() {
-        logoutModal.classList.add('hidden');
+    
+    if (logoutBtn && logoutModal) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logoutModal.classList.remove('hidden');
+        });
     }
+    
+    function closeLogout() {
+        if (logoutModal) logoutModal.classList.add('hidden');
+    }
+    
+    if (cancelLogout) cancelLogout.addEventListener('click', closeLogout);
+    if (closeLogoutModal) closeLogoutModal.addEventListener('click', closeLogout);
+    if (logoutModal) {
+        logoutModal.addEventListener('click', (e) => {
+            if (e.target === logoutModal) closeLogout();
+        });
+    }
+    
+    if (confirmLogout) {
+        confirmLogout.addEventListener('click', () => {
+            window.location.href = '../Login/login.html';
+        });
+    }
+    
+    console.log('Event listeners setup complete including verification modal');
+}
 
-    cancelLogout.addEventListener('click', closeLogout);
-    closeLogoutModal.addEventListener('click', closeLogout);
-    logoutModal.addEventListener('click', (e) => {
-        if (e.target === logoutModal) closeLogout();
+// Helper function to reset edit form
+function resetEditForm() {
+    const editForm = document.getElementById('editProductForm');
+    if (editForm) editForm.reset();
+    
+    const editCategory = document.getElementById('edit-category');
+    const editType = document.getElementById('edit-type');
+    
+    if (editCategory) editCategory.value = '';
+    if (editType) {
+        editType.value = '';
+        editType.disabled = true;
+    }
+    
+    // Reset other containers
+    const categoryOtherContainer = document.getElementById('category-other-container');
+    const typeOtherContainer = document.getElementById('type-other-container');
+    
+    if (categoryOtherContainer) categoryOtherContainer.classList.add('hidden');
+    if (typeOtherContainer) typeOtherContainer.classList.add('hidden');
+    
+    // Reset price type to single
+    const priceTypeSelect = document.getElementById('edit-price-type');
+    if (priceTypeSelect) {
+        priceTypeSelect.value = 'single';
+        // Trigger the change event to update UI
+        priceTypeSelect.dispatchEvent(new Event('change'));
+    }
+    
+    // Clear dynamic fields safely
+    const dynamicFields = ['edit-strength', 'edit-form', 'edit-dosage', 'edit-directions', 'edit-sizes'];
+    dynamicFields.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.value = '';
     });
-
-    confirmLogout.addEventListener('click', () => {
-        window.location.href = '../Login/login.html';
+    
+    // Clear image inputs safely
+    const imageInputs = ['edit-main-image', 'edit-image1', 'edit-image2', 'edit-image3', 'edit-image4'];
+    imageInputs.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.value = '';
+    });
+    
+    // Clear price items container safely
+    const priceItemsContainer = document.querySelector('.price-items-container');
+    if (priceItemsContainer) {
+        // Keep only the first row (template row)
+        const rows = priceItemsContainer.querySelectorAll('.price-item-row');
+        rows.forEach((row, index) => {
+            if (index > 0) {
+                row.remove();
+            }
+        });
+        
+        // Clear inputs in the first row
+        const firstRow = priceItemsContainer.querySelector('.price-item-row');
+        if (firstRow) {
+            const inputs = firstRow.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.value = '';
+            });
+        }
+    }
+    
+    // Clear optional single price fields
+    const priceFields = ['edit-price', 'edit-mrp', 'edit-old-price'];
+    priceFields.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.value = '';
     });
 }
+
+// Update your existing openEditModal function (around line 408)
+function openEditModal(product = null) {
+    console.log('Opening edit modal...');
+    
+    try {
+        const editProductModal = document.getElementById('editProductModal');
+        const modalTitle = document.getElementById('editModalTitle');
+        
+        // CRITICAL: Check if modal exists
+        if (!editProductModal) {
+            console.error('❌ Edit modal not found in DOM!');
+            showSuccessPopup('Error: Edit form not available', 'error');
+            return;
+        }
+        
+        if (!modalTitle) {
+            console.error('❌ Modal title not found!');
+        }
+        
+        // Show modal FIRST so elements are in DOM
+        editProductModal.style.display = 'flex';
+        
+        if (product && product.productId) {
+            // EDIT MODE
+            modalTitle.textContent = 'Edit Product';
+            currentProductId = product.productId;
+            
+            console.log('✅ Loading product data for editing:', product.productName);
+            console.log('📊 Product data:', product);
+            
+            // Reset form
+            resetEditForm();
+            
+            // Wait for modal to be fully rendered and form reset
+            setTimeout(() => {
+                try {
+                    // SAFE: Function to set value only if element exists
+                    function safeSetValue(elementId, value) {
+                        try {
+                            const element = document.getElementById(elementId);
+                            if (element) {
+                                element.value = value;
+                                console.log(`✅ Set ${elementId} = "${value}"`);
+                                return true;
+                            } else {
+                                console.warn(`⚠️ Element "${elementId}" not found in DOM`);
+                                return false;
+                            }
+                        } catch (error) {
+                            console.error(`❌ Error setting ${elementId}:`, error);
+                            return false;
+                        }
+                    }
+                    
+                    // BASIC FIELDS - Only set what definitely exists
+                    const basicFields = [
+                        { id: 'edit-sku', value: product.sku || '' },
+                        { id: 'edit-name', value: product.productName || '' },
+                        { id: 'edit-brand', value: product.brandName || '' },
+                        { id: 'edit-prescription', value: product.prescriptionRequired ? 'Yes' : 'No' },
+                        { id: 'edit-status', value: product.productStatus || 'Available' },
+                        { id: 'edit-quantity', value: product.productQuantity || 0 },
+                        { id: 'edit-rating', value: product.rating || 0 },
+                        { id: 'edit-batch', value: product.batchNo || '' }
+                    ];
+                    
+                    // Set basic fields
+                    basicFields.forEach(field => safeSetValue(field.id, field.value));
+                    
+                    // Handle dates
+                    const mfgDate = product.mfgDate ? product.mfgDate.split('T')[0] : '';
+                    const expDate = product.expDate ? product.expDate.split('T')[0] : '';
+                    safeSetValue('edit-mfg-date', mfgDate);
+                    safeSetValue('edit-expiry', expDate);
+                    
+                    // Text areas and optional fields
+                    safeSetValue('edit-description', product.productDescription || '');
+                    safeSetValue('edit-benefits', (product.benefitsList || []).join('\n'));
+                    safeSetValue('edit-ingredients', (product.ingredientsList || []).join(', '));
+                    
+                    // Optional: directions field
+                    const directionsElement = document.getElementById('edit-directions');
+                    if (directionsElement) {
+                        directionsElement.value = (product.directionsList || []).join('\n');
+                    }
+                    
+                    // Dynamic fields
+                    if (product.productDynamicFields) {
+                        safeSetValue('edit-strength', product.productDynamicFields.strength || '');
+                        safeSetValue('edit-form', product.productDynamicFields.form || '');
+                        safeSetValue('edit-dosage', product.productDynamicFields.dosage || '');
+                    }
+                    
+                    // Handle category
+                    const categorySelect = document.getElementById('edit-category');
+                    if (categorySelect) {
+                        if (product.productCategory && allCategories.includes(product.productCategory)) {
+                            categorySelect.value = product.productCategory;
+                            console.log(`✅ Set category: ${product.productCategory}`);
+                        } else if (product.productCategory) {
+                            categorySelect.value = 'Other';
+                            const categoryOtherInput = document.getElementById('edit-category-other');
+                            if (categoryOtherInput) {
+                                categoryOtherInput.value = product.productCategory;
+                                categoryOtherInput.required = true;
+                                const categoryOtherContainer = document.getElementById('category-other-container');
+                                if (categoryOtherContainer) {
+                                    categoryOtherContainer.classList.remove('hidden');
+                                }
+                            }
+                        }
+                        
+                        // Enable subcategory dropdown
+                        populateSubcategoryDropdown(categorySelect.value);
+                    }
+                    
+                    // Handle subcategory
+                    const typeSelect = document.getElementById('edit-type');
+                    if (typeSelect && product.productSubCategory) {
+                        if (allSubcategories.includes(product.productSubCategory)) {
+                            typeSelect.value = product.productSubCategory;
+                            console.log(`✅ Set subcategory: ${product.productSubCategory}`);
+                        } else {
+                            typeSelect.value = 'Other';
+                            const typeOtherInput = document.getElementById('edit-type-other');
+                            if (typeOtherInput) {
+                                typeOtherInput.value = product.productSubCategory;
+                                typeOtherInput.required = true;
+                                const typeOtherContainer = document.getElementById('type-other-container');
+                                if (typeOtherContainer) {
+                                    typeOtherContainer.classList.remove('hidden');
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Handle pricing - SIMPLIFIED
+                    const sizes = product.productSizes || [];
+                    const prices = product.productPrice || [];
+                    const oldPrices = product.productOldPrice || [];
+                    
+                    console.log('💰 Pricing data:', { sizes, prices, oldPrices });
+                    
+                    // Check if we should use multiple prices
+                    const shouldUseMultiplePrices = 
+                        (prices && Array.isArray(prices) && prices.length > 1) ||
+                        (sizes && sizes.length > 1);
+                    
+                    const priceTypeSelect = document.getElementById('edit-price-type');
+                    if (priceTypeSelect) {
+                        if (shouldUseMultiplePrices) {
+                            priceTypeSelect.value = 'multiple';
+                            console.log('💰 Using multiple price mode');
+                            
+                            // Wait for UI to update, then populate price data
+                            setTimeout(() => {
+                                const priceList = sizes.map((size, index) => ({
+                                    variant: size,
+                                    price: prices[index] || 0,
+                                    originalPrice: oldPrices[index] || 0
+                                }));
+                                
+                                populatePriceData(priceList, prices[0], oldPrices[0]);
+                            }, 200);
+                        } else {
+                            priceTypeSelect.value = 'single';
+                            console.log('💰 Using single price mode');
+                            
+                            // Set single price
+                            safeSetValue('edit-price', prices && prices.length > 0 ? prices[0] : '');
+                            safeSetValue('edit-old-price', oldPrices && oldPrices.length > 0 ? oldPrices[0] : '');
+                        }
+                        
+                        // Trigger change event
+                        setTimeout(() => {
+                            priceTypeSelect.dispatchEvent(new Event('change'));
+                        }, 100);
+                    }
+                    
+                    // Handle sizes
+                    const sizesElement = document.getElementById('edit-sizes');
+                    if (sizesElement) {
+                        sizesElement.value = sizes.join(', ');
+                    }
+                    
+                    // Verification status
+                    const verificationStatusSelect = document.getElementById('edit-verification-status');
+                    if (verificationStatusSelect) {
+                        verificationStatusSelect.value = product.verificationStatus || 'PENDING';
+                        const verificationContainer = document.getElementById('verification-status-container');
+                        if (verificationContainer) {
+                            verificationContainer.classList.remove('hidden');
+                        }
+                    }
+                    
+                    // Clear image placeholders
+                    const mainImageInput = document.getElementById('edit-main-image');
+                    if (mainImageInput && product.productMainImage) {
+                        mainImageInput.placeholder = 'Current image exists. Click to replace';
+                    }
+                    
+                    console.log('✅ Product data loaded into form successfully');
+                    
+                } catch (innerError) {
+                    console.error('❌ Error loading product data:', innerError);
+                    showSuccessPopup('Error loading product data: ' + innerError.message, 'error');
+                }
+            }, 300); // Wait for modal animation
+        } else {
+            // ADD NEW PRODUCT MODE
+            modalTitle.textContent = 'Add New Product';
+            currentProductId = null;
+            
+            // Reset form
+            setTimeout(() => {
+                resetEditForm();
+                
+                // Hide verification status for new products
+                const verificationContainer = document.getElementById('verification-status-container');
+                if (verificationContainer) {
+                    verificationContainer.classList.add('hidden');
+                }
+            }, 100);
+        }
+        
+        // Setup price management
+        setTimeout(() => {
+            try {
+                setupPriceManagement();
+            } catch (priceError) {
+                console.warn('Price management setup had issues:', priceError);
+            }
+        }, 400);
+        
+    } catch (outerError) {
+        console.error('❌ CRITICAL ERROR in openEditModal:', outerError);
+        console.error('Error stack:', outerError.stack);
+        showSuccessPopup('Critical error opening edit form. Please refresh page.', 'error');
+    }
+}
+
+// SIMPLIFIED resetEditForm - Remove all problematic references
+function resetEditForm() {
+    console.log('🔄 Resetting edit form...');
+    
+    try {
+        // Get the form
+        const editForm = document.getElementById('editProductForm');
+        if (editForm) {
+            editForm.reset();
+        }
+        
+        // Reset category dropdowns safely
+        const categorySelect = document.getElementById('edit-category');
+        const typeSelect = document.getElementById('edit-type');
+        
+        if (categorySelect) categorySelect.value = '';
+        if (typeSelect) {
+            typeSelect.value = '';
+            typeSelect.disabled = true;
+        }
+        
+        // Hide "other" containers
+        const containers = ['category-other-container', 'type-other-container'];
+        containers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.classList.add('hidden');
+            }
+        });
+        
+        // Clear "other" inputs
+        const otherInputs = ['edit-category-other', 'edit-type-other'];
+        otherInputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.value = '';
+                input.required = false;
+            }
+        });
+        
+        // Reset price type
+        const priceTypeSelect = document.getElementById('edit-price-type');
+        if (priceTypeSelect) {
+            priceTypeSelect.value = 'single';
+        }
+        
+        // Clear single price fields
+        const priceFields = ['edit-price', 'edit-old-price'];
+        priceFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) field.value = '';
+        });
+        
+        // Clear text areas
+        const textAreas = [
+            'edit-description', 'edit-benefits', 'edit-ingredients', 
+            'edit-directions', 'edit-strength', 'edit-form', 'edit-dosage', 'edit-sizes'
+        ];
+        
+        textAreas.forEach(textAreaId => {
+            const textArea = document.getElementById(textAreaId);
+            if (textArea) textArea.value = '';
+        });
+        
+        // Clear image inputs
+        for (let i = 1; i <= 4; i++) {
+            const imageInput = document.getElementById(`edit-image${i}`);
+            if (imageInput) imageInput.value = '';
+        }
+        
+        const mainImageInput = document.getElementById('edit-main-image');
+        if (mainImageInput) {
+            mainImageInput.value = '';
+            mainImageInput.placeholder = '';
+        }
+        
+        console.log('✅ Form reset complete');
+        
+    } catch (error) {
+        console.error('❌ Error resetting form:', error);
+    }
+}
+    
+    // Show the modal
+    const modal = document.getElementById('editProductModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Setup price management AFTER modal is visible
+        setTimeout(() => {
+            setupPriceManagement();
+            
+            // Also populate categories and subcategories
+            // loadCategories();
+            // loadSubcategories('edit-category', 'edit-type');
+              allCategories();
+            allSubcategories('edit-category', 'edit-type');
+        }, 100);
+    }
 
 // ============================================
 // HELPER FUNCTIONS
@@ -2242,3 +4219,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         showSuccessPopup('Error loading data from server. Please check your connection.', 'error');
     }
 });
+
+// Make removePriceItem globally available for inline onclick
+window.removePriceItem = removePriceItem;
